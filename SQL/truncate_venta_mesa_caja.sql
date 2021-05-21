@@ -1,0 +1,12 @@
+truncate caja_cierre;
+truncate caja_detalle;
+truncate factura;
+truncate item_caja_cierre;
+truncate item_compra_insumo;
+truncate item_factura;
+truncate item_venta;
+truncate itemven_insumo;
+truncate venta;
+truncate venta_mesa;
+truncate item_venta_mesa;
+truncate item_venta_mesa_venta;
