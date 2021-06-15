@@ -31,7 +31,7 @@ public class FrmBackup extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("BACKUP");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         boton_guardar();
     }
 

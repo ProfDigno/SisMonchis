@@ -48,7 +48,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
      */
     private void abrir_formulario_cliente() {
         this.setTitle("CLIENTE");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         reestableser_cliente();
         color_formulario();
         cdao.actualizar_tabla_cliente(conn, tblpro_cliente);

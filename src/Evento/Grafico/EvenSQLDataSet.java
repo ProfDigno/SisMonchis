@@ -220,7 +220,7 @@ public class EvenSQLDataSet {
                 + "WHEN date_part('dow', fecha_emision)=5 THEN 'VIERNES' \n"
                 + "WHEN date_part('dow', fecha_emision)=6 THEN 'SABADO' \n"
                 + "ELSE 'sin dia' END as dia,\n"
-                + "sum(monto_venta) as total\n"
+                + "sum(monto_venta_efectivo+monto_venta_tarjeta) as total\n"
                 + "from venta \n"
                 + "where estado='EMITIDO'\n"
                 + "and date_part('week', fecha_emision)>=(date_part('week', date('now()'))-4) \n"

@@ -51,7 +51,7 @@ public class FrmRepInventarioValorizadoCompra extends javax.swing.JInternalFrame
 
     void abrir_formulario() {
         this.setTitle("REPORTE INVENTARIO VALORIZADO POR VENTA");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         color_formulario();
         reestableser();
     }

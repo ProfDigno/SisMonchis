@@ -34,7 +34,7 @@ public class FrmZonaDelivery extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("ZONA DELIVERY");
-        evetbl.centrar_formulario(this);        
+        evetbl.centrar_formulario_internalframa(this);        
         reestableser();
         zdao.actualizar_tabla_zona_delivery(conn, tblzona_delivery);
         color_formulario();

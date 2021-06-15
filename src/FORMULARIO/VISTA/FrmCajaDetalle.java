@@ -60,72 +60,100 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     EvenJTextField evejtf = new EvenJTextField();
 //    ConnPostgres_SER conPsSER = new ConnPostgres_SER();
     EvenMensajeJoptionpane evemen = new EvenMensajeJoptionpane();
-    DAO_caja_detalle cdao=new DAO_caja_detalle();
-    PosImprimir_Venta posven=new PosImprimir_Venta();
-    PosImprimir_Gasto posgas=new PosImprimir_Gasto();
-    PosImprimir_Vale posval=new PosImprimir_Vale();
+    DAO_caja_detalle cdao = new DAO_caja_detalle();
+    PosImprimir_Venta posven = new PosImprimir_Venta();
+    PosImprimir_Gasto posgas = new PosImprimir_Gasto();
+    PosImprimir_Vale posval = new PosImprimir_Vale();
     PosImprimir_Compra poscomp = new PosImprimir_Compra();
     ConnPostgres cpt = new ConnPostgres();
-    cla_color_pelete clacolor= new cla_color_pelete();
+    cla_color_pelete clacolor = new cla_color_pelete();
+
     void abrir() {
         conn = cpt.getConnPosgres();
         this.setTitle("CAJA DETALLE");
         cdao.actualizar_tabla_caja_detalle(conn, tblcaja_resumen);
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         color_formulario();
     }
-    void color_formulario(){
+
+    void color_formulario() {
         panel_principal.setBackground(clacolor.getColor_insertar_primario());
         panel_venta.setBackground(clacolor.getColor_insertar_secundario());
         panel_compra.setBackground(clacolor.getColor_insertar_secundario());
         panel_gasto.setBackground(clacolor.getColor_insertar_secundario());
         panel_vale.setBackground(clacolor.getColor_insertar_secundario());
     }
-    void seleccionar_caja_detalle(){
-        if(!evejt.getBoolean_validar_select(tblcaja_resumen)){
-            fecha_emision = evejt.getString_select(tblcaja_resumen,0);
-            actualizar_caja_detalle_otros(fecha_emision, "VENTA_EFECTIVO", "c.monto_venta_efectivo", tblcaja_venta_efectivo,txtcantidad_venta_efectivo,jFtotal_venta_efectivo);
-            actualizar_caja_detalle_otros(fecha_emision, "VENTA_TARJETA", "c.monto_venta_tarjeta", tblcaja_venta_tarjeta,txtcantidad_venta_tarjeta,jFtotal_venta_tarjeta);
-            actualizar_caja_detalle_otros(fecha_emision, "VALE", "c.monto_vale", tblcaja_vale,txtcantidad_vale,jFtotal_vale);
-            actualizar_caja_detalle_otros(fecha_emision, "GASTO", "c.monto_gasto", tblcaja_gasto,txtcantidad_gasto,jFtotal_gasto);
-            actualizar_caja_detalle_otros(fecha_emision, "COMPRA", "c.monto_compra", tblcaja_compra,txtcantidad_compra,jFtotal_compra);
+
+    void seleccionar_caja_detalle() {
+        if (!evejt.getBoolean_validar_select(tblcaja_resumen)) {
+            fecha_emision = evejt.getString_select(tblcaja_resumen, 0);
+            actualizar_caja_detalle_venta(fecha_emision, tblcaja_venta, txtcantidad_venta_efectivo, jFtotal_venta_efectivo);
+//            actualizar_caja_detalle_otros(fecha_emision, "VENTA_EFECTIVO", "c.monto_venta_efectivo", tblcaja_venta_efectivo,txtcantidad_venta_efectivo,jFtotal_venta_efectivo);
+//            actualizar_caja_detalle_otros(fecha_emision, "VENTA_TARJETA", "c.monto_venta_tarjeta", tblcaja_venta_tarjeta,txtcantidad_venta_tarjeta,jFtotal_venta_tarjeta);
+            actualizar_caja_detalle_otros(fecha_emision, "VALE", "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
+            actualizar_caja_detalle_otros(fecha_emision, "GASTO", "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
+            actualizar_caja_detalle_otros(fecha_emision, "COMPRA", "c.monto_compra", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
             caja_detalle_saldo(fecha_emision);
         }        
     }
-
-    void actualizar_caja_detalle_otros(String fecha_emision, String origen_tabla, String campo_total, JTable tabla,JTextField txtcantidad,JFormattedTextField jftotal) {
+    
+    void actualizar_caja_detalle_otros(String fecha_emision, String origen_tabla, String campo_total, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
         String sql = "select c.id_origen,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
-                + "TRIM(to_char("+campo_total+",'999G999G999')) as monto,estado \n"
+                + "TRIM(to_char(" + campo_total + ",'999G999G999')) as monto,estado \n"
                 + " from caja_detalle c \n"
-                + "where date(c.fecha_emision)='"+fecha_emision+"'\n"
-                + "and c.tabla_origen='"+origen_tabla+"'\n"
+                + "where date(c.fecha_emision)='" + fecha_emision + "'\n"
+                + "and c.tabla_origen='" + origen_tabla + "'\n"
                 + "order by 1 desc";
         eveconn.Select_cargar_jtable(conn, sql, tabla);
         caja_detalle_cantidad_total(fecha_emision, origen_tabla, campo_total, txtcantidad, jftotal);
         anchotabla_caja_detalle_otros(tabla);
         
     }
+
+    void actualizar_caja_detalle_venta(String fecha_emision, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
+        String sql = "select c.id_origen,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
+                + "TRIM(to_char(c.monto_venta_efectivo,'999G999G999')) as v_efectivo,"
+                + "TRIM(to_char(c.monto_venta_tarjeta,'999G999G999')) as v_tarjeta,"
+                + "c.tabla_origen as origen,"
+                + "estado \n"
+                + " from caja_detalle c \n"
+                + "where date(c.fecha_emision)='" + fecha_emision + "'\n"
+                + "and c.tabla_origen ilike'%VENTA%'\n"
+                + "order by 1 desc";
+        eveconn.Select_cargar_jtable(conn, sql, tabla);
+//        caja_detalle_cantidad_total(fecha_emision, origen_tabla, campo_total, txtcantidad, jftotal);
+//        anchotabla_caja_detalle_otros(tabla);
+        anchotabla_caja_detalle_venta(tabla);
+        
+    }
+
     void anchotabla_caja_detalle_otros(JTable tabla) {
-        int Ancho[] = {8,17,52, 10,13};
+        int Ancho[] = {8, 17, 52, 10, 13};
         evejt.setAnchoColumnaJtable(tabla, Ancho);
     }
+
+    void anchotabla_caja_detalle_venta(JTable tabla) {
+        int Ancho[] = {7, 15, 38, 9,9,14,8};
+        evejt.setAnchoColumnaJtable(tabla, Ancho);
+    }
+
     void caja_detalle_saldo(String fecha_emision) {
-        String titulo="caja_detalle_saldo";
+        String titulo = "caja_detalle_saldo";
         String sql = "select sum(monto_venta_efectivo+monto_venta_tarjeta) as ingreso,sum(monto_compra+monto_gasto+monto_vale) as egreso, \n"
                 + "sum((monto_venta_efectivo+monto_venta_tarjeta)-(monto_compra+monto_gasto+monto_vale)) as saldo\n"
-                + "from caja_detalle where date(fecha_emision)='"+fecha_emision+"'";
+                + "from caja_detalle where date(fecha_emision)='" + fecha_emision + "'";
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
             if (rs.next()) {
-                int ingreso=rs.getInt("ingreso");
-                int egreso=rs.getInt("egreso");
-                int saldo=rs.getInt("saldo");
+                int ingreso = rs.getInt("ingreso");
+                int egreso = rs.getInt("egreso");
+                int saldo = rs.getInt("saldo");
                 jFcaja_ingreso.setValue(ingreso);
                 jFcaja_egreso.setValue(egreso);
                 jFcaja_saldo.setValue(saldo);
-                if(saldo<0){
+                if (saldo < 0) {
                     jFcaja_saldo.setBackground(Color.YELLOW);
-                }else{
+                } else {
                     jFcaja_saldo.setBackground(Color.WHITE);
                 }
             }
@@ -133,24 +161,26 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
             evemen.mensaje_error(e, sql, titulo);
         }
     }
-    void caja_detalle_cantidad_total(String fecha_emision, String origen_tabla, String campo_total,JTextField txtcantidad,JFormattedTextField jftotal) {
-        String titulo="caja_detalle_cantidad_total";
-        String sql = "select count(*) as cantidad,sum("+campo_total+") as total\n"
+
+    void caja_detalle_cantidad_total(String fecha_emision, String origen_tabla, String campo_total, JTextField txtcantidad, JFormattedTextField jftotal) {
+        String titulo = "caja_detalle_cantidad_total";
+        String sql = "select count(*) as cantidad,sum(" + campo_total + ") as total\n"
                 + " from caja_detalle c \n"
-                + "where date(c.fecha_emision)='"+fecha_emision+"'\n"
-                + "and c.tabla_origen='"+origen_tabla+"'";
+                + "where date(c.fecha_emision)='" + fecha_emision + "'\n"
+                + "and c.tabla_origen='" + origen_tabla + "'";
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
             if (rs.next()) {
-                String cantidad=rs.getString("cantidad");
+                String cantidad = rs.getString("cantidad");
                 txtcantidad.setText(cantidad);
-                int total=rs.getInt("total");
+                int total = rs.getInt("total");
                 jftotal.setValue(total);
             }
         } catch (SQLException e) {
             evemen.mensaje_error(e, sql, titulo);
         }
     }
+
     public FrmCajaDetalle() {
         initComponents();
         abrir();
@@ -178,21 +208,12 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         jFcaja_saldo = new javax.swing.JFormattedTextField();
         panel_venta = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblcaja_venta_efectivo = new javax.swing.JTable();
+        tblcaja_venta = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         txtcantidad_venta_efectivo = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jFtotal_venta_efectivo = new javax.swing.JFormattedTextField();
         btnimprimir_venta = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        panel_venta1 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        tblcaja_venta_tarjeta = new javax.swing.JTable();
-        jLabel5 = new javax.swing.JLabel();
-        txtcantidad_venta_tarjeta = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        jFtotal_venta_tarjeta = new javax.swing.JFormattedTextField();
-        btnimprimir_venta_tarjeta = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         panel_compra = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
@@ -317,7 +338,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         panel_venta.setBackground(new java.awt.Color(204, 204, 255));
         panel_venta.setBorder(javax.swing.BorderFactory.createTitledBorder("CAJA VENTA"));
 
-        tblcaja_venta_efectivo.setModel(new javax.swing.table.DefaultTableModel(
+        tblcaja_venta.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -328,7 +349,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(tblcaja_venta_efectivo);
+        jScrollPane2.setViewportView(tblcaja_venta);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("CANTIDAD:");
@@ -379,91 +400,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
                     .addComponent(btnimprimir_venta, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        jTabbedPane1.addTab("VENTA-(EFECTIVO)", panel_venta);
-
-        panel_venta1.setBackground(new java.awt.Color(204, 204, 255));
-        panel_venta1.setBorder(javax.swing.BorderFactory.createTitledBorder("CAJA VENTA"));
-
-        tblcaja_venta_tarjeta.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane4.setViewportView(tblcaja_venta_tarjeta);
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel5.setText("CANTIDAD:");
-
-        txtcantidad_venta_tarjeta.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel6.setText("TOTAL:");
-
-        jFtotal_venta_tarjeta.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
-        jFtotal_venta_tarjeta.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jFtotal_venta_tarjeta.setText("0");
-        jFtotal_venta_tarjeta.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-
-        btnimprimir_venta_tarjeta.setText("IMPRIMIR TICKET VENTA");
-        btnimprimir_venta_tarjeta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnimprimir_venta_tarjetaActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panel_venta1Layout = new javax.swing.GroupLayout(panel_venta1);
-        panel_venta1.setLayout(panel_venta1Layout);
-        panel_venta1Layout.setHorizontalGroup(
-            panel_venta1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4)
-            .addGroup(panel_venta1Layout.createSequentialGroup()
-                .addComponent(btnimprimir_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtcantidad_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
-                .addComponent(jFtotal_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        panel_venta1Layout.setVerticalGroup(
-            panel_venta1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_venta1Layout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_venta1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel5)
-                    .addComponent(txtcantidad_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6)
-                    .addComponent(jFtotal_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnimprimir_venta_tarjeta, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        );
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 944, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(panel_venta1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 518, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addComponent(panel_venta1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 1, Short.MAX_VALUE)))
-        );
-
-        jTabbedPane1.addTab("VENTA-(TARJETA)", jPanel1);
+        jTabbedPane1.addTab("VENTA", panel_venta);
 
         panel_compra.setBackground(new java.awt.Color(204, 204, 255));
         panel_compra.setBorder(javax.swing.BorderFactory.createTitledBorder("CAJA_COMPRA"));
@@ -719,7 +656,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
 
         pack();
@@ -737,43 +674,35 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
 
     private void btnimprimir_ventaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_ventaActionPerformed
         // TODO add your handling code here:
-        if(!evejt.getBoolean_validar_select(tblcaja_venta_efectivo)){
-            int idventa=evejt.getInt_select_id(tblcaja_venta_efectivo);
+        if (!evejt.getBoolean_validar_select(tblcaja_venta)) {
+            int idventa = evejt.getInt_select_id(tblcaja_venta);
             posven.boton_imprimir_pos_VENTA(conn, idventa);
         }
     }//GEN-LAST:event_btnimprimir_ventaActionPerformed
 
     private void btnimprimir_valeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_valeActionPerformed
         // TODO add your handling code here:
-        if(!evejt.getBoolean_validar_select(tblcaja_vale)){
-            int idvale=evejt.getInt_select_id(tblcaja_vale);
+        if (!evejt.getBoolean_validar_select(tblcaja_vale)) {
+            int idvale = evejt.getInt_select_id(tblcaja_vale);
             posval.boton_imprimir_pos_VALE(conn, idvale);
         }
     }//GEN-LAST:event_btnimprimir_valeActionPerformed
 
     private void btnimprimir_GASTOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_GASTOActionPerformed
         // TODO add your handling code here:
-        if(!evejt.getBoolean_validar_select(tblcaja_gasto)){
-            int idgasto=evejt.getInt_select_id(tblcaja_gasto);
+        if (!evejt.getBoolean_validar_select(tblcaja_gasto)) {
+            int idgasto = evejt.getInt_select_id(tblcaja_gasto);
             posgas.boton_imprimir_pos_GASTO(conn, idgasto);
         }
     }//GEN-LAST:event_btnimprimir_GASTOActionPerformed
 
     private void btnimprimir_compraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_compraActionPerformed
         // TODO add your handling code here:
-        if(!evejt.getBoolean_validar_select(tblcaja_compra)){
-            int idcompra=evejt.getInt_select_id(tblcaja_compra);
+        if (!evejt.getBoolean_validar_select(tblcaja_compra)) {
+            int idcompra = evejt.getInt_select_id(tblcaja_compra);
             poscomp.boton_imprimir_pos_compra(conn, idcompra);
         }
     }//GEN-LAST:event_btnimprimir_compraActionPerformed
-
-    private void btnimprimir_venta_tarjetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_venta_tarjetaActionPerformed
-        // TODO add your handling code here:
-        if(!evejt.getBoolean_validar_select(tblcaja_venta_tarjeta)){
-            int idventa=evejt.getInt_select_id(tblcaja_venta_tarjeta);
-            posven.boton_imprimir_pos_VENTA(conn, idventa);
-        }
-    }//GEN-LAST:event_btnimprimir_venta_tarjetaActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -782,7 +711,6 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnimprimir_compra;
     private javax.swing.JButton btnimprimir_vale;
     private javax.swing.JButton btnimprimir_venta;
-    private javax.swing.JButton btnimprimir_venta_tarjeta;
     private javax.swing.JFormattedTextField jFcaja_egreso;
     private javax.swing.JFormattedTextField jFcaja_ingreso;
     private javax.swing.JFormattedTextField jFcaja_saldo;
@@ -790,7 +718,6 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField jFtotal_gasto;
     private javax.swing.JFormattedTextField jFtotal_vale;
     private javax.swing.JFormattedTextField jFtotal_venta_efectivo;
-    private javax.swing.JFormattedTextField jFtotal_venta_tarjeta;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -799,19 +726,15 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -820,17 +743,14 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panel_principal;
     private javax.swing.JPanel panel_vale;
     private javax.swing.JPanel panel_venta;
-    private javax.swing.JPanel panel_venta1;
     private javax.swing.JTable tblcaja_compra;
     private javax.swing.JTable tblcaja_gasto;
     private javax.swing.JTable tblcaja_resumen;
     private javax.swing.JTable tblcaja_vale;
-    private javax.swing.JTable tblcaja_venta_efectivo;
-    private javax.swing.JTable tblcaja_venta_tarjeta;
+    private javax.swing.JTable tblcaja_venta;
     private javax.swing.JTextField txtcantidad_compra;
     private javax.swing.JTextField txtcantidad_gasto;
     private javax.swing.JTextField txtcantidad_vale;
     private javax.swing.JTextField txtcantidad_venta_efectivo;
-    private javax.swing.JTextField txtcantidad_venta_tarjeta;
     // End of variables declaration//GEN-END:variables
 }

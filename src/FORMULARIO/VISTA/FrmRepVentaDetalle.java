@@ -39,7 +39,7 @@ public class FrmRepVentaDetalle extends javax.swing.JInternalFrame {
 
     void abrir_formulario() {
         this.setTitle("REPORTE VENTA DETALLE");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         reestableser();
     }
 

@@ -33,7 +33,7 @@ public class FrmGasto_tipo extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("GASTO TIPO");
-        evetbl.centrar_formulario(this);        
+        evetbl.centrar_formulario_internalframa(this);        
         reestableser();
         pcdao.actualizar_tabla_gasto_tipo(conn, tblgasto_tipo);
         color_formulario();

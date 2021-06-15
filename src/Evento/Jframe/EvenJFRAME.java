@@ -23,12 +23,20 @@ public class EvenJFRAME {
         System.out.println("Abrir Jinternal: "+formu.getName());
     }
 
-    public  void centrar_formulario(javax.swing.JInternalFrame frame) {
+    public  void centrar_formulario_internalframa(javax.swing.JInternalFrame frame) {
         Dimension desktopSize = FrmMenuMonchis.escritorio.getSize();
         Dimension jInternalFrameSize = frame.getSize();
         frame.setLocation((desktopSize.width - jInternalFrameSize.width) / 2,
                 (desktopSize.height - jInternalFrameSize.height) / 2);
         System.out.println("CENTRAR Jinternal: "+frame.getTitle());
+    }
+    
+    public  void centrar_formulario_JDialog(javax.swing.JDialog frame) {
+        Dimension desktopSize = FrmMenuMonchis.escritorio.getSize();
+        Dimension jInternalFrameSize = frame.getSize();
+        frame.setLocation((desktopSize.width - jInternalFrameSize.width) / 2,
+                (desktopSize.height - jInternalFrameSize.height) / 2);
+        System.out.println("CENTRAR JDialog: "+frame.getTitle());
     }
     public void maximizar_jinternal(JInternalFrame formu){
         try {

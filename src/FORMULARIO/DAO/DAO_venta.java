@@ -39,10 +39,10 @@ public class DAO_venta {
     private String mensaje_insert = "VENTA GUARDADO CORRECTAMENTE";
     private String mensaje_update = "VENTA MODIFICADO CORECTAMENTE";
     private String sql_insert = "INSERT INTO public.venta(\n"
-            + "idventa,fecha_emision,monto_venta, \n"
+            + "idventa,fecha_emision,monto_venta_efectivo, \n"
             + "monto_delivery,redondeo,estado,observacion,forma_pago,delivery, fk_idcliente, \n"
-            + "fk_idusuario, fk_identregador,entrega)\n"
-            + "    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );";
+            + "fk_idusuario, fk_identregador,entrega,monto_venta_tarjeta)\n"
+            + "    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,? );";
 
     private String sql_estado = "UPDATE public.venta\n"
             + "   SET estado=?\n"
@@ -52,14 +52,14 @@ public class DAO_venta {
             + " WHERE idventa=?;";
     private String sql_entregador = "UPDATE public.venta\n"
             + "   SET fk_identregador=?\n"
-            + " WHERE idventa=?;";
+            + " WHERE idventa=?;"; 
     private String sql_est_ser = "UPDATE public.venta\n"
             + "   SET estado=?\n"
             + " WHERE idventa=?;";
     private String orden = " order by v.idventa desc";
-    private String sql_cargar = "SELECT  idventa,fecha_emision, monto_venta, monto_delivery,redondeo, estado, \n"
+    private String sql_cargar = "SELECT  idventa,fecha_emision, monto_venta_efectivo, monto_delivery,redondeo, estado, \n"
             + "       observacion, forma_pago, delivery, fk_idcliente, \n"
-            + "       fk_idusuario, fk_identregador,entrega\n"
+            + "       fk_idusuario, fk_identregador,entrega,monto_venta_tarjeta\n"
             + "  FROM public.venta where idventa=";
     private String mensaje_terminar = "TERMINADO";
     private String mensaje_entregador = "CAMBIO ENTREGADOR";
@@ -75,7 +75,7 @@ public class DAO_venta {
             pst = conn.prepareStatement(sql_insert);
             pst.setInt(1, ven.getC1idventa());
             pst.setTimestamp(2, evefec.getTimestamp_sistema());
-            pst.setDouble(3, ven.getC3monto_venta());
+            pst.setDouble(3, ven.getC3monto_venta_efectivo());
             pst.setDouble(4, ven.getC4monto_delivery());
             pst.setDouble(5, ven.getC5redondeo());
             pst.setString(6, ven.getC6estado());
@@ -86,6 +86,7 @@ public class DAO_venta {
             pst.setInt(11, ven.getC11fk_idusuario());
             pst.setInt(12, ven.getC12fk_identregador());
             pst.setString(13, ven.getC13entrega());
+            pst.setDouble(14, ven.getC14monto_venta_tarjeta());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + ven.toString(), titulo);
@@ -103,7 +104,7 @@ public class DAO_venta {
             if (rs.next()) {
                 ven.setC1idventa(rs.getInt(1));
                 ven.setC2fecha_emision(rs.getString(2));
-                ven.setC3monto_venta(rs.getDouble(3));
+                ven.setC3monto_venta_efectivo(rs.getDouble(3));
                 ven.setC4monto_delivery(rs.getDouble(4));
                 ven.setC5redondeo(rs.getDouble(5));
                 ven.setC6estado(rs.getString(6));
@@ -114,6 +115,7 @@ public class DAO_venta {
                 ven.setC11fk_idusuario(rs.getInt(11));
                 ven.setC12fk_identregador(rs.getInt(12));
                 ven.setC13entrega(rs.getString(13));
+                ven.setC14monto_venta_tarjeta(rs.getDouble(14));
             }
         } catch (Exception e) {
             evemen.mensaje_error(e, sql_cargar + "\n" + ven.toString(), titulo);
@@ -186,9 +188,9 @@ public class DAO_venta {
         String sql_select = "select v.idventa,to_char(v.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha,\n"
                 + "(c.idcliente||'-'||c.nombre) as cliente,\n"
                 + "c.telefono,v.estado,v.forma_pago,v.entrega as entrega,\n"
-                + "TRIM(to_char(v.monto_venta,'999G999G999')) as monto,\n"
-                + "TRIM(to_char(v.redondeo,'999G999G999')) as redondeo,\n"
-                + "TRIM(to_char(v.monto_delivery,'999G999G999')) as delivery \n"
+                + "TRIM(to_char(v.monto_venta_efectivo,'999G999G999')) as v_efectivo,\n"
+                + "TRIM(to_char(v.monto_venta_tarjeta,'999G999G999')) as v_tarjeta, \n"
+                + "TRIM(to_char((v.monto_venta_efectivo+v.monto_venta_tarjeta),'999G999G999')) as v_total\n"
                 + "from venta v,cliente c,entregador e\n"
                 + "where v.fk_idcliente=c.idcliente "
                 + "and v.fk_identregador=e.identregador\n"
@@ -225,7 +227,7 @@ public class DAO_venta {
     public void imprimir_rep_venta_todos(Connection conn, String filtro) {
         String sql = "select v.idventa as idventa,to_char(v.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha,v.forma_pago as mesa,\n"
                 + "c.ruc as ruc,('('||c.idcliente||')'||c.nombre) as cliente,c.tipo,\n"
-                + "v.estado as estado,v.monto_venta as monto,v.monto_delivery as delivery,u.usuario as usuario\n"
+                + "v.estado as estado,v.monto_venta_efectivo as monto,v.monto_delivery as delivery,u.usuario as usuario\n"
                 + "from venta v,cliente c,usuario u\n"
                 + "where v.fk_idcliente=c.idcliente\n"
                 + "and v.fk_idusuario=u.idusuario\n"
@@ -239,7 +241,9 @@ public class DAO_venta {
     public double getDouble_suma_venta(Connection conn, String campo, String filtro) {
         double sumaventa = 0;
         String titulo = "getDouble_suma_venta";
-        String sql = "select count(*) as cantidad,sum(v.monto_venta) as sumaventa\n"
+        String sql = "select count(*) as cantidad,"
+                + "sum(v.monto_venta_efectivo) as sumaventa_efectivo,\n"
+                + "sum(v.monto_venta_tarjeta) as sumaventa_tarjeta "
                 + "from venta v,cliente c,usuario u\n"
                 + "where v.fk_idcliente=c.idcliente\n"
                 + "and v.fk_idusuario=u.idusuario\n"

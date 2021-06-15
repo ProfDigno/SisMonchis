@@ -32,7 +32,7 @@ public class FrmEntregador extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("ENTREGADOR");
-        evetbl.centrar_formulario(this);        
+        evetbl.centrar_formulario_internalframa(this);        
         reestableser();
         pcdao.actualizar_tabla_entregador(conn, tblentregador);
         color_formulario();

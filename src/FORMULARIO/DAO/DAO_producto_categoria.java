@@ -35,8 +35,20 @@ public class DAO_producto_categoria {
     private String sql_update = "UPDATE public.producto_categoria\n"
             + "   SET  nombre=?, activar=?,orden=? \n"
             + " WHERE idproducto_categoria=?";
+    private String sql_update_orden = "UPDATE public.producto_categoria\n"
+            + "   SET  orden=? \n"
+            + " WHERE idproducto_categoria=?";
 //    private String sql_select="select * from producto_categoria order by 2 asc";
     private String sql_cargar = "select nombre,activar,orden from producto_categoria where idproducto_categoria=";
+    private String sql_up_orden = "select sum(iv.cantidad) as cant,pc.idproducto_categoria,pc.nombre \n"
+            + "from producto_categoria pc,producto p,item_venta iv,venta v\n"
+            + "where p.fk_idproducto_categoria=pc.idproducto_categoria\n"
+            + "and iv.fk_idproducto=p.idproducto\n"
+            + "and iv.fk_idventa=v.idventa\n"
+            + "and v.estado='EMITIDO'\n"
+            + "and date(v.fecha_emision)>=date(current_date-30)\n"
+            + "and date(v.fecha_emision)<=current_date\n"
+            + "group by 2,3 order by 1 asc;";
 
     public void cargar_producto_categoria(producto_categoria cate, JTable tabla) {
         String titulo = "cargar_producto_categoria";
@@ -54,6 +66,7 @@ public class DAO_producto_categoria {
             evemen.mensaje_error(e, sql_cargar + "\n" + cate.toString(), titulo);
         }
     }
+
     public void cargar_producto_categoria_reporte(producto_categoria cate, int idproducto_categoria) {
         String titulo = "cargar_producto_categoria_reporte";
 //        int id = evejt.getInt_select_id(tabla);
@@ -70,6 +83,7 @@ public class DAO_producto_categoria {
             evemen.mensaje_error(e, sql_cargar + "\n" + cate.toString(), titulo);
         }
     }
+
     public void insertar_producto_categoria(Connection conn, producto_categoria cate) {
         cate.setIdproducto_categoria(eveconn.getInt_ultimoID_mas_uno(conn, cate.getTabla(), cate.getIdtabla()));
         String titulo = "insertar_producto_categoria";
@@ -124,7 +138,21 @@ public class DAO_producto_categoria {
             evemen.mensaje_error(e, sql_update + "\n" + cate.toString(), titulo);
         }
     }
-
+    public void update_producto_categoria_orden(Connection conn, producto_categoria cate) {
+        String titulo = "update_producto_categoria";
+        PreparedStatement pst = null;
+        try {
+            pst = conn.prepareStatement(sql_update_orden);
+            pst.setInt(1, cate.getOrden());
+            pst.setInt(2, cate.getIdproducto_categoria());
+            pst.execute();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql_update_orden + "\n" + cate.toString(), titulo);
+//            evemen.modificado_correcto(mensaje_update, true);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql_update_orden + "\n" + cate.toString(), titulo);
+        }
+    }
     public void actualizar_tabla_producto_categoria(Connection conn, JTable tbltabla, String fechadesde, String fechahasta) {
         String sql_select = "select ca.idproducto_categoria as idc,ca.nombre,ca.activar,"
                 + " case when "
@@ -165,7 +193,6 @@ public class DAO_producto_categoria {
 
     public void imprimir_rep_venta_producto_categoria(Connection conn, String fecdesde, String fechasta, String filtro_categoria) {
         String sql = "select p.idproducto as id,(c.nombre||'-'||u.nombre||'-'||p.nombre) as nombre,"
-                
                 + "(select avg(iv.precio_venta) as cant \n"
                 + "from item_venta iv,venta v,cliente cl,producto p \n"
                 + "where  iv.fk_idventa=v.idventa and v.fk_idcliente=cl.idcliente\n"
@@ -173,7 +200,6 @@ public class DAO_producto_categoria {
                 + "and date(v.fecha_emision) >= '" + fecdesde + "' and date(v.fecha_emision) <= '" + fechasta + "' \n"
                 + "and iv.fk_idproducto=p.idproducto\n"
                 + "and p.fk_idproducto_categoria=c.idproducto_categoria) as pre_ven,"
-                
                 + "    case when ((select sum(iv.cantidad)  \n"
                 + "from item_venta iv,venta v,cliente cl,producto p2 \n"
                 + "where  iv.fk_idventa=v.idventa and v.fk_idcliente=cl.idcliente\n"
@@ -188,7 +214,6 @@ public class DAO_producto_categoria {
                 + "and date(v.fecha_emision) >= '" + fecdesde + "' and date(v.fecha_emision) <= '" + fechasta + "' \n"
                 + "and iv.fk_idproducto=p2.idproducto              \n"
                 + "and p2.idproducto=p.idproducto) else 0 end as cant,\n"
-                
                 + "     case when ((select sum(iv.cantidad*iv.precio_venta)  \n"
                 + "from item_venta iv,venta v,cliente cl,producto p2 \n"
                 + "where  iv.fk_idventa=v.idventa and v.fk_idcliente=cl.idcliente\n"
@@ -203,9 +228,7 @@ public class DAO_producto_categoria {
                 + "and date(v.fecha_emision) >= '" + fecdesde + "' and date(v.fecha_emision) <= '" + fechasta + "' \n"
                 + "and iv.fk_idproducto=p2.idproducto              \n"
                 + "and p2.idproducto=p.idproducto) else 0 end as total,\n"
-                
                 + "('('||c.idproducto_categoria||')-'||c.nombre) as categoria,\n"
-                
                 + "     case when  ((select sum(iv.cantidad) as cant \n"
                 + "from item_venta iv,venta v,cliente cl,producto p \n"
                 + "where  iv.fk_idventa=v.idventa and v.fk_idcliente=cl.idcliente\n"
@@ -220,7 +243,6 @@ public class DAO_producto_categoria {
                 + "and date(v.fecha_emision) >= '" + fecdesde + "' and date(v.fecha_emision) <= '" + fechasta + "' \n"
                 + "and iv.fk_idproducto=p.idproducto\n"
                 + "and p.fk_idproducto_categoria=c.idproducto_categoria) else 0 end as cant_ven,\n"
-                
                 + "     case when  ((select sum(iv.cantidad*iv.precio_venta) as cant \n"
                 + "from item_venta iv,venta v,cliente cl,producto p \n"
                 + "where  iv.fk_idventa=v.idventa and v.fk_idcliente=cl.idcliente\n"
@@ -235,15 +257,33 @@ public class DAO_producto_categoria {
                 + "and date(v.fecha_emision) >= '" + fecdesde + "' and date(v.fecha_emision) <= '" + fechasta + "' \n"
                 + "and iv.fk_idproducto=p.idproducto\n"
                 + "and p.fk_idproducto_categoria=c.idproducto_categoria) else 0 end as total_ven,"
-                
-                + "('Fecha Desde:"+fecdesde+" Hasta:"+fechasta+"') as fecha \n"
+                + "('Fecha Desde:" + fecdesde + " Hasta:" + fechasta + "') as fecha \n"
                 + "from producto p,producto_categoria c,producto_unidad u \n"
                 + "where  c.idproducto_categoria=p.fk_idproducto_categoria \n"
                 + "and u.idproducto_unidad=p.fk_idproducto_unidad \n"
-                + filtro_categoria+"\n"
+                + filtro_categoria + "\n"
                 + "order by c.idproducto_categoria,4 desc; ";
         String titulonota = "VENTA PRODUCTO POR CATEGORIA";
         String direccion = "src/REPORTE/PRODUCTO/repVentaProductoCategoria.jrxml";
         rep.imprimirjasper(conn, sql, titulonota, direccion);
+    }
+
+    public void update_orden_categoria_mas_vendido_mes() {
+        String titulo = "update_orden_categoria_mas_vendido_mes";
+        Connection conn = ConnPostgres.getConnPosgres();
+        producto_categoria cate=new producto_categoria();
+        try {
+            ResultSet rs = eveconn.getResulsetSQL(conn,sql_up_orden, titulo);
+            int orden=0;
+            while (rs.next()) {
+                orden++;
+                int idproducto_categoria=(rs.getInt("idproducto_categoria"));
+                cate.setOrden(orden);
+                cate.setIdproducto_categoria(idproducto_categoria);
+                update_producto_categoria_orden(conn, cate);
+            }
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql_up_orden , titulo);
+        }
     }
 }

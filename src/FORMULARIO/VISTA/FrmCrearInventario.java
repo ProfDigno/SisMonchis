@@ -62,7 +62,7 @@ public class FrmCrearInventario extends javax.swing.JInternalFrame {
 
     void abrir_formulario() {
         this.setTitle("CREAR INVENTARIO");
-        eveJfra.centrar_formulario(this);
+        eveJfra.centrar_formulario_internalframa(this);
         reestableser();
         color_formulario();
     }

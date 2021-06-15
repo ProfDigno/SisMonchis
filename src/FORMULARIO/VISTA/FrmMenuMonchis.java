@@ -21,6 +21,7 @@ import FORMULARIO.DAO.DAO_cliente;
 import FORMULARIO.DAO.DAO_cotizacion;
 import FORMULARIO.DAO.DAO_factura;
 import FORMULARIO.DAO.DAO_producto;
+import FORMULARIO.DAO.DAO_producto_categoria;
 import FORMULARIO.DAO.DAO_venta;
 import FORMULARIO.ENTIDAD.caja_cierre;
 import FORMULARIO.ENTIDAD.cotizacion;
@@ -56,6 +57,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     DAO_cliente cdao = new DAO_cliente();
     DAO_venta vdao = new DAO_venta();
     DAO_producto pdao = new DAO_producto();
+    DAO_producto_categoria pcDAO=new DAO_producto_categoria();
     Cla_insert_automatico ins_auto = new Cla_insert_automatico();
     EvenConexion eveconn = new EvenConexion();
     caja_cierre cjcie = new caja_cierre();
@@ -87,9 +89,41 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         grafico_mas_vendidos();
         grafico_venta_semanal();
         pdao.actualizar_tabla_producto_stock_minimo(conn, tbl_producto_stock_minimo);
+        pcDAO.update_orden_categoria_mas_vendido_mes();
         iniciar_color();
+        actualizacion_version_v1();
     }
-
+void actualizacion_version_v1() {
+        /**
+         * ALTER TABLE cliente ADD COLUMN delivery boolean; update cliente set
+         * delivery=true; update gastos set fk_idusuario=7 where fk_idusuario=1;
+         * alter table itemventacomanda alter column preciocompra type
+         * numeric(14,0) using preciocompra::numeric;
+         */
+        String sql = "DO $$ \n"
+                + "    BEGIN\n"
+                + "        BEGIN\n"
+                //                + "        update producto set orden='0'  where orden is null;\n "
+//                + "ALTER TABLE venta ADD COLUMN forma_pago text;\n "
+//                + "update venta set forma_pago='EFECTIVO';\n "
+//                + "ALTER TABLE caja_detalle ADD COLUMN estado text;\n"
+//                + "update caja_detalle set estado='temp';\n"
+//                + "update caja_detalle set estado='EMITIDO' where tabla_origen='VENTA' and monto_venta>0;\n"
+//                + "update caja_detalle set estado='ANULADO' where tabla_origen='VENTA' and monto_venta=0;\n"
+//                + "update caja_detalle set estado='CERRADO' where tabla_origen='CAJA_CERRAR';\n"
+//                + "update caja_detalle set estado='ABIERTO' where tabla_origen='CAJA_ABRIR';\n"
+                + "ALTER TABLE venta RENAME COLUMN monto_venta TO monto_venta_efectivo;\n"
+                + "ALTER TABLE venta ADD COLUMN monto_venta_tarjeta numeric(14,0);\n"
+                + "update venta set monto_venta_tarjeta=0;\n"
+                + "update venta set monto_venta_tarjeta=monto_venta_efectivo where forma_pago='TARJETA';\n"
+                + "update venta set monto_venta_efectivo=0 where forma_pago='TARJETA';\n"
+                + "        EXCEPTION\n"
+                + "            WHEN duplicate_column THEN RAISE NOTICE 'duplicate_column.';\n"
+                + "        END;\n"
+                + "    END;\n"
+                + "$$ ";
+        eveconn.SQL_execute_libre(conn, sql);
+    }
     void ocultar_grafico() {
         panel_mas_vendidos.setVisible(!jCocultar_grafico.isSelected());
         panel_stock_minimo.setVisible(!jCocultar_grafico.isSelected());

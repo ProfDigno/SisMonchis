@@ -46,7 +46,7 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
         this.setTitle("CAJA ABRIR");
         connLocal = cpt.getConnPosgres();
         color_formulario();
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
     }
     void color_formulario(){
         panel_insert.setBackground(clacolor.getColor_base());

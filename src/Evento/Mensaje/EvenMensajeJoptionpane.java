@@ -147,7 +147,7 @@ public class EvenMensajeJoptionpane {
                 sumasql = sumasql + "\n";
             }
         }
-        JOptionPane.showMessageDialog(null, "Error:" + e + "\n" + sumasql, titulo, JOptionPane.ERROR_MESSAGE);
+//        JOptionPane.showMessageDialog(null, "Error:" + e + "\n" + sumasql, titulo, JOptionPane.ERROR_MESSAGE);
         Imprimir_serial_sql_error(e, sql, titulo);
         if (getCant_error() > 2) {//cantidad de error antes de cerrar
             setCant_error(0);

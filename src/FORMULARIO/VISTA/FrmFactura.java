@@ -71,7 +71,7 @@ public class FrmFactura extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("FACTURA");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         jList_cliente.setVisible(false);
         reestableser();
         crear_item_producto();

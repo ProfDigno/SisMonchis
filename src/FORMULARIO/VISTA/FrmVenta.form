@@ -39,7 +39,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jTabbedPane_VENTA" alignment="0" max="32767" attributes="0"/>
+          <Component id="jTabbedPane_VENTA" alignment="0" pref="632" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -61,7 +61,7 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="panel_referencia_categoria" min="-2" pref="149" max="-2" attributes="0"/>
+                      <Component id="jScrollPane3" min="-2" pref="149" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
@@ -114,7 +114,7 @@
                                   <Component id="panel_insertar_pri_item" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="panel_referencia_categoria" min="-2" pref="588" max="-2" attributes="0"/>
+                          <Component id="jScrollPane3" alignment="0" min="-2" pref="589" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="11" max="32767" attributes="0"/>
                   </Group>
@@ -122,23 +122,6 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="panel_referencia_categoria">
-              <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="ff" green="99" red="66" type="rgb"/>
-                </Property>
-                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                  <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
-                    <EtchetBorder/>
-                  </Border>
-                </Property>
-              </Properties>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                <Property name="columns" type="int" value="1"/>
-                <Property name="rows" type="int" value="0"/>
-              </Layout>
-            </Container>
             <Container class="javax.swing.JPanel" name="panel_referencia_unidad">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -547,9 +530,11 @@
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="btnconfirmar_venta_efectivo" min="-2" pref="119" max="-2" attributes="0"/>
+                                          <Component id="btnconfirmar_venta_efectivo" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="btnconfirmar_venta_tarjeta" min="-2" pref="114" max="-2" attributes="0"/>
+                                          <Component id="btnconfirmar_venta_tarjeta" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="btnconfirmar_venta_combinar" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -615,6 +600,7 @@
                               <Component id="btnconfirmar_venta_tarjeta" alignment="2" min="-2" pref="46" max="-2" attributes="0"/>
                               <Component id="btnconfirmar_venta_efectivo" alignment="2" min="-2" pref="46" max="-2" attributes="0"/>
                               <Component id="jButton1" alignment="2" min="-2" pref="42" max="-2" attributes="0"/>
+                              <Component id="btnconfirmar_venta_combinar" alignment="2" min="-2" pref="46" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                           <Component id="jCimprimir_ticket" min="-2" max="-2" attributes="0"/>
@@ -823,9 +809,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Tahoma" size="14" style="1"/>
                     </Property>
-                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                      <Image iconType="3" name="/iconos/venta/efectivo.png"/>
-                    </Property>
+                    <Property name="text" type="java.lang.String" value="CONTADO"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnconfirmar_venta_efectivoActionPerformed"/>
@@ -969,9 +953,10 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="btnconfirmar_venta_tarjeta">
                   <Properties>
-                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                      <Image iconType="3" name="/iconos/venta/credito.png"/>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="14" style="1"/>
                     </Property>
+                    <Property name="text" type="java.lang.String" value="TARJETA"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnconfirmar_venta_tarjetaActionPerformed"/>
@@ -993,6 +978,17 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="IMPRIMIR TICKET"/>
                   </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnconfirmar_venta_combinar">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="14" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="COMBINAR"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnconfirmar_venta_combinarActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
@@ -1040,6 +1036,29 @@
                 <Property name="horizontalAlignment" type="int" value="0"/>
               </Properties>
             </Component>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane3">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Container class="javax.swing.JPanel" name="panel_referencia_categoria">
+                  <Properties>
+                    <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="ff" green="99" red="66" type="rgb"/>
+                    </Property>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                        <EtchetBorder/>
+                      </Border>
+                    </Property>
+                  </Properties>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                    <Property name="columns" type="int" value="1"/>
+                    <Property name="rows" type="int" value="0"/>
+                  </Layout>
+                </Container>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="panel_referencia_venta">
@@ -1143,7 +1162,7 @@
                           <Component id="panel_tabla_item" max="32767" attributes="0"/>
                           <Component id="panel_tabla_entregador" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="32" max="32767" attributes="0"/>
+                      <EmptySpace pref="28" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

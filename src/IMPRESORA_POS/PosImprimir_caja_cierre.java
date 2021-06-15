@@ -117,7 +117,7 @@ public class PosImprimir_caja_cierre {
                 + "and icc.fk_idcaja_cierre=" + fk_idcaja_cierre + "\n"
                 + "and (v.estado='EMITIDO' or v.estado='TERMINADO')\n"
                 + " " + grupo + "\n"
-                + "and (c.tabla_origen='VENTA_EFECTIVO' or c.tabla_origen='VENTA_TARJETA');";
+                + "and (c.tabla_origen ilike'%VENTA%');";
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
             if (rs.next()) {
@@ -138,7 +138,7 @@ public class PosImprimir_caja_cierre {
                 + "from caja_cierre cc,item_caja_cierre icc,caja_detalle cd,\n"
                 + "venta v,item_venta iv,producto p,producto_categoria pc,producto_unidad pu,producto_marca pm\n"
                 + "where cc.idcaja_cierre="+idcaja_cierre
-                + " and (cd.tabla_origen='VENTA_EFECTIVO' or cd.tabla_origen='VENTA_TARJETA')\n"
+                + " and (cd.tabla_origen ilike'%VENTA%')\n"
                 + "and (v.estado='EMITIDO' or v.estado='TERMINADO')\n"
                 + "and v.idventa=iv.fk_idventa\n"
                 + "and cc.idcaja_cierre=icc.fk_idcaja_cierre\n"

@@ -32,7 +32,7 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("GASTO TIPO");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         reestableser();
         pdao.actualizar_tabla_usuario(conn, tblusuario);
         color_formulario();

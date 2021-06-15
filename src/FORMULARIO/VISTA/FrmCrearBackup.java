@@ -98,7 +98,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
 
     void abrir() {
         this.setTitle("BACKUP");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         fecha=evefec.getString_formato_fecha();
         fecha=fecha+".backup";
         iniciarTiempo();

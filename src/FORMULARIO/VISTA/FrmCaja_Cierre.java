@@ -64,14 +64,15 @@ public class FrmCaja_Cierre extends javax.swing.JInternalFrame {
     double caja_detalle_SALDO = 0;
     double caja_detalle_DIFERENCIA = 0;
     double caja_detalle_CIERRE;
+    private String estado_CERRADO="CERRADO";
 
     void abrir_formulario() {
         this.setTitle("CAJA CIERRE");
         connLocal = cpt.getConnPosgres();
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         caja_detalle_cantidad_total("CAJA_ABRIR", "monto_caja", txtcant_caja, jFabrir_caja);
-        caja_detalle_cantidad_total("VENTA_EFECTIVO", "monto_venta_efectivo", txtcant_venta_efectivo, jFtotal_venta_efectivo);
-        caja_detalle_cantidad_total("VENTA_TARJETA", "monto_venta_tarjeta", txtcant_venta_tarjeta, jFtotal_venta_tarjeta);
+        caja_detalle_cantidad_total_venta( "monto_venta_efectivo", txtcant_venta_efectivo, jFtotal_venta_efectivo);
+        caja_detalle_cantidad_total_venta( "monto_venta_tarjeta", txtcant_venta_tarjeta, jFtotal_venta_tarjeta);
         caja_detalle_cantidad_total("GASTO", "monto_gasto", txtcant_gasto, jFtotal_gasto);
         caja_detalle_cantidad_total("COMPRA", "monto_compra", txtcant_compra, jFtotal_compra);
         caja_detalle_cantidad_total("VALE", "monto_vale", txtcant_vale, jFtotal_vale);
@@ -110,7 +111,7 @@ public class FrmCaja_Cierre extends javax.swing.JInternalFrame {
         int idcaja_cierre = (eveconn.getInt_ultimoID_max(connLocal, cjcie.getTb_caja_cierre(), cjcie.getId_idcaja_cierre()));
         cjcie.setC1idcaja_cierre(idcaja_cierre);
         cjcie_dao.cargar_caja_cierre(cjcie);
-        if (cjcie.getC4estado().equals("CERRADO")) {
+        if (cjcie.getC4estado().equals(estado_CERRADO)) {
             JOptionPane.showMessageDialog(null, "NO HAY CAJA ABIERTA SE DEBE ABRIR UNO NUEVO");
             this.dispose();
         }
@@ -172,7 +173,24 @@ public class FrmCaja_Cierre extends javax.swing.JInternalFrame {
             evemen.mensaje_error(e, sql, titulo);
         }
     }
-
+    void caja_detalle_cantidad_total_venta(String campo_total, JTextField txtcantidad, JFormattedTextField jftotal) {
+        String titulo = "caja_detalle_cantidad_total";
+        String sql = "select count(*) as cantidad,sum(" + campo_total + ") as total\n"
+                + " from caja_detalle c \n"
+                + "where c.cierre='A' \n"
+                + "and " + campo_total + ">0 ";
+        try {
+            ResultSet rs = eveconn.getResulsetSQL(connLocal, sql, titulo);
+            if (rs.next()) {
+                String cantidad = rs.getString("cantidad");
+                txtcantidad.setText(cantidad);
+                int total = rs.getInt("total");
+                jftotal.setValue(total);
+            }
+        } catch (SQLException e) {
+            evemen.mensaje_error(e, sql, titulo);
+        }
+    }
     void caja_detalle_SALDO() {
         String titulo = "caja_detalle_cantidad_total";
         String sql = "select ((sum(monto_venta_efectivo+monto_venta_tarjeta+monto_caja))-(sum(monto_gasto+monto_compra+monto_vale))) as saldo \n"
@@ -245,7 +263,7 @@ public class FrmCaja_Cierre extends javax.swing.JInternalFrame {
                 icidao.insertar_item_caja_cierre(connLocal, iccierre);
             }
             cjcie.setC1idcaja_cierre(idcaja_cierre);
-            cjcie.setC4estado("CERRADO");
+            cjcie.setC4estado(estado_CERRADO);
             cjcie_dao.update_caja_cierre(connLocal, cjcie);
             cdao.update_caja_detalle_CERRARTODO(connLocal);
             connLocal.commit();

@@ -107,7 +107,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     void abrir_formulario() {
         String servidor = "";
         this.setTitle("COMPRA--> USUARIO:" + usu.getGlobal_nombre() + servidor);
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         codao.cargar_cotizacion(coti, 1);
         crear_item_producto();
         reestableser_compra();

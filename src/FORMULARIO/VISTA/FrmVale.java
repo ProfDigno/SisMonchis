@@ -58,7 +58,7 @@ public class FrmVale extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("VALE");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         reestableser();
         color_formulario();
     }

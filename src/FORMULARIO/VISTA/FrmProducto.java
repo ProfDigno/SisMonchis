@@ -50,7 +50,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("PRODUCTO");
-        eveJfra.centrar_formulario(this);
+        eveJfra.centrar_formulario_internalframa(this);
         reestableser();
         pdao.actualizar_tabla_producto(conn, tblproducto);
         color_formulario();

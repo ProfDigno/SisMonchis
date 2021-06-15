@@ -38,7 +38,7 @@ public class FrmProducto_marca extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("PRODUCTO MARCA");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         reestableser();
         color_formulario();
     }

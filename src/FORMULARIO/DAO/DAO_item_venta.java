@@ -88,12 +88,12 @@ public class DAO_item_venta {
         }
     }
 
-    public void tabla_item_cliente_filtro(Connection conn, JTable tblitem_producto_filtro, item_venta item) {
+    public void tabla_item_venta_filtro(Connection conn, JTable tblitem_producto_filtro, item_venta item) {
         evconn.Select_cargar_jtable(conn, sql_select + item.getC6fk_idventa(), tblitem_producto_filtro);
-        ancho_tabla_item_cliente_filtro(tblitem_producto_filtro);
+        ancho_tabla_item_venta_filtro(tblitem_producto_filtro);
     }
 
-    public void ancho_tabla_item_cliente_filtro(JTable tblitem_producto_filtro) {
+    public void ancho_tabla_item_venta_filtro(JTable tblitem_producto_filtro) {
         int Ancho[] = {55, 15, 5, 15};
         evejt.setAnchoColumnaJtable(tblitem_producto_filtro, Ancho);
     }

@@ -46,7 +46,7 @@ public class FrmProveedor extends javax.swing.JInternalFrame {
      */
     private void abrir_formulario_cliente() {
         this.setTitle("PROVEEDOR");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         reestableser_proveedor();
         color_formulario();
         cdao.actualizar_tabla_proveedor(conn, tblproveedor);

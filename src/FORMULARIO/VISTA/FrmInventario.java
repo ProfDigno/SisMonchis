@@ -31,7 +31,7 @@ public class FrmInventario extends javax.swing.JInternalFrame {
     EvenJtable eveJtab = new EvenJtable();
     void abrir_formulario() {
         this.setTitle("INVENTARIOS");
-        evetbl.centrar_formulario(this);        
+        evetbl.centrar_formulario_internalframa(this);        
         indao.actualizar_tabla_inventario(conn, tblinventario);
         color_formulario();
     }

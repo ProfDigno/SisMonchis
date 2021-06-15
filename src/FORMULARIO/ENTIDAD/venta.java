@@ -59,7 +59,7 @@ public class venta {
     private int c1idventa;
     private static int c1idventa_estatico;
     private String c2fecha_emision;
-    private double c3monto_venta;
+    private double c3monto_venta_efectivo;
     private double c4monto_delivery;
     private double c5redondeo;
     private String c6estado;
@@ -70,6 +70,8 @@ public class venta {
     private int c11fk_idusuario;
     private int c12fk_identregador;
     private String c13entrega;
+    private double c14monto_venta_tarjeta;
+    
     private static int c10fk_idcliente_estatico;
     
     private static String tabla;
@@ -127,12 +129,12 @@ public class venta {
         this.c6estado = c5estado;
     }
 
-    public double getC3monto_venta() {
-        return c3monto_venta;
+    public double getC3monto_venta_efectivo() {
+        return c3monto_venta_efectivo;
     }
 
-    public void setC3monto_venta(double c6monto_venta) {
-        this.c3monto_venta = c6monto_venta;
+    public void setC3monto_venta_efectivo(double c6monto_venta) {
+        this.c3monto_venta_efectivo = c6monto_venta;
     }
 
     public double getC4monto_delivery() {
@@ -248,6 +250,20 @@ public class venta {
      */
     public void setC13entrega(String c13entrega) {
         this.c13entrega = c13entrega;
+    }
+
+    /**
+     * @return the c13monto_venta_tarjeta
+     */
+    public double getC14monto_venta_tarjeta() {
+        return c14monto_venta_tarjeta;
+    }
+
+    /**
+     * @param c13monto_venta_tarjeta the c13monto_venta_tarjeta to set
+     */
+    public void setC14monto_venta_tarjeta(double c13monto_venta_tarjeta) {
+        this.c14monto_venta_tarjeta = c13monto_venta_tarjeta;
     }
      
     

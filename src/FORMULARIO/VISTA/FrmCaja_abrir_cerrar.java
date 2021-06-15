@@ -81,7 +81,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         this.setTitle("CAJA ABRIR-CIERRE");
         ccdao.actualizar_tabla_caja_cierre(conn, tblcaja_resumen);
         color_formulario();
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
     }
 
 
@@ -96,8 +96,8 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     void seleccionar_caja_detalle() {
         if (!evejt.getBoolean_validar_select(tblcaja_resumen)) {
             String fk_idcaja_cierre = evejt.getString_select(tblcaja_resumen, 0);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre, "VENTA_EFECTIVO", "c.monto_venta_efectivo", tblcaja_venta_efectivo, txtcantidad_venta_efectivo, jFtotal_venta_efectivo);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre, "VENTA_TARJETA", "c.monto_venta_tarjeta", tblcaja_venta_tarjeta, txtcantidad_venta_tarjeta, jFtotal_venta_tarjeta);
+            actualizar_caja_detalle_venta(fk_idcaja_cierre, tblcaja_venta_efectivo, txtcantidad_venta_efectivo, jFtotal_venta_efectivo);
+//            actualizar_caja_detalle_otros(fk_idcaja_cierre, "VENTA_TARJETA", "c.monto_venta_tarjeta", tblcaja_venta_tarjeta, txtcantidad_venta_tarjeta, jFtotal_venta_tarjeta);
             actualizar_caja_detalle_otros(fk_idcaja_cierre, "VALE", "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
             actualizar_caja_detalle_otros(fk_idcaja_cierre, "GASTO", "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
             actualizar_caja_detalle_otros(fk_idcaja_cierre, "COMPRA", "c.monto_compra", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
@@ -110,7 +110,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
 //            actualizar_venta_grupo(fk_idcaja_cierre, grupo_delivery, tblcaja_venta_delivery, txtcantidad_venta_delivery, jFtotal_venta_delivery);
         }
     }
-
+    
     void actualizar_caja_detalle_otros(String fk_idcaja_cierre, String origen_tabla, String campo_total, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
         String sql = "select c.id_origen,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
                 + "TRIM(to_char(" + campo_total + ",'999G999G999')) as monto,c.estado \n"
@@ -123,7 +123,27 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         caja_detalle_cantidad_total(fk_idcaja_cierre, origen_tabla, campo_total, txtcantidad, jftotal);
         anchotabla_caja_detalle_otros(tabla);
     }
-
+        void actualizar_caja_detalle_venta(String fk_idcaja_cierre, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
+        String sql = "select c.id_origen,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
+                + "TRIM(to_char(c.monto_venta_efectivo,'999G999G999')) as v_efectivo,"
+                + "TRIM(to_char(c.monto_venta_tarjeta,'999G999G999')) as v_tarjeta,"
+                + "c.tabla_origen as origen,"
+                + "estado \n"
+                + " from caja_detalle c,item_caja_cierre icc \n"
+                + "where c.idcaja_detalle=icc.fk_idcaja_detalle\n"
+                + "and icc.fk_idcaja_cierre=" + fk_idcaja_cierre + "\n"
+                + "and c.tabla_origen ilike'%VENTA%'\n"
+                + "order by 1 desc";
+        eveconn.Select_cargar_jtable(conn, sql, tabla);
+//        caja_detalle_cantidad_total(fecha_emision, origen_tabla, campo_total, txtcantidad, jftotal);
+//        anchotabla_caja_detalle_otros(tabla);
+        anchotabla_caja_detalle_venta(tabla);
+        
+    }
+        void anchotabla_caja_detalle_venta(JTable tabla) {
+        int Ancho[] = {7, 15, 38, 9,9,14,8};
+        evejt.setAnchoColumnaJtable(tabla, Ancho);
+    }
 //    void actualizar_venta_grupo(String fk_idcaja_cierre, String grupo, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
 //        String sql = "select v.idventa,v.estado,to_char(v.fecha_inicio,'yyyy-MM-dd HH24:MI') as fecha_venta,v.nombre_mesa as mesa,\n"
 //                + "iv.iditem_venta as idiv,iv.descripcion,\n"
@@ -265,15 +285,6 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         jFtotal_venta_efectivo = new javax.swing.JFormattedTextField();
         btnimprimir_venta = new javax.swing.JButton();
-        panel_venta_grupo_0 = new javax.swing.JPanel();
-        panel_venta1 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        tblcaja_venta_tarjeta = new javax.swing.JTable();
-        jLabel5 = new javax.swing.JLabel();
-        txtcantidad_venta_tarjeta = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        jFtotal_venta_tarjeta = new javax.swing.JFormattedTextField();
-        btnimprimir_ccierre_vg2 = new javax.swing.JButton();
         panel_delivery = new javax.swing.JPanel();
         panel_venta3 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
@@ -497,89 +508,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
                     .addComponent(btnimprimir_venta, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        jTabbedPane1.addTab("VENTA-(EFECTIVO)", panel_venta);
-
-        panel_venta1.setBackground(new java.awt.Color(204, 204, 255));
-        panel_venta1.setBorder(javax.swing.BorderFactory.createTitledBorder("CAJA VENTA"));
-
-        tblcaja_venta_tarjeta.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane4.setViewportView(tblcaja_venta_tarjeta);
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel5.setText("CANTIDAD:");
-
-        txtcantidad_venta_tarjeta.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel6.setText("TOTAL:");
-
-        jFtotal_venta_tarjeta.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
-        jFtotal_venta_tarjeta.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jFtotal_venta_tarjeta.setText("0");
-        jFtotal_venta_tarjeta.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-
-        btnimprimir_ccierre_vg2.setText("IMPRIMIR CAJA CIERRE G0");
-        btnimprimir_ccierre_vg2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnimprimir_ccierre_vg2ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panel_venta1Layout = new javax.swing.GroupLayout(panel_venta1);
-        panel_venta1.setLayout(panel_venta1Layout);
-        panel_venta1Layout.setHorizontalGroup(
-            panel_venta1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 1026, Short.MAX_VALUE)
-            .addGroup(panel_venta1Layout.createSequentialGroup()
-                .addComponent(btnimprimir_ccierre_vg2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtcantidad_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jFtotal_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        panel_venta1Layout.setVerticalGroup(
-            panel_venta1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_venta1Layout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_venta1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel5)
-                    .addComponent(txtcantidad_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6)
-                    .addComponent(jFtotal_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnimprimir_ccierre_vg2)))
-        );
-
-        javax.swing.GroupLayout panel_venta_grupo_0Layout = new javax.swing.GroupLayout(panel_venta_grupo_0);
-        panel_venta_grupo_0.setLayout(panel_venta_grupo_0Layout);
-        panel_venta_grupo_0Layout.setHorizontalGroup(
-            panel_venta_grupo_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1038, Short.MAX_VALUE)
-            .addGroup(panel_venta_grupo_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(panel_venta1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        panel_venta_grupo_0Layout.setVerticalGroup(
-            panel_venta_grupo_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 525, Short.MAX_VALUE)
-            .addGroup(panel_venta_grupo_0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(panel_venta1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jTabbedPane1.addTab("VENTA-(TARJETA)", panel_venta_grupo_0);
+        jTabbedPane1.addTab("VENTA", panel_venta);
 
         panel_venta3.setBackground(new java.awt.Color(204, 204, 255));
         panel_venta3.setBorder(javax.swing.BorderFactory.createTitledBorder("CAJA VENTA"));
@@ -958,21 +887,11 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnimprimir_ccierreActionPerformed
 
-    private void btnimprimir_ccierre_vg2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_ccierre_vg2ActionPerformed
-        // TODO add your handling code here:
-        if (!evejt.getBoolean_validar_select(tblcaja_resumen)) {
-            String idcaja_cierre = evejt.getString_select(tblcaja_resumen,0);
-            String grupo_0 = " and iv.grupo=0 and (tipo='P' or tipo='I') ";
-            posccvg.boton_imprimir_pos_VENTA_grupo(conn, idcaja_cierre, grupo_0,nom_grupo_0);
-        }
-    }//GEN-LAST:event_btnimprimir_ccierre_vg2ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnactualizar_tabla;
     private javax.swing.JButton btnimprimir_GASTO;
     private javax.swing.JButton btnimprimir_ccierre;
-    private javax.swing.JButton btnimprimir_ccierre_vg2;
     private javax.swing.JButton btnimprimir_compra;
     private javax.swing.JButton btnimprimir_vale;
     private javax.swing.JButton btnimprimir_venta;
@@ -984,7 +903,6 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField jFtotal_vale;
     private javax.swing.JFormattedTextField jFtotal_venta_delivery;
     private javax.swing.JFormattedTextField jFtotal_venta_efectivo;
-    private javax.swing.JFormattedTextField jFtotal_venta_tarjeta;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -995,8 +913,6 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -1006,7 +922,6 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
@@ -1017,21 +932,17 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panel_principal;
     private javax.swing.JPanel panel_vale;
     private javax.swing.JPanel panel_venta;
-    private javax.swing.JPanel panel_venta1;
     private javax.swing.JPanel panel_venta3;
-    private javax.swing.JPanel panel_venta_grupo_0;
     private javax.swing.JTable tblcaja_compra;
     private javax.swing.JTable tblcaja_gasto;
     private javax.swing.JTable tblcaja_resumen;
     private javax.swing.JTable tblcaja_vale;
     private javax.swing.JTable tblcaja_venta_delivery;
     private javax.swing.JTable tblcaja_venta_efectivo;
-    private javax.swing.JTable tblcaja_venta_tarjeta;
     private javax.swing.JTextField txtcantidad_compra;
     private javax.swing.JTextField txtcantidad_gasto;
     private javax.swing.JTextField txtcantidad_vale;
     private javax.swing.JTextField txtcantidad_venta_delivery;
     private javax.swing.JTextField txtcantidad_venta_efectivo;
-    private javax.swing.JTextField txtcantidad_venta_tarjeta;
     // End of variables declaration//GEN-END:variables
 }

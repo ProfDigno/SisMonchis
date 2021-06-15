@@ -56,7 +56,7 @@ public class PosImprimir_Venta {
         String sql = "select v.idventa,to_char(v.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha,\n"
                 + "(c.idcliente||'-'||c.nombre) as cliente,\n"
                 + "c.telefono,c.direccion,\n"
-                + "TRIM(to_char(v.monto_venta,'999G999G999')) as monto,\n"
+                + "TRIM(to_char((v.monto_venta_efectivo+v.monto_venta_tarjeta),'999G999G999')) as monto,\n"
                 + "TRIM(to_char(v.redondeo,'999G999G999')) as redondeo,\n"
                 + "v.observacion,iv.cantidad,iv.descripcion,\n"
                 + "TRIM(to_char(iv.precio_venta,'999G999G999')) as precio,iv.precio_venta as precioint,\n"

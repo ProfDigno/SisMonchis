@@ -56,7 +56,7 @@ public class FrmGasto extends javax.swing.JInternalFrame {
      */
     void abrir_formulario() {
         this.setTitle("GASTO");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         reestableser();
         color_formulario();
     }

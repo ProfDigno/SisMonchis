@@ -29,7 +29,7 @@ public class FrmProducto_unidad extends javax.swing.JInternalFrame {
     cla_color_pelete clacolor= new cla_color_pelete();
     void abrir_formulario() {
         this.setTitle("PRODUCTO UNIDAD");
-        evetbl.centrar_formulario(this);        
+        evetbl.centrar_formulario_internalframa(this);        
         reestableser();
         udao.actualizar_tabla_producto_unidad(conn, tblpro_unidad);
         color_formulario();

@@ -54,7 +54,7 @@ public class FrmRepGananciaCompraVenta extends javax.swing.JInternalFrame {
 
     void abrir_formulario() {
         this.setTitle("REPORTE GANACIA POR VENTA");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         color_formulario();
         reestableser();
     }

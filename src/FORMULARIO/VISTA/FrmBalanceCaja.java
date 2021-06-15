@@ -52,7 +52,7 @@ public class FrmBalanceCaja extends javax.swing.JInternalFrame {
     cla_color_pelete clacolor= new cla_color_pelete();
     void abrir_formulario() {
         this.setTitle("BALANCE");
-        evetbl.centrar_formulario(this);
+        evetbl.centrar_formulario_internalframa(this);
         txtfecha_desde.setText(evefec.getString_fecha_dia1());
         txtfecha_hasta.setText(evefec.getString_formato_fecha());
         color_formulario();
