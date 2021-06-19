@@ -122,7 +122,7 @@ void actualizacion_version_v1() {
                 + "        END;\n"
                 + "    END;\n"
                 + "$$ ";
-        eveconn.SQL_execute_libre(conn, sql);
+//        eveconn.SQL_execute_libre(conn, sql);
     }
     void ocultar_grafico() {
         panel_mas_vendidos.setVisible(!jCocultar_grafico.isSelected());

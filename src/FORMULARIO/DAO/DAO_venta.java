@@ -52,7 +52,7 @@ public class DAO_venta {
             + " WHERE idventa=?;";
     private String sql_entregador = "UPDATE public.venta\n"
             + "   SET fk_identregador=?\n"
-            + " WHERE idventa=?;"; 
+            + " WHERE idventa=?;";
     private String sql_est_ser = "UPDATE public.venta\n"
             + "   SET estado=?\n"
             + " WHERE idventa=?;";
@@ -95,10 +95,11 @@ public class DAO_venta {
             evemen.mensaje_error(e, sql_insert + "\n" + ven.toString(), titulo);
         }
     }
+
     public void cargar_venta(venta ven, int idventa) {
         String titulo = "cargar_venta";
         Connection conn = ConnPostgres.getConnPosgres();
-         
+
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql_cargar + idventa, titulo);
             if (rs.next()) {
@@ -121,6 +122,7 @@ public class DAO_venta {
             evemen.mensaje_error(e, sql_cargar + "\n" + ven.toString(), titulo);
         }
     }
+
     public void update_estado_venta(Connection conn, venta ven) {
         String titulo = "update_estado_venta";
         PreparedStatement pst = null;
@@ -136,6 +138,7 @@ public class DAO_venta {
             evemen.mensaje_error(e, sql_estado + "\n" + ven.toString(), titulo);
         }
     }
+
     public void update_forma_pago_venta(Connection conn, venta ven) {
         String titulo = "update_forma_pago_venta";
         PreparedStatement pst = null;
@@ -151,6 +154,7 @@ public class DAO_venta {
             evemen.mensaje_error(e, sql_forma_pago + "\n" + ven.toString(), titulo);
         }
     }
+
     public void update_cambio_entregador(Connection conn, venta ven) {
         String titulo = "update_cambio_entregador";
         PreparedStatement pst = null;
@@ -166,7 +170,6 @@ public class DAO_venta {
             evemen.mensaje_error(e, sql_entregador + "\n" + ven.toString(), titulo);
         }
     }
-
 
     private void update_estado_venta_servidor(Connection conn, String indice, String estado) {
         String titulo = "update_estado_venta_servidor";
@@ -200,9 +203,8 @@ public class DAO_venta {
         everende.rendertabla_estados(tblventa, 4);
     }
 
-
     public void ancho_tabla_venta(JTable tblventa) {
-        int Ancho[] = {6,10,20,7,8,8,11,6,6,6};
+        int Ancho[] = {6, 10, 20, 7, 8, 8, 11, 6, 6, 6};
         evejt.setAnchoColumnaJtable(tblventa, Ancho);
     }
 
@@ -238,12 +240,28 @@ public class DAO_venta {
         rep.imprimirjasper(conn, sql, titulonota, direccion);
     }
 
+    public void imprimir_rep_venta_todos_2(Connection conn, String filtro) {
+        String sql = "select v.idventa as idventa,to_char(v.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha,v.forma_pago as f_pago,\n"
+                + "c.ruc as ruc,('('||c.idcliente||')'||c.nombre) as cliente,\n"
+                + "v.estado as estado,v.monto_venta_efectivo as v_efectivo,v.monto_venta_tarjeta as v_tarjeta,\n"
+                + "(v.monto_venta_efectivo+v.monto_venta_tarjeta) as v_total,u.usuario as usuario\n"
+                + "from venta v,cliente c,usuario u\n"
+                + "where v.fk_idcliente=c.idcliente\n"
+                + "and v.fk_idusuario=u.idusuario\n"
+                + " " + filtro + "\n"
+                + "order by v.idventa desc;";
+        String titulonota = "VENTA TODOS";
+        String direccion = "src/REPORTE/VENTA/repVentaTodos_2.jrxml";
+        rep.imprimirjasper(conn, sql, titulonota, direccion);
+    }
+
     public double getDouble_suma_venta(Connection conn, String campo, String filtro) {
         double sumaventa = 0;
         String titulo = "getDouble_suma_venta";
         String sql = "select count(*) as cantidad,"
                 + "sum(v.monto_venta_efectivo) as sumaventa_efectivo,\n"
-                + "sum(v.monto_venta_tarjeta) as sumaventa_tarjeta "
+                + "sum(v.monto_venta_tarjeta) as sumaventa_tarjeta, "
+                + "sum(v.monto_venta_tarjeta+v.monto_venta_efectivo) as sumaventa_total "
                 + "from venta v,cliente c,usuario u\n"
                 + "where v.fk_idcliente=c.idcliente\n"
                 + "and v.fk_idusuario=u.idusuario\n"
