@@ -1,46 +1,54 @@
                                    
  ======MONCHI'S SHOP BEER======    
-          CODIGO:5                 
- INICIO:       2021-04-09 18:30    
- FIN:          2021-04-18 21:18    
+          CODIGO:47                
+ INICIO:       2021-05-29 10:13    
+ FIN:          2021-05-29 23:23    
  #=============================#   
- CAJA ABRIR:             1,000     
- VENTA EFECTIVO:         6,270,500 
- VENTA TARJETA:          499,500   
+ CAJA ABRIR:             3,147,000 
+ VENTA EFECTIVO:         3,256,620 
+ VENTA TARJETA:          185,000   
  ------Detalle Venta-----------    
                                    
  DELIVERY:               0         
  #=============================#   
- TOTAL GASTO:            0         
+ TOTAL GASTO:            60,000    
  TOTAL VALE:             0         
- TOTAL COMPRA:           6,565,478 
+ TOTAL COMPRA:           1,258,472 
  #=============================#   
- SISTEMA:                205,522   
- CIERRE:                 205,522   
+ SISTEMA:                5,270,148 
+ CIERRE:                 5,270,148 
  DIFERENCIA:             (0)       
  ------TOP 20 Mas Vendido-----     
- 142 X  Amstel Bier-Lata 269ml-Premium
- 67 X   Amstel Bier-Lata 350ml-Premium
- 51 X   PILSEN-Lata 269ml-Clasica  
- 50 X   HEINEKEN-Bote 1Lts-alcohol 
- 42 X   Skol-Lata 269ml-Pilsen     
- 30 X   PILSEN-Bote 340 ml-Clasica Retornable
- 29 X   Skol-Bote 300ml-Ñoñito     
- 28 X   Brahma-Lata 350ml-Duplo Malte
- 28 X   PILSEN-Bote 1Lts-Ñoño      
- 26 X   Edelmeister-Lata 500ml-Sin alcohol
- 25 X   Corona-Bote 210ml-Pony     
- 24 X   Antartica-Lata 350ml-Original
- 24 X   GinTonica-Bote 275ml-DuRoyale
- 14 X   Antartica-Bote 600ml-Original
- 12 X   Brahma-Bote 1Lts-Ñoño      
- 12 X   Bavaria-Bote 330ml-Sin alcohol
- 11 X   HEINEKEN-Bote 650ml-Holandesa Premium
- 10 X   Stella Artois-Lata 269ml-Belgium
- 9 X    Skol Beats-Bote 313ml-Senses 
- 9 X    HEINEKEN-Lata 250ml-Lager  
+ 93 X   HEINEKEN-Bote 650ml-Holandesa Premium
+ 48 X   Amstel Bier-Lata 350ml-Premium
+ 21 X   Eisenbahn-Bote 355ml-Pilsen
+ 16 X   Munich-Lata 350ml-Royal    
+ 15 X   PILSEN-Lata 354cl-Clasica  
+ 15 X   Amstel Bier-Lata 269ml-Premium
+ 14 X   Smirnoff Ice-Bote 275ml-Limao Classico
+ 12 X   Corona-Bote 210ml-Pony     
+ 12 X   Budweiser-Lata 473ml-King of Beers
+ 10 X   PILSEN-Bote 340 ml-Clasica Retornable
+ 10 X   Frizze-Lata 473ml-Blue Evolution
+ 9 X    Skol-Lata 269ml-Pilsen     
+ 8 X    Antartica-Bote 600ml-Original
+ 6 X    Black Sheep-600Puff-Grape Ice
+ 6 X    Stella Artois-Lata 269ml-Belgium
+ 6 X    Eisenbahn-Lata 350ml-Pilsen
+ 6 X    Miller-Bote 650ml-Genuine Draft
+ 5 X    Black Sheep-600Puff-Peach Ice
+ 4 X    Coca Cola-Bote 2lts-Original Descartable
+ 4 X    MIRANDA-1 BOLSA-HIELO CUBITO GRANDE
                                    
-                                   
+ -----COMPRA-PROVEEDOR----         
+ Prov:CERVEPAR                     
+ Nota:(12272)            630,576   
+ Prov:Retail S.A                   
+ Nota:(36538)            277,200   
+ Prov:Olmedo Bebidas               
+ Nota:(100)              188,000   
+ Prov:Coca Cola Paresa             
+ Nota:(14188)            162,696   
                                    
                                    
                                    

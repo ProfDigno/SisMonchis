@@ -53,6 +53,47 @@ public class ClaAuxFiltroVenta {
         }
         return sumaestado + fin;
     }
+    public String forma_pago(JCheckBox jCpago_efectivo,JCheckBox jCpago_tarjeta,JCheckBox jCpago_combinado) {
+        String estado = "";
+        String sumaestado = "";
+        int contestado = 0;
+        String condi = "";
+        String fin = "";
+        if (jCpago_efectivo.isSelected()) {
+            contestado++;
+            if (contestado == 1) {
+                condi = " and(";
+                fin = ") ";
+            } else {
+                condi = " or";
+            }
+            estado = condi + " v.forma_pago='EFECTIVO' ";
+            sumaestado = sumaestado + estado;
+        }
+        if (jCpago_tarjeta.isSelected()) {
+            contestado++;
+            if (contestado == 1) {
+                condi = " and(";
+                fin = ") ";
+            } else {
+                condi = " or";
+            }
+            estado = condi + " v.forma_pago='TARJETA' ";
+            sumaestado = sumaestado + estado;
+        }
+        if (jCpago_combinado.isSelected()) {
+            contestado++;
+            if (contestado == 1) {
+                condi = " and(";
+                fin = ") ";
+            } else {
+                condi = " or";
+            }
+            estado = condi + " v.forma_pago='COMBINADO' ";
+            sumaestado = sumaestado + estado;
+        }
+        return sumaestado + fin;
+    }
         public String filtro_estado_compra(JCheckBox jCestado_emitido,JCheckBox jCestado_anulado) {
         String estado = "";
         String sumaestado = "";

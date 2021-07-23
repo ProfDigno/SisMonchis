@@ -59,6 +59,10 @@ public class PosImprimir_caja_cierre {
     private static int tk_iv_fila_top;
     private static String[] iv1_cantidad_top = new String[200];
     private static String[] iv2_nombre_top = new String[200];
+    private static int compra_fila;
+    private static String[] compra_monto = new String[200];
+    private static String[] compra_proveedor = new String[200];
+    private static String[] compra_nota = new String[200];
 
     private void cargar_datos_caja_cierre(Connection conn, int idcaja_cierre) {
         String titulo = "cargar_datos_caja_cierre";
@@ -137,7 +141,7 @@ public class PosImprimir_caja_cierre {
         String sql = "select (pm.nombre||'-'||pu.nombre||'-'||p.nombre) as producto,sum(iv.cantidad) as cant\n"
                 + "from caja_cierre cc,item_caja_cierre icc,caja_detalle cd,\n"
                 + "venta v,item_venta iv,producto p,producto_categoria pc,producto_unidad pu,producto_marca pm\n"
-                + "where cc.idcaja_cierre="+idcaja_cierre
+                + "where cc.idcaja_cierre=" + idcaja_cierre
                 + " and (cd.tabla_origen ilike'%VENTA%')\n"
                 + "and (v.estado='EMITIDO' or v.estado='TERMINADO')\n"
                 + "and v.idventa=iv.fk_idventa\n"
@@ -149,7 +153,7 @@ public class PosImprimir_caja_cierre {
                 + "and p.fk_idproducto_unidad=pu.idproducto_unidad\n"
                 + "and p.fk_idproducto_marca=pm.idproducto_marca\n"
                 + "group by 1\n"
-                + "order by 2 desc limit "+jsprint.getCant_top_venta();
+                + "order by 2 desc limit " + jsprint.getCant_top_venta();
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
             tk_iv_fila_top = 0;
@@ -157,6 +161,32 @@ public class PosImprimir_caja_cierre {
                 iv1_cantidad_top[tk_iv_fila_top] = rs.getString("cant");
                 iv2_nombre_top[tk_iv_fila_top] = rs.getString("producto");
                 tk_iv_fila_top++;
+            }
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql, titulo);
+        }
+    }
+
+    private void cargar_datos_compra_proveedor(Connection conn, int idcaja_cierre) {
+        String titulo = "cargar_datos_compra_proveedor";
+        String sql = "select ('Nota:('||co.nro_nota||')') as nota ,('Prov:'||pv.nombre) as provee,\n"
+                + "TRIM(to_char(co.monto_compra,'999G999G999')) as monto \n"
+                + "from item_caja_cierre icc,caja_detalle cd,compra co,proveedor pv\n"
+                + "where icc.fk_idcaja_cierre="+idcaja_cierre
+                + " and icc.fk_idcaja_detalle=cd.idcaja_detalle\n"
+                + "and co.fk_idproveedor=pv.idproveedor\n"
+                + "and cd.id_origen=co.idcompra\n"
+                + "and cd.tabla_origen='COMPRA'\n"
+                + "and co.estado='EMITIDO' \n"
+                + "order by co.monto_compra desc;";
+        try {
+            ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
+            compra_fila = 0;
+            while (rs.next()) {
+                compra_nota[compra_fila] = rs.getString("nota");
+                compra_proveedor[compra_fila] = rs.getString("provee");
+                compra_monto[compra_fila] = rs.getString("monto");
+                compra_fila++;
             }
         } catch (Exception e) {
             evemen.mensaje_error(e, sql, titulo);
@@ -195,7 +225,7 @@ public class PosImprimir_caja_cierre {
         e.setNumber(101.85);
         //Definir el tamanho del papel 
         int tempfila = 0;
-        int totalfila = jsprint.getTt_fila_cc()+tk_iv_fila_top;
+        int totalfila = jsprint.getTt_fila_cc() + tk_iv_fila_top+(compra_fila*2);
         printer.setOutSize(totalfila, totalColumna);
         printer.printTextWrap(1 + tempfila, 1, jsprint.getSep_inicio(), totalColumna, jsprint.getLinea_cabezera() + config.getNombre_sistema() + jsprint.getLinea_cabezera());
         printer.printTextWrap(2 + tempfila, 2, 10, totalColumna, "CODIGO:" + tk_idcaja_cierre);
@@ -233,6 +263,13 @@ public class PosImprimir_caja_cierre {
             printer.printTextWrap(21 + tempfila, 21, jsprint.getSep_inicio(), totalColumna, iv1_cantidad_top[i] + " X");
             printer.printTextWrap(21 + tempfila, 21, jsprint.getSep_item_precio(), jsprint.getTt_text_descrip(), iv2_nombre_top[i]);
             tempfila = tempfila + 1;
+        }
+        printer.printTextWrap(22 + tempfila, 22, jsprint.getSep_inicio(), totalColumna, "-----COMPRA-PROVEEDOR----");
+        for (int i = 0; i < compra_fila; i++) {
+            printer.printTextWrap(23 + tempfila, 23, jsprint.getSep_inicio(), jsprint.getTt_text_descrip(), compra_proveedor[i]);
+            printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_inicio(), totalColumna, compra_nota[i]);
+            printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_numero(), totalColumna, compra_monto[i]);
+            tempfila = tempfila + 2;
         }
         printer.toFile(tk_ruta_archivo);
         try {
@@ -274,6 +311,7 @@ public class PosImprimir_caja_cierre {
     public void boton_imprimir_pos_caja_cierre(Connection conn, int idcaja_cierre) {
         cargar_datos_caja_cierre(conn, idcaja_cierre);
         cargar_datos_itemventa_top_producto(conn, idcaja_cierre);
+        cargar_datos_compra_proveedor(conn, idcaja_cierre);
         crear_mensaje_textarea_y_confirmar();
     }
 }

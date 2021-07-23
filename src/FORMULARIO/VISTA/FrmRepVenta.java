@@ -49,6 +49,7 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
         panel_fecha.setBackground(clacolor.getColor_insertar_secundario());
         panel_estado.setBackground(clacolor.getColor_insertar_secundario());
         panel_cliente.setBackground(clacolor.getColor_insertar_secundario());
+        panel_formapago.setBackground(clacolor.getColor_insertar_secundario());
     }
     String filtro_venta_todos() {
         String filtro = "";
@@ -58,6 +59,7 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
             txtfecha_desde.setText(fecdesde);
             txtfecha_hasta.setText(fechasta);
             String filtro_estado = auxvent.filtro_estado(jCestado_emitido, jCestado_terminado, jCestado_anulado);
+            String filtro_formapago=auxvent.forma_pago(jCpago_efectivo, jCpago_tarjeta, jCpago_combinado);
             String filtro_fecha = " and date(v.fecha_emision) >= '" + fecdesde + "' and date(v.fecha_emision) <= '" + fechasta + "' \n";
             String filtro_cliente = "";
             if (fk_idcliente_local >= 0) {
@@ -65,6 +67,7 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
             }
             filtro = filtro + filtro_fecha;
             filtro = filtro + filtro_estado;
+            filtro = filtro + filtro_formapago;
             filtro = filtro + filtro_cliente;
         }
         return filtro;
@@ -133,6 +136,10 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
         jList_cliente = new javax.swing.JList<>();
         jLabel3 = new javax.swing.JLabel();
         txtbucarCliente_nombre = new javax.swing.JTextField();
+        panel_formapago = new javax.swing.JPanel();
+        jCpago_efectivo = new javax.swing.JCheckBox();
+        jCpago_tarjeta = new javax.swing.JCheckBox();
+        jCpago_combinado = new javax.swing.JCheckBox();
         btnimprimir = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jFtotal_venta_efectivo = new javax.swing.JFormattedTextField();
@@ -241,7 +248,7 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
                 .addComponent(jCestado_terminado)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCestado_anulado)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(199, Short.MAX_VALUE))
         );
         panel_estadoLayout.setVerticalGroup(
             panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -305,7 +312,53 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
                     .addComponent(txtbucarCliente_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jList_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 82, Short.MAX_VALUE))
+                .addGap(0, 65, Short.MAX_VALUE))
+        );
+
+        panel_formapago.setBorder(javax.swing.BorderFactory.createTitledBorder("FORMA PAGO"));
+
+        jCpago_efectivo.setText("EFECTIVO");
+        jCpago_efectivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCpago_efectivoActionPerformed(evt);
+            }
+        });
+
+        jCpago_tarjeta.setText("TARJETA");
+        jCpago_tarjeta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCpago_tarjetaActionPerformed(evt);
+            }
+        });
+
+        jCpago_combinado.setText("COMBINADO");
+        jCpago_combinado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCpago_combinadoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_formapagoLayout = new javax.swing.GroupLayout(panel_formapago);
+        panel_formapago.setLayout(panel_formapagoLayout);
+        panel_formapagoLayout.setHorizontalGroup(
+            panel_formapagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_formapagoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jCpago_efectivo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCpago_tarjeta)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCpago_combinado)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panel_formapagoLayout.setVerticalGroup(
+            panel_formapagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_formapagoLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panel_formapagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCpago_efectivo)
+                    .addComponent(jCpago_tarjeta)
+                    .addComponent(jCpago_combinado)))
         );
 
         javax.swing.GroupLayout panel_reporte_ventaLayout = new javax.swing.GroupLayout(panel_reporte_venta);
@@ -315,6 +368,7 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
             .addComponent(panel_estado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(panel_fecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(panel_cliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panel_formapago, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         panel_reporte_ventaLayout.setVerticalGroup(
             panel_reporte_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -323,8 +377,10 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
                 .addGap(3, 3, 3)
                 .addComponent(panel_estado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel_cliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(7, 7, 7))
+                .addComponent(panel_formapago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panel_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         btnimprimir.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -504,6 +560,21 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
         seleccionar_check();
     }//GEN-LAST:event_btnbuscar_fechaActionPerformed
 
+    private void jCpago_efectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_efectivoActionPerformed
+        // TODO add your handling code here:
+        seleccionar_check();
+    }//GEN-LAST:event_jCpago_efectivoActionPerformed
+
+    private void jCpago_tarjetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_tarjetaActionPerformed
+        // TODO add your handling code here:
+        seleccionar_check();
+    }//GEN-LAST:event_jCpago_tarjetaActionPerformed
+
+    private void jCpago_combinadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_combinadoActionPerformed
+        // TODO add your handling code here:
+        seleccionar_check();
+    }//GEN-LAST:event_jCpago_combinadoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnbuscar_fecha;
@@ -512,6 +583,9 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox jCestado_anulado;
     private javax.swing.JCheckBox jCestado_emitido;
     private javax.swing.JCheckBox jCestado_terminado;
+    private javax.swing.JCheckBox jCpago_combinado;
+    private javax.swing.JCheckBox jCpago_efectivo;
+    private javax.swing.JCheckBox jCpago_tarjeta;
     private javax.swing.JFormattedTextField jFcant_fila;
     private javax.swing.JFormattedTextField jFtotal_venta_efectivo;
     private javax.swing.JFormattedTextField jFtotal_venta_tarjeta;
@@ -527,6 +601,7 @@ public class FrmRepVenta extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panel_cliente;
     private javax.swing.JPanel panel_estado;
     private javax.swing.JPanel panel_fecha;
+    private javax.swing.JPanel panel_formapago;
     private javax.swing.JPanel panel_reporte_venta;
     private javax.swing.JTextField txtbucarCliente_nombre;
     private javax.swing.JTextField txtfecha_desde;
