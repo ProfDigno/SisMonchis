@@ -106,9 +106,9 @@ public class DAO_item_compra {
         item_compra item = new item_compra();
         for (int row = 0; row < tblitem_compra_insumo.getRowCount(); row++) {
             String idproducto = ((tblitem_compra_insumo.getModel().getValueAt(row, 0).toString()));
-            String descripcion = ((tblitem_compra_insumo.getModel().getValueAt(row, 1).toString()));
-            String precio_compra = ((tblitem_compra_insumo.getModel().getValueAt(row, 3).toString()));
-            String cantidad = ((tblitem_compra_insumo.getModel().getValueAt(row, 4).toString()));
+            String descripcion = ((tblitem_compra_insumo.getModel().getValueAt(row, 2).toString()));
+            String precio_compra = ((tblitem_compra_insumo.getModel().getValueAt(row, 4).toString()));
+            String cantidad = ((tblitem_compra_insumo.getModel().getValueAt(row, 5).toString()));
             try {
                 item.setC2descripcion(descripcion);
                 item.setC3precio_compra(Double.parseDouble(precio_compra));

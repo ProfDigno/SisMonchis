@@ -55,7 +55,7 @@ EvenJFRAME evetbl = new EvenJFRAME();
         DAO.cargar_proveedor(conn, entidad, idproveedor);
         FrmCompra.txtprovee_nombre.setText(entidad.getC3nombre());
         FrmCompra.txtprovee_ruc.setText(entidad.getC6ruc());
-        FrmCompra.txtbuscar_insumo_producto.grabFocus();
+        FrmCompra.txtprod_buscar_nombre.grabFocus();
     }
     private void buscar_proveedor(java.awt.event.KeyEvent evt,String campo,String buscar) {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
