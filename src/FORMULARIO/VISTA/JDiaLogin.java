@@ -17,6 +17,7 @@ import FORMULARIO.DAO.DAO_caja_cierre;
 import FORMULARIO.DAO.DAO_usuario;
 import FORMULARIO.DAO.DAO_venta;
 import FORMULARIO.ENTIDAD.caja_cierre;
+import FORMULARIO.ENTIDAD.financista;
 import FORMULARIO.ENTIDAD.usuario;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
@@ -45,6 +46,7 @@ public class JDiaLogin extends javax.swing.JDialog {
     caja_cierre cjcie = new caja_cierre();
     DAO_caja_cierre cjcie_dao = new DAO_caja_cierre();
     cla_color_pelete clacolor= new cla_color_pelete();
+    private financista fina = new financista();
     /**
      * Creates new form FrmZonaDelivery
      */
@@ -109,6 +111,7 @@ public class JDiaLogin extends javax.swing.JDialog {
             if (bdao.getBoolean_backup_creado_hoy(conn)) {
                 evetbl.abrir_TablaJinternal(new FrmCrearBackup());
             }
+            primer_finanza();
             int idcaja_cierre = (eveconn.getInt_ultimoID_max(conn, cjcie.getTb_caja_cierre(), cjcie.getId_idcaja_cierre()));
             if (idcaja_cierre == 0) {
                 JOptionPane.showMessageDialog(null, "NO HAY NINGUNA CAJA");
@@ -127,7 +130,12 @@ public class JDiaLogin extends javax.swing.JDialog {
             txtusuario.grabFocus();
         }
     }
-
+    void primer_finanza(){
+        int idfinancista = (eveconn.getInt_ultimoID_mas_uno(conn, fina.getTb_financista(), fina.getId_idfinancista()));
+        if(idfinancista==0){
+            evetbl.abrir_TablaJinternal(new FrmFinancista());
+        }
+    }
     void boton_entrar() {
         if (validar_ingreso()) {
             usu.setU3usuario(txtusuario.getText());

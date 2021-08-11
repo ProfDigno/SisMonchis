@@ -21,15 +21,21 @@ public class DAO_compra {
     EvenFecha evefec = new EvenFecha();
     private String mensaje_insert = "COMPRA GUARDADO CORRECTAMENTE";
     private String mensaje_update = "COMPRA MODIFICADO CORECTAMENTE";
-    private String sql_insert = "INSERT INTO compra(idcompra,fecha_emision,estado,observacion,forma_pago,monto_compra,fk_idproveedor,fk_idusuario,nro_nota) VALUES (?,?,?,?,?,?,?,?,?);";
+    private String sql_insert = "INSERT INTO compra(idcompra,fecha_emision,estado,observacion,forma_pago,monto_compra,"
+            + "fk_idproveedor,fk_idusuario,nro_nota,condicion,fk_idfinancista) VALUES (?,?,?,?,?,?,?,?,?,?,?);";
     private String sql_update = "UPDATE compra SET fecha_emision=?,estado=?,observacion=?,forma_pago=?,monto_compra=?,fk_idproveedor=?,fk_idusuario=?,nro_nota=? WHERE idcompra=?;";
     private String sql_select = "select c.idcompra as idc,to_char(c.fecha_emision,'dd-MM-yyyy HH24:MI') as fecha, \n"
-            + "p.nombre as provee,p.ruc,c.estado,TRIM(to_char(c.monto_compra,'999G999G999')) as monto,u.usuario\n"
-            + "from compra c,proveedor p,usuario u \n"
-            + "where c.fk_idproveedor=p.idproveedor \n"
-            + "and c.fk_idusuario=u.idusuario\n"
+            + "p.nombre as provee,p.ruc,c.estado,c.condicion,\n"
+            + "TRIM(to_char(c.monto_compra,'999G999G999')) as monto,f.idfinancista as idf,f.nombre as financista,\n"
+            + "gcf.estado as est_credito\n"
+            + "from compra c\n"
+            + "inner join proveedor p on c.fk_idproveedor=p.idproveedor \n"
+            + "inner join financista f on c.fk_idfinancista=f.idfinancista\n"
+            + "LEFT  join credito_finanza cf on cf.fk_idcompra = c.idcompra\n"
+            + "LEFT join grupo_credito_finanza gcf on cf.fk_idgrupo_credito_finanza=gcf.idgrupo_credito_finanza\n"
+            + "where c.idcompra>0 \n"
             + "";
-    private String order_select=" order by 1 desc;";
+    private String order_select = " order by 1 desc;";
     private String sql_cargar = "SELECT idcompra,fecha_emision,estado,observacion,forma_pago,monto_compra,fk_idproveedor,fk_idusuario FROM compra WHERE idcompra=";
     private String sql_estado = "UPDATE public.compra\n"
             + "   SET estado=?\n"
@@ -50,6 +56,8 @@ public class DAO_compra {
             pst.setInt(7, com.getC7fk_idproveedor());
             pst.setInt(8, com.getC8fk_idusuario());
             pst.setInt(9, com.getC9nro_nota());
+            pst.setString(10, com.getC10condicion());
+            pst.setInt(11, com.getC11fk_idfinancista());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + com.toString(), titulo);
@@ -104,15 +112,17 @@ public class DAO_compra {
     }
 
     public void actualizar_tabla_compra(Connection conn, JTable tbltabla) {
-        eveconn.Select_cargar_jtable(conn, sql_select+order_select, tbltabla);
+        eveconn.Select_cargar_jtable(conn, sql_select + order_select, tbltabla);
         ancho_tabla_compra(tbltabla);
     }
-    public void actualizar_tabla_compra_buscar(Connection conn, JTable tbltabla,String buscar) {
-        eveconn.Select_cargar_jtable(conn, sql_select+buscar+order_select, tbltabla);
+
+    public void actualizar_tabla_compra_buscar(Connection conn, JTable tbltabla, String buscar) {
+        eveconn.Select_cargar_jtable(conn, sql_select + buscar + order_select, tbltabla);
         ancho_tabla_compra(tbltabla);
     }
+
     public void ancho_tabla_compra(JTable tbltabla) {
-        int Ancho[] = {5,15, 30,10, 10, 10, 10};
+        int Ancho[] = {5,8, 20, 9, 6, 6, 7, 2, 12,8};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 

@@ -40,7 +40,7 @@ public class BO_venta {
             }
             vdao.insertar_venta(conn, ven);
             ivdao.insertar_item_venta_de_tabla(conn, tblitem_producto, item, ven);
-            cdao.insertar_caja_detalle(conn, caja);
+            cdao.insertar_caja_detalle1(conn, caja);
             
             conn.commit();
             insertado = true;

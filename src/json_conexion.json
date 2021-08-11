@@ -1,7 +1,7 @@
 {
 "localhost":"localhost",
 "port":"5432",
-"basedato":"bdmonchisbeer_10",
+"basedato":"bdmonchisbeer_13",
 "usuario":"postgres",
 "password":"4650586"
 }

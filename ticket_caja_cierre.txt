@@ -1,57 +1,33 @@
                                    
  ======MONCHI'S SHOP BEER======    
-          CODIGO:47                
- INICIO:       2021-05-29 10:13    
- FIN:          2021-05-29 23:23    
+          CODIGO:116               
+ INICIO:       2021-08-11 01:38    
+ FIN:          2021-08-11 01:51    
  #=============================#   
- CAJA ABRIR:             3,147,000 
- VENTA EFECTIVO:         3,256,620 
- VENTA TARJETA:          185,000   
+ CAJA ABRIR:             10,000    
+ VENTA EFECTIVO:         66,680    
+ VENTA TARJETA:          35,000    
  ------Detalle Venta-----------    
                                    
  DELIVERY:               0         
  #=============================#   
- TOTAL GASTO:            60,000    
+ TOTAL GASTO:            0         
  TOTAL VALE:             0         
- TOTAL COMPRA:           1,258,472 
+ TOTAL COMPRA:           0         
+ TOTAL RECIBO:           33,942    
  #=============================#   
- SISTEMA:                5,270,148 
- CIERRE:                 5,270,148 
- DIFERENCIA:             (0)       
+ SISTEMA:                77,738    
+ CIERRE:                 78,000    
+ DIFERENCIA:             (262)     
+ #=============================#   
+ TOTAL COMP-CREDITO:     33,942    
  ------TOP 20 Mas Vendido-----     
- 93 X   HEINEKEN-Bote 650ml-Holandesa Premium
- 48 X   Amstel Bier-Lata 350ml-Premium
- 21 X   Eisenbahn-Bote 355ml-Pilsen
- 16 X   Munich-Lata 350ml-Royal    
- 15 X   PILSEN-Lata 354cl-Clasica  
- 15 X   Amstel Bier-Lata 269ml-Premium
- 14 X   Smirnoff Ice-Bote 275ml-Limao Classico
- 12 X   Corona-Bote 210ml-Pony     
- 12 X   Budweiser-Lata 473ml-King of Beers
- 10 X   PILSEN-Bote 340 ml-Clasica Retornable
- 10 X   Frizze-Lata 473ml-Blue Evolution
- 9 X    Skol-Lata 269ml-Pilsen     
- 8 X    Antartica-Bote 600ml-Original
- 6 X    Black Sheep-600Puff-Grape Ice
- 6 X    Stella Artois-Lata 269ml-Belgium
- 6 X    Eisenbahn-Lata 350ml-Pilsen
- 6 X    Miller-Bote 650ml-Genuine Draft
- 5 X    Black Sheep-600Puff-Peach Ice
- 4 X    Coca Cola-Bote 2lts-Original Descartable
- 4 X    MIRANDA-1 BOLSA-HIELO CUBITO GRANDE
+ 20 X   HEINEKEN-Bote 1Lts-alcohol 
+ 7 X    Skol-Bote 275ml-Abre facil 
                                    
  -----COMPRA-PROVEEDOR----         
- Prov:CERVEPAR                     
- Nota:(12272)            630,576   
- Prov:Retail S.A                   
- Nota:(36538)            277,200   
- Prov:Olmedo Bebidas               
- Nota:(100)              188,000   
- Prov:Coca Cola Paresa             
- Nota:(14188)            162,696   
-                                   
-                                   
-                                   
+ (CREDITO)Distribuidora del Paraguay S.A
+ Nota:(362)              33,942    
                                    
                                    
                                    

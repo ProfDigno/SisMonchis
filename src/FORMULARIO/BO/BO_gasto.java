@@ -33,7 +33,7 @@ public class BO_gasto {
                 conn.setAutoCommit(false);
             }
             gdao.insertar_gasto(conn, gas);
-            cdao.insertar_caja_detalle(conn, caja);
+            cdao.insertar_caja_detalle1(conn, caja);
             conn.commit();
             return true;
         } catch (SQLException e) {

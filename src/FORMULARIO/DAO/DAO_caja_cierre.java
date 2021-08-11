@@ -39,11 +39,15 @@ public class DAO_caja_cierre {
             + "TRIM(to_char(sum(cd.monto_venta_efectivo),'999G999G999')) as in_vEfectivo,\n"
             + "TRIM(to_char(sum(cd.monto_venta_tarjeta),'999G999G999')) as in_vTarjeta,\n"
             + "TRIM(to_char(sum(cd.monto_compra),'999G999G999')) as eg_compra,\n"
+            + "TRIM(to_char(sum(cd.monto_compra_credito),'999G999G999')) as compra_cre,\n"
             + "TRIM(to_char(sum(cd.monto_gasto),'999G999G999')) as eg_gasto,\n"
             + "TRIM(to_char(sum(cd.monto_vale),'999G999G999')) as eg_vale,\n"
-            + "TRIM(to_char((sum(cd.monto_caja+cd.monto_venta_efectivo+cd.monto_venta_tarjeta))-(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale)),'999G999G999')) as sistema,\n"
+            + "TRIM(to_char(sum(cd.monto_recibo_pago),'999G999G999')) as eg_recibo,\n"
+            + "TRIM(to_char((sum(cd.monto_caja+cd.monto_venta_efectivo+cd.monto_venta_tarjeta))-"
+            + "(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale+cd.monto_recibo_pago)),'999G999G999')) as sistema,\n"
             + "TRIM(to_char(sum(cd.monto_cierre),'999G999G999')) as cierre,\n"
-            + "TRIM(to_char((sum(cd.monto_cierre)-((sum(cd.monto_caja+cd.monto_venta_efectivo+cd.monto_venta_tarjeta))-(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale)))),'999G999G999')) as diferencia\n"
+            + "TRIM(to_char((sum(cd.monto_cierre)-((sum(cd.monto_caja+cd.monto_venta_efectivo+cd.monto_venta_tarjeta))-"
+            + "(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale+cd.monto_recibo_pago)))),'999G999G999')) as diferencia\n"
             + "from caja_cierre cc,item_caja_cierre icc,caja_detalle cd\n"
             + "where cc.idcaja_cierre=icc.fk_idcaja_cierre\n"
             + "and cd.idcaja_detalle=icc.fk_idcaja_detalle\n"
@@ -110,7 +114,7 @@ public class DAO_caja_cierre {
     }
 
     public void ancho_tabla_caja_cierre(JTable tbltabla) {
-        int Ancho[] = {4,10,10,8,8,8,8,8,8,8,8,9};
+        int Ancho[] = {4,10,10,8,8,8,8,7,7,7,7,7,7,7};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 

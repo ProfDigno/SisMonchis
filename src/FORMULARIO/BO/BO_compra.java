@@ -4,9 +4,14 @@ import BASEDATO.LOCAL.ConnPostgres;
 import Evento.Mensaje.EvenMensajeJoptionpane;
 import FORMULARIO.DAO.DAO_caja_detalle;
 import FORMULARIO.DAO.DAO_compra;
+import FORMULARIO.DAO.DAO_credito_finanza;
+import FORMULARIO.DAO.DAO_financista;
 import FORMULARIO.DAO.DAO_item_compra;
 import FORMULARIO.ENTIDAD.caja_detalle;
 import FORMULARIO.ENTIDAD.compra;
+import FORMULARIO.ENTIDAD.credito_finanza;
+import FORMULARIO.ENTIDAD.financista;
+import FORMULARIO.ENTIDAD.item_compra;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.swing.JTable;
@@ -17,7 +22,9 @@ public class BO_compra {
     EvenMensajeJoptionpane evmen = new EvenMensajeJoptionpane();
     private DAO_item_compra icdao=new DAO_item_compra();
     private DAO_caja_detalle cdao = new DAO_caja_detalle();
-   public boolean getBoolean_compra(JTable tblitem_compra_insumo, compra comp,caja_detalle caja) {
+    private DAO_credito_finanza ccli_dao = new DAO_credito_finanza();
+    private DAO_financista cli_dao = new DAO_financista();
+   public boolean getBoolean_compra1(JTable tblitem_compra_insumo, compra comp,caja_detalle caja) {
         boolean insertado = false;
         String titulo = "getBoolean_compra";
         Connection conn = null;
@@ -28,7 +35,7 @@ public class BO_compra {
             }
             com_dao.insertar_compra(conn, comp);
             icdao.insertar_item_compra_de_tabla(conn, tblitem_compra_insumo, comp);
-            cdao.insertar_caja_detalle(conn, caja);
+            cdao.insertar_caja_detalle1(conn, caja);
             conn.commit();
             insertado = true;
         } catch (SQLException e) {
@@ -83,7 +90,7 @@ public class BO_compra {
             }
         }
     }
-    public void update_anular_compra(Connection conn, compra comp, caja_detalle caja) {
+    public void update_anular_compra(Connection conn, compra comp, caja_detalle caja,credito_finanza cf,financista fina) {
         String titulo = "update_anular_compra";
         try {
             if (conn.getAutoCommit()) {
@@ -91,6 +98,8 @@ public class BO_compra {
             }
             com_dao.update_estado_compra(conn, comp);
             cdao.anular_caja_detalle(conn, caja);
+            ccli_dao.update_credito_finanza_anular(conn, cf);
+            cli_dao.update_finanza_saldo_credito(conn, fina);
             icdao.descontar_stock_producto(conn, comp);
             conn.commit();
         } catch (SQLException e) {
@@ -101,5 +110,30 @@ public class BO_compra {
                 evmen.Imprimir_serial_sql_error(e1, comp.toString(), titulo);
             }
         }
+    }
+    public boolean getBoolean_insertar_compra_credito(Connection conn, JTable tblitem_venta,
+            item_compra item, compra com,credito_finanza cfina,financista fina, caja_detalle caja) {
+        boolean insertado = false;
+        String titulo = "getBoolean_insertar_venta_credito";
+        try {
+            if (conn.getAutoCommit()) {
+                conn.setAutoCommit(false);
+            }
+            com_dao.insertar_compra(conn, com);
+            icdao.insertar_item_compra_de_tabla(conn, tblitem_venta, com);
+            ccli_dao.insertar_credito_finanza(conn, cfina);
+            cli_dao.update_finanza_saldo_credito(conn, fina);
+            cdao.insertar_caja_detalle1(conn, caja);
+            conn.commit();
+            insertado = true;
+        } catch (SQLException e) {
+            evmen.mensaje_error(e, com.toString(), titulo);
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                evmen.Imprimir_serial_sql_error(e1, com.toString(), titulo);
+            }
+        }
+        return insertado;
     }
 }

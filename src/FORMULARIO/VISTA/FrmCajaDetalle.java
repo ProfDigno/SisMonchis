@@ -17,6 +17,7 @@ import Evento.Jtable.EvenJtable;
 import Evento.Jtable.EvenRender;
 import Evento.Mensaje.EvenMensajeJoptionpane;
 import FORMULARIO.DAO.DAO_caja_detalle;
+import FORMULARIO.ENTIDAD.caja_detalle;
 import IMPRESORA_POS.PosImprimir_Compra;
 import IMPRESORA_POS.PosImprimir_Gasto;
 import IMPRESORA_POS.PosImprimir_Vale;
@@ -67,7 +68,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     PosImprimir_Compra poscomp = new PosImprimir_Compra();
     ConnPostgres cpt = new ConnPostgres();
     cla_color_pelete clacolor = new cla_color_pelete();
-
+    public static caja_detalle caja = new caja_detalle();
     void abrir() {
         conn = cpt.getConnPosgres();
         this.setTitle("CAJA DETALLE");
@@ -90,9 +91,11 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
             actualizar_caja_detalle_venta(fecha_emision, tblcaja_venta, txtcantidad_venta_efectivo, jFtotal_venta_efectivo);
 //            actualizar_caja_detalle_otros(fecha_emision, "VENTA_EFECTIVO", "c.monto_venta_efectivo", tblcaja_venta_efectivo,txtcantidad_venta_efectivo,jFtotal_venta_efectivo);
 //            actualizar_caja_detalle_otros(fecha_emision, "VENTA_TARJETA", "c.monto_venta_tarjeta", tblcaja_venta_tarjeta,txtcantidad_venta_tarjeta,jFtotal_venta_tarjeta);
-            actualizar_caja_detalle_otros(fecha_emision, "VALE", "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
-            actualizar_caja_detalle_otros(fecha_emision, "GASTO", "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
-            actualizar_caja_detalle_otros(fecha_emision, "COMPRA", "c.monto_compra", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
+            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_vale(), "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
+            actualizar_caja_detalle_otros(fecha_emision,caja.getTabla_origen_gasto(), "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
+            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_compra_contado(), "c.monto_compra", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
+            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_compra_credito(), "c.monto_compra_credito", tblcaja_compra_credito, txtcantidad_compra_credito, jFtotal_compra_credito);
+            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_recibo(), "c.monto_recibo_pago", tblcaja_recibo, txtcantidad_recibo_comp, jFtotal_recibo_comp);
             caja_detalle_saldo(fecha_emision);
         }        
     }
@@ -139,8 +142,10 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
 
     void caja_detalle_saldo(String fecha_emision) {
         String titulo = "caja_detalle_saldo";
-        String sql = "select sum(monto_venta_efectivo+monto_venta_tarjeta) as ingreso,sum(monto_compra+monto_gasto+monto_vale) as egreso, \n"
-                + "sum((monto_venta_efectivo+monto_venta_tarjeta)-(monto_compra+monto_gasto+monto_vale)) as saldo\n"
+        String sql = "select sum(monto_venta_efectivo+monto_venta_tarjeta) as ingreso,"
+                + "sum(monto_compra+monto_gasto+monto_vale+monto_recibo_pago) as egreso, \n"
+                + "sum((monto_venta_efectivo+monto_venta_tarjeta)-"
+                + "(monto_compra+monto_gasto+monto_vale+monto_recibo_pago)) as saldo\n"
                 + "from caja_detalle where date(fecha_emision)='" + fecha_emision + "'";
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
@@ -241,6 +246,24 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         jLabel4 = new javax.swing.JLabel();
         jFtotal_vale = new javax.swing.JFormattedTextField();
         btnimprimir_vale = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        panel_compra1 = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tblcaja_compra_credito = new javax.swing.JTable();
+        jLabel16 = new javax.swing.JLabel();
+        txtcantidad_compra_credito = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
+        jFtotal_compra_credito = new javax.swing.JFormattedTextField();
+        btnimprimir_compra_credito = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        panel_compra2 = new javax.swing.JPanel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        tblcaja_recibo = new javax.swing.JTable();
+        jLabel18 = new javax.swing.JLabel();
+        txtcantidad_recibo_comp = new javax.swing.JTextField();
+        jLabel19 = new javax.swing.JLabel();
+        jFtotal_recibo_comp = new javax.swing.JFormattedTextField();
+        btnimprimir_compra_credito1 = new javax.swing.JButton();
 
         setClosable(true);
         setTitle("CAJA DETALLE");
@@ -298,7 +321,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         panel_principal.setLayout(panel_principalLayout);
         panel_principalLayout.setHorizontalGroup(
             panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 932, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1083, Short.MAX_VALUE)
             .addGroup(panel_principalLayout.createSequentialGroup()
                 .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnactualizar_tabla)
@@ -451,7 +474,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
                 .addComponent(txtcantidad_compra, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel15)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 356, Short.MAX_VALUE)
                 .addComponent(jFtotal_compra, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         panel_compraLayout.setVerticalGroup(
@@ -471,7 +494,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 944, Short.MAX_VALUE)
+            .addGap(0, 1095, Short.MAX_VALUE)
             .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(panel_compra, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -533,7 +556,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
                 .addComponent(txtcantidad_gasto, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel13)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 356, Short.MAX_VALUE)
                 .addComponent(jFtotal_gasto, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         panel_gastoLayout.setVerticalGroup(
@@ -553,7 +576,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 944, Short.MAX_VALUE)
+            .addGap(0, 1095, Short.MAX_VALUE)
             .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(panel_gasto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -615,7 +638,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
                 .addComponent(txtcantidad_vale, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 356, Short.MAX_VALUE)
                 .addComponent(jFtotal_vale, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         panel_valeLayout.setVerticalGroup(
@@ -635,7 +658,7 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 944, Short.MAX_VALUE)
+            .addGap(0, 1095, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(panel_vale, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -647,6 +670,170 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         );
 
         jTabbedPane1.addTab("VALE", jPanel3);
+
+        panel_compra1.setBackground(new java.awt.Color(204, 204, 255));
+        panel_compra1.setBorder(javax.swing.BorderFactory.createTitledBorder("CAJA_COMPRA"));
+
+        tblcaja_compra_credito.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane8.setViewportView(tblcaja_compra_credito);
+
+        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel16.setText("CANTIDAD:");
+
+        txtcantidad_compra_credito.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+
+        jLabel17.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel17.setText("TOTAL:");
+
+        jFtotal_compra_credito.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
+        jFtotal_compra_credito.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFtotal_compra_credito.setText("0");
+        jFtotal_compra_credito.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+
+        btnimprimir_compra_credito.setText("IMPRIMIR TICKET COMPRA");
+        btnimprimir_compra_credito.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnimprimir_compra_creditoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_compra1Layout = new javax.swing.GroupLayout(panel_compra1);
+        panel_compra1.setLayout(panel_compra1Layout);
+        panel_compra1Layout.setHorizontalGroup(
+            panel_compra1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane8)
+            .addGroup(panel_compra1Layout.createSequentialGroup()
+                .addComponent(btnimprimir_compra_credito, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel16)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtcantidad_compra_credito, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel17)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 356, Short.MAX_VALUE)
+                .addComponent(jFtotal_compra_credito, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        panel_compra1Layout.setVerticalGroup(
+            panel_compra1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_compra1Layout.createSequentialGroup()
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_compra1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel16)
+                    .addComponent(btnimprimir_compra_credito, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtcantidad_compra_credito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel17)
+                    .addComponent(jFtotal_compra_credito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1095, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(panel_compra1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 522, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(panel_compra1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("COMPRA-CREDITO", jPanel1);
+
+        panel_compra2.setBackground(new java.awt.Color(204, 204, 255));
+        panel_compra2.setBorder(javax.swing.BorderFactory.createTitledBorder("RECIBO PAGO COMPRA"));
+
+        tblcaja_recibo.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane9.setViewportView(tblcaja_recibo);
+
+        jLabel18.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel18.setText("CANTIDAD:");
+
+        txtcantidad_recibo_comp.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+
+        jLabel19.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel19.setText("TOTAL:");
+
+        jFtotal_recibo_comp.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
+        jFtotal_recibo_comp.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFtotal_recibo_comp.setText("0");
+        jFtotal_recibo_comp.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+
+        btnimprimir_compra_credito1.setText("IMPRIMIR TICKET RECIBO");
+        btnimprimir_compra_credito1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnimprimir_compra_credito1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_compra2Layout = new javax.swing.GroupLayout(panel_compra2);
+        panel_compra2.setLayout(panel_compra2Layout);
+        panel_compra2Layout.setHorizontalGroup(
+            panel_compra2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane9)
+            .addGroup(panel_compra2Layout.createSequentialGroup()
+                .addComponent(btnimprimir_compra_credito1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtcantidad_recibo_comp, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel19)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 356, Short.MAX_VALUE)
+                .addComponent(jFtotal_recibo_comp, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        panel_compra2Layout.setVerticalGroup(
+            panel_compra2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_compra2Layout.createSequentialGroup()
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_compra2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel18)
+                    .addComponent(btnimprimir_compra_credito1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtcantidad_recibo_comp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel19)
+                    .addComponent(jFtotal_recibo_comp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1095, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(panel_compra2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 526, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(panel_compra2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("RECIBO-PAG-COMPRA", jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -704,18 +891,30 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnimprimir_compraActionPerformed
 
+    private void btnimprimir_compra_creditoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_compra_creditoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnimprimir_compra_creditoActionPerformed
+
+    private void btnimprimir_compra_credito1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_compra_credito1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnimprimir_compra_credito1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnactualizar_tabla;
     private javax.swing.JButton btnimprimir_GASTO;
     private javax.swing.JButton btnimprimir_compra;
+    private javax.swing.JButton btnimprimir_compra_credito;
+    private javax.swing.JButton btnimprimir_compra_credito1;
     private javax.swing.JButton btnimprimir_vale;
     private javax.swing.JButton btnimprimir_venta;
     private javax.swing.JFormattedTextField jFcaja_egreso;
     private javax.swing.JFormattedTextField jFcaja_ingreso;
     private javax.swing.JFormattedTextField jFcaja_saldo;
     private javax.swing.JFormattedTextField jFtotal_compra;
+    private javax.swing.JFormattedTextField jFtotal_compra_credito;
     private javax.swing.JFormattedTextField jFtotal_gasto;
+    private javax.swing.JFormattedTextField jFtotal_recibo_comp;
     private javax.swing.JFormattedTextField jFtotal_vale;
     private javax.swing.JFormattedTextField jFtotal_venta_efectivo;
     private javax.swing.JLabel jLabel1;
@@ -723,12 +922,18 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel9;
@@ -737,19 +942,27 @@ public class FrmCajaDetalle extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel panel_compra;
+    private javax.swing.JPanel panel_compra1;
+    private javax.swing.JPanel panel_compra2;
     private javax.swing.JPanel panel_gasto;
     private javax.swing.JPanel panel_principal;
     private javax.swing.JPanel panel_vale;
     private javax.swing.JPanel panel_venta;
     private javax.swing.JTable tblcaja_compra;
+    private javax.swing.JTable tblcaja_compra_credito;
     private javax.swing.JTable tblcaja_gasto;
+    private javax.swing.JTable tblcaja_recibo;
     private javax.swing.JTable tblcaja_resumen;
     private javax.swing.JTable tblcaja_vale;
     private javax.swing.JTable tblcaja_venta;
     private javax.swing.JTextField txtcantidad_compra;
+    private javax.swing.JTextField txtcantidad_compra_credito;
     private javax.swing.JTextField txtcantidad_gasto;
+    private javax.swing.JTextField txtcantidad_recibo_comp;
     private javax.swing.JTextField txtcantidad_vale;
     private javax.swing.JTextField txtcantidad_venta_efectivo;
     // End of variables declaration//GEN-END:variables

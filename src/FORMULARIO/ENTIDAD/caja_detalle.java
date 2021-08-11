@@ -12,6 +12,20 @@ package FORMULARIO.ENTIDAD;
 public class caja_detalle {
 
     /**
+     * @return the c16monto_recibo_pago
+     */
+    public double getC17monto_recibo_pago() {
+        return c17monto_recibo_pago;
+    }
+
+    /**
+     * @param c16monto_recibo_pago the c16monto_recibo_pago to set
+     */
+    public void setC17monto_recibo_pago(double c16monto_recibo_pago) {
+        this.c17monto_recibo_pago = c16monto_recibo_pago;
+    }
+
+    /**
      * @return the c5monto_venta_tarjeta
      */
     public double getC5monto_venta_tarjeta() {
@@ -40,6 +54,8 @@ public class caja_detalle {
     private String c13tabla_origen_update;
     private String c14cierre;
     private String c15estado;
+    private double c17monto_recibo_pago;
+    private double c18monto_compra_credito;
     private int c16fk_idusuario;
     
     
@@ -47,6 +63,64 @@ public class caja_detalle {
     private static String tabla;
     private static String idtabla;
 
+    public static String getTabla_origen_venta_efectivo() {
+        return tabla_origen_venta_efectivo;
+    }
+
+    public static String getTabla_origen_venta_tarjeta() {
+        return tabla_origen_venta_tarjeta;
+    }
+
+    public static String getTabla_origen_compra_contado() {
+        return tabla_origen_compra_contado;
+    }
+
+    public static String getTabla_origen_compra_credito() {
+        return tabla_origen_compra_credito;
+    }
+
+    public static String getTabla_origen_vale() {
+        return tabla_origen_vale;
+    }
+
+    public static String getTabla_origen_gasto() {
+        return tabla_origen_gasto;
+    }
+
+    public static String getTabla_origen_caja() {
+        return tabla_origen_caja;
+    }
+
+    public static String getTabla_origen_cierre() {
+        return tabla_origen_cierre;
+    }
+    public static String getTabla_origen_venta_combinado() {
+        return tabla_origen_venta_combinado;
+    }
+    private static String tabla_origen_venta_efectivo="VENTA_EFECTIVO";
+    private static String tabla_origen_venta_tarjeta="VENTA_TARJETA";
+     private static String tabla_origen_venta_combinado="VENTA_COMBI";
+    private static String tabla_origen_compra_contado="COMPRA_CONTADO";
+    private static String tabla_origen_compra_credito="COMPRA_CREDITO";
+    private static String tabla_origen_vale="VALE";
+    private static String tabla_origen_gasto="GASTO";
+    private static String tabla_origen_recibo="RECIBO";
+    private static String tabla_origen_caja_abrir="CAJA_ABRIR";
+    private static String tabla_origen_caja_cerrar="CAJA_CERRAR";
+
+    public static String getTabla_origen_recibo() {
+        return tabla_origen_recibo;
+    }
+    
+    public static String getTabla_origen_caja_abrir() {
+        return tabla_origen_caja_abrir;
+    }
+
+    public static String getTabla_origen_caja_cerrar() {
+        return tabla_origen_caja_cerrar;
+    }
+    private static String tabla_origen_caja;
+    private static String tabla_origen_cierre;
     public caja_detalle() {
         setTabla("caja_detalle");
         setIdtabla("idcaja_detalle");
@@ -81,7 +155,7 @@ public class caja_detalle {
         return c3descripcion;
     }
 
-    public void setC3descripcion(String c3descripcion) {
+    public void setC3descripcion1(String c3descripcion) {
         this.c3descripcion = c3descripcion;
     }
 
@@ -226,6 +300,20 @@ public class caja_detalle {
      */
     public void setC13tabla_origen_update(String c13tabla_origen_update) {
         this.c13tabla_origen_update = c13tabla_origen_update;
+    }
+
+    /**
+     * @return the c18monto_compra_credito
+     */
+    public double getC18monto_compra_credito() {
+        return c18monto_compra_credito;
+    }
+
+    /**
+     * @param c18monto_compra_credito the c18monto_compra_credito to set
+     */
+    public void setC18monto_compra_credito(double c18monto_compra_credito) {
+        this.c18monto_compra_credito = c18monto_compra_credito;
     }
 
     

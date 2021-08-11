@@ -57,7 +57,7 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
     }
     void cargar_datos_caja() {
         caja.setC2fecha_emision(evefec.getString_formato_fecha_hora());
-        caja.setC3descripcion("(VENTA) CAJA ABRIR:" );
+        caja.setC3descripcion1("(VENTA) CAJA ABRIR:" );
         caja.setC4monto_venta_efectivo(0);
         caja.setC5monto_venta_tarjeta(0);
         caja.setC6monto_delivery(0);
@@ -68,15 +68,16 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
         caja.setC11monto_cierre(0);
         caja.setC12id_origen(0);
         caja.setC13tabla_origen("CAJA_ABRIR");
-//        caja.setC14cierre("C");
         caja.setC15estado("EMITIDO");
         caja.setC16fk_idusuario(usu.getGlobal_idusuario());
+        caja.setC17monto_recibo_pago(0);
+        caja.setC18monto_compra_credito(0);
     }
     void boton_caja_cierre(){
         if(txtmonto_caja_abrir.getText().trim().length()>0){
             cargar_datos_caja();
             cargar_datos_caja_cierre();
-            bocjcie.insertar_caja_cierre(cjcie, caja);
+            bocjcie.insertar_caja_cierre1(cjcie, caja);
             this.dispose();
         }
     }

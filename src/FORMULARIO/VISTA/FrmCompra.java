@@ -11,6 +11,7 @@ import BASEDATO.EvenConexion;
 //import BASEDATO.SERVIDOR.ConnPostgres_SER;
 import CONFIGURACION.EvenDatosPc;
 import Evento.Color.cla_color_pelete;
+import Evento.Combobox.EvenCombobox;
 import Evento.Fecha.EvenFecha;
 import Evento.JTextField.EvenJTextField;
 import Evento.Jframe.EvenJFRAME;
@@ -66,17 +67,23 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     EvenMensajeJoptionpane evemen = new EvenMensajeJoptionpane();
     caja_detalle caja = new caja_detalle();
     cotizacion coti = new cotizacion();
+    private EvenCombobox cmb = new EvenCombobox();
     private DAO_cotizacion codao = new DAO_cotizacion();
     private DAO_producto ipdao = new DAO_producto();
     private producto prod = new producto();
     private proveedor ent_prov = new proveedor();
     private compra compi = new compra();
+    private item_compra item = new item_compra();
     private DAO_compra cidao = new DAO_compra();
     private BO_compra ciBO = new BO_compra();
     private DAO_item_compra icidao = new DAO_item_compra();
     private DAO_caja_detalle cdao = new DAO_caja_detalle();
     private usuario usu = new usuario();
     private PosImprimir_Compra poscomp = new PosImprimir_Compra();
+    private DAO_grupo_credito_finanza gccDAO = new DAO_grupo_credito_finanza();
+    private credito_finanza cfina = new credito_finanza();
+    private grupo_credito_finanza gcc = new grupo_credito_finanza();
+    private financista fina = new financista();
     Connection conn = ConnPostgres.getConnPosgres();
     private DefaultTableModel model_itemf = new DefaultTableModel();
     private cla_color_pelete clacolor = new cla_color_pelete();
@@ -102,6 +109,14 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private DAO_proveedor DAO_prov = new DAO_proveedor();
     private int fk_idproveedor;
     private String tabla_origen = "COMPRA";
+    private String condicion_CONTADO = "CONTADO";
+    private String condicion_CREDITO = "CREDITO";
+//    private String tabla_origen_CONTADO = "COMPRA_CONTADO";
+//    private String tabla_origen_CREDITO = "COMPRA_CREDITO";
+    private double monto_compra_contado;
+    private double monto_compra_credito;
+    private String condicion;
+    private int fk_idfinancista;
 
     private void abrir_formulario() {
         String servidor = "";
@@ -109,8 +124,13 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         evetbl.centrar_formulario_internalframa(this);
         codao.cargar_cotizacion(coti, 1);
         crear_item_producto();
+        cargar_finanza();
         reestableser_compra();
         color_formulario();
+    }
+
+    private void cargar_finanza() {
+        cmb.cargarCombobox(conn, jCfinancista, "idfinancista", "nombre", "financista", "");
     }
 
     private void cargar_proveedor() {
@@ -159,6 +179,8 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         idcompra_ultimo = (eveconn.getInt_ultimoID_mas_uno(conn, compi.getTb_compra(), compi.getId_idcompra()));
         txtidcompra.setText(String.valueOf(idcompra_ultimo));
         txtbuscar_fecha.setText(evefec.getString_formato_fecha());
+        txtnro_nota.setText(null);
+        jRcond_contado.setSelected(true);
         jList_producto.setVisible(false);
         evejt.limpiar_tabla_datos(model_itemf);
         txtobservacion.setText("Ninguna");
@@ -205,10 +227,10 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     }
 
     private boolean validar_subtotal() {
-        if (txtprod_cant.getText().trim().length() < 0) {
+        if (txtprod_cant.getText().trim().length() <= 0) {
             return false;
         }
-        if (txtprod_pre_com.getText().trim().length() < 0) {
+        if (txtprod_pre_com.getText().trim().length() <= 0) {
             return false;
         }
         return true;
@@ -310,6 +332,12 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         if (evejtf.getBoo_JTextField_vacio(txtnro_nota, "CARGAR UN NUMERO DE NOTA")) {
             return false;
         }
+        if (jRcond_credito.isSelected()) {
+            if (jCfinancista.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "SI ES CREDITO...SE DEBE SELECCIONAR UN FINANCISTA");
+                return false;
+            }
+        }
         return true;
     }
 
@@ -322,17 +350,26 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         compi.setC8fk_idusuario(usu.getGlobal_idusuario());
         int nro_nota = Integer.parseInt(txtnro_nota.getText());
         compi.setC9nro_nota(nro_nota);
-
+        String condicion = "";
+        if (jRcond_contado.isSelected()) {
+            condicion = condicion_CONTADO;
+        }
+        if (jRcond_credito.isSelected()) {
+            condicion = condicion_CREDITO;
+        }
+        fk_idfinancista = cmb.getInt_seleccionar_COMBOBOX(conn, jCfinancista, "idfinancista", "nombre", "financista");
+        compi.setC10condicion(condicion);
+        compi.setC11fk_idfinancista(fk_idfinancista);
     }
 
     private void cargar_datos_caja() {
         caja.setC2fecha_emision(evefec.getString_formato_fecha_hora());
-        caja.setC3descripcion("(COMPRA) id:" + idcompra_ultimo + " Pro:" + txtprovee_nombre.getText());
+        caja.setC3descripcion1("(COMPRA) id:" + idcompra_ultimo + " Pro:" + txtprovee_nombre.getText());
         caja.setC4monto_venta_efectivo(0);
         caja.setC5monto_venta_tarjeta(0);
         caja.setC6monto_delivery(0);
         caja.setC7monto_gasto(0);
-        caja.setC8monto_compra(monto_compra);
+        caja.setC8monto_compra(monto_compra_contado);
         caja.setC9monto_vale(0);
         caja.setC10monto_caja(0);
         caja.setC11monto_cierre(0);
@@ -340,58 +377,129 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         caja.setC13tabla_origen(tabla_origen);
         caja.setC15estado(est_EMITIDO);
         caja.setC16fk_idusuario(usu.getGlobal_idusuario());
+        caja.setC17monto_recibo_pago(0);
+        caja.setC18monto_compra_credito(monto_compra_credito);
+    }
+
+    private String getDescripcion_item_venta() {
+        String suma_descripcion = "";
+        for (int row = 0; row < tblitem_producto.getRowCount(); row++) {
+            String descripcion = ((tblitem_producto.getModel().getValueAt(row, 2).toString()));
+            suma_descripcion = suma_descripcion + descripcion + ", ";
+        }
+        return suma_descripcion;
+    }
+
+    private void cargar_credito_finanza() {
+        gccDAO.cargar_grupo_credito_finanza_id(conn, gcc, fk_idfinancista);
+        cfina.setC3descripcion(getDescripcion_item_venta());
+        cfina.setC4estado(est_EMITIDO);
+        cfina.setC5monto_contado(monto_compra_contado);
+        cfina.setC6monto_credito(monto_compra_credito);
+        cfina.setC7tabla_origen(tabla_origen);
+        cfina.setC8fk_idgrupo_credito_finanza(gcc.getC1idgrupo_credito_finanza());
+        cfina.setC9fk_idsaldo_credito_finanza(0);
+        cfina.setC10fk_idrecibo_pago_finanza(0);
+        cfina.setC11fk_idcompra(idcompra_ultimo);
     }
 
     private void boton_comfirmar_compra() {
         if (validar_compra()) {
-            sumar_item_compra();
-            cargar_datos_compra();
-            cargar_datos_caja();
-            if (ciBO.getBoolean_compra(tblitem_producto, compi, caja)) {
-                if (habilitar_editar) {
-                    habilitar_editar = false;
-                    btnconfirmar_insertar.setText("CONFIRMAR");
-                    anular_compra(idcompra_insumo_editar);
+
+            if (jRcond_contado.isSelected()) {
+                monto_compra_credito = 0;
+                monto_compra_contado = monto_compra;
+                condicion = condicion_CONTADO;
+                tabla_origen = caja.getTabla_origen_compra_contado();
+                sumar_item_compra();
+                cargar_datos_compra();
+                cargar_datos_caja();
+                if (ciBO.getBoolean_compra1(tblitem_producto, compi, caja)) {
+//                    if (habilitar_editar) {
+//                        habilitar_editar = false;
+//                        btnconfirmar_insertar.setText("CONFIRMAR");
+//                        anular_compra(idcompra_insumo_editar);
+//                    }
+                    poscomp.boton_imprimir_pos_compra(conn, idcompra_ultimo);
+                    reestableser_compra();
                 }
-                poscomp.boton_imprimir_pos_compra(conn, idcompra_ultimo);
-                reestableser_compra();
+            }
+            if (jRcond_credito.isSelected()) {
+                monto_compra_credito = monto_compra;
+                monto_compra_contado = 0;
+                condicion = condicion_CREDITO;
+                tabla_origen = caja.getTabla_origen_compra_credito();
+                cargar_datos_compra();
+                cargar_credito_finanza();
+                cargar_datos_caja();
+                fina.setC1idfinancista(fk_idfinancista);
+                if (ciBO.getBoolean_insertar_compra_credito(conn, tblitem_producto, item, compi, cfina, fina, caja)) {
+                    poscomp.boton_imprimir_pos_compra(conn, idcompra_ultimo);
+                    reestableser_compra();
+                }
             }
         }
     }
 
     private void seleccionar_compra() {
         if (!evejt.getBoolean_validar_select(tblcompra)) {
-            String estado = evejt.getString_select(tblcompra, 5);
+            String estado = evejt.getString_select(tblcompra, 4);
+            String condicion = evejt.getString_select(tblcompra, 5);
+            String est_credito = evejt.getString_select(tblcompra, 9);
             idcompra_insumo_select = evejt.getInt_select_id(tblcompra);
             if (estado.equals(est_ANULADO)) {
                 btnanularventa.setEnabled(false);
             }
             if (estado.equals(est_EMITIDO)) {
                 btnanularventa.setEnabled(true);
+                if (est_credito.equals("CERRADO")) {
+                    btnanularventa.setEnabled(false);
+                }
+                if (est_credito.equals("null")) {
+                    btnanularventa.setEnabled(false);
+                }
+                if (condicion.equals(condicion_CONTADO)) {
+                    btnanularventa.setEnabled(true);
+                }
             }
             if (estado.equals(est_CONFIRMADO)) {
                 btnanularventa.setEnabled(false);
+            }
+            if (condicion.equals(condicion_CONTADO)) {
+                tabla_origen = caja.getTabla_origen_compra_contado();
+                System.out.println("tabla_origen:" + tabla_origen);
+            }
+            if (condicion.equals(condicion_CREDITO)) {
+                tabla_origen = caja.getTabla_origen_compra_credito();
+                System.out.println("tabla_origen:" + tabla_origen);
             }
             int idcompra_insumo = evejt.getInt_select_id(tblcompra);
             icidao.tabla_item_compra_insumo_filtro(conn, tblitem_compra_insumo, idcompra_insumo);
         }
     }
 
-    private void anular_compra(int idcompra_insumo) {
+    private void anular_compra(int idcompra_insumo, int idfinancista) {
         compi.setC1idcompra(idcompra_insumo);
         compi.setC3estado(est_ANULADO);
         caja.setC15estado(est_ANULADO);
         caja.setC13tabla_origen(tabla_origen);
         caja.setC12id_origen(idcompra_insumo);
-        ciBO.update_anular_compra(conn, compi, caja);
+        cfina.setC4estado(est_ANULADO);
+        cfina.setC5monto_contado(0);
+        cfina.setC6monto_credito(0);
+        cfina.setC11fk_idcompra(idcompra_insumo);
+        fina.setC1idfinancista(idfinancista);
+        ciBO.update_anular_compra(conn, compi, caja, cfina, fina);
         cidao.actualizar_tabla_compra(conn, tblcompra);
     }
 
     private void boton_anular_compra() {
+//        JOptionPane.showMessageDialog(null,"ANULAR NO ESTA HABILITADO POR EL MOMENTO.. HASTA ANULAR CREDITO COMPRA");
         if (!evejt.getBoolean_validar_select(tblcompra)) {
             if (evemen.MensajeGeneral_warning("ESTAS SEGURO DE ANULAR ESTA COMPRA", "ANULAR", "ACEPTAR", "CANCELAR")) {
                 int idcompra = evejt.getInt_select_id(tblcompra);
-                anular_compra(idcompra);
+                int idfinancista = evejt.getInt_select(tblcompra, 7);
+                anular_compra(idcompra, idfinancista);
             }
         }
     }
@@ -417,7 +525,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
             } else {
                 condi = " or";
             }
-            estado = condi + " c.estado='"+est_EMITIDO+"' ";
+            estado = condi + " c.estado='" + est_EMITIDO + "' ";
             sumaestado = sumaestado + estado;
         }
         if (jCestado_confirmado.isSelected()) {
@@ -428,7 +536,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
             } else {
                 condi = " or";
             }
-            estado = condi + " c.estado='"+est_CONFIRMADO+"' ";
+            estado = condi + " c.estado='" + est_CONFIRMADO + "' ";
             sumaestado = sumaestado + estado;
         }
         if (jCestado_anulado.isSelected()) {
@@ -439,7 +547,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
             } else {
                 condi = " or";
             }
-            estado = condi + " c.estado='"+est_ANULADO+"' ";
+            estado = condi + " c.estado='" + est_ANULADO + "' ";
             sumaestado = sumaestado + estado;
         }
         return sumaestado + fin;
@@ -460,25 +568,24 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         }
     }
 
-    private void cargar_datos_caja_insertar(int idcompra) {
-        cidao.cargar_compra(conn, compi, idcompra);
-        caja.setC2fecha_emision(evefec.getString_formato_fecha_hora());
-        caja.setC3descripcion("(COMPRA) id:" + idcompra + " Usuario:" + usu.getGlobal_nombre());
-        caja.setC4monto_venta_efectivo(0);
-        caja.setC5monto_venta_tarjeta(0);
-        caja.setC6monto_delivery(0);
-        caja.setC7monto_gasto(0);
-        caja.setC8monto_compra(compi.getC6monto_compra());
-        caja.setC9monto_vale(0);
-        caja.setC10monto_caja(0);
-        caja.setC11monto_cierre(0);
-        caja.setC12id_origen(idcompra);
-        caja.setC13tabla_origen(tabla_origen);
-        caja.setC15estado(est_EMITIDO);
-        caja.setC16fk_idusuario(usu.getGlobal_idusuario());
-        cdao.insertar_caja_detalle(conn, caja);
-    }
-
+//    private void cargar_datos_caja_insertar1(int idcompra) {
+//        cidao.cargar_compra(conn, compi, idcompra);
+//        caja.setC2fecha_emision(evefec.getString_formato_fecha_hora());
+//        caja.setC3descripcion("(COMPRA) id:" + idcompra + " Usuario:" + usu.getGlobal_nombre());
+//        caja.setC4monto_venta_efectivo(0);
+//        caja.setC5monto_venta_tarjeta(0);
+//        caja.setC6monto_delivery(0);
+//        caja.setC7monto_gasto(0);
+//        caja.setC8monto_compra(compi.getC6monto_compra());
+//        caja.setC9monto_vale(0);
+//        caja.setC10monto_caja(0);
+//        caja.setC11monto_cierre(0);
+//        caja.setC12id_origen(idcompra);
+//        caja.setC13tabla_origen(tabla_origen);
+//        caja.setC15estado(est_EMITIDO);
+//        caja.setC16fk_idusuario(usu.getGlobal_idusuario());
+//        cdao.insertar_caja_detalle1(conn, caja);
+//    }
     private void cargar_item_compra_cantidad(java.awt.event.KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_DOWN) {
             if (txtprod_cant.getText().trim().length() > 0) {
@@ -518,6 +625,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         gru_campo = new javax.swing.ButtonGroup();
+        gru_cond = new javax.swing.ButtonGroup();
         jTabbedPane_VENTA = new javax.swing.JTabbedPane();
         panel_base_2 = new javax.swing.JPanel();
         jTab_producto_ingrediente = new javax.swing.JTabbedPane();
@@ -562,6 +670,11 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         btnnuevo_provee = new javax.swing.JButton();
         jLabel15 = new javax.swing.JLabel();
         txtnro_nota = new javax.swing.JTextField();
+        jPanel3 = new javax.swing.JPanel();
+        jRcond_contado = new javax.swing.JRadioButton();
+        jRcond_credito = new javax.swing.JRadioButton();
+        jPanel4 = new javax.swing.JPanel();
+        jCfinancista = new javax.swing.JComboBox<>();
         panel_base_1 = new javax.swing.JPanel();
         panel_tabla_compra = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -646,9 +759,12 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         );
         panel_insertar_seg_compraLayout.setVerticalGroup(
             panel_insertar_seg_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_insertar_seg_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jLabel2)
-                .addComponent(txtobservacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(panel_insertar_seg_compraLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_insertar_seg_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtobservacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(61, Short.MAX_VALUE))
         );
 
         jLayeredPane1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -915,20 +1031,16 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                         .addComponent(txtprod_stock)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_insertar_pri_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_insertar_pri_compraLayout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(panel_insertar_seg_compra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_insertar_pri_compraLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(panel_insertar_pri_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(panel_insertar_pri_compraLayout.createSequentialGroup()
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btneliminar_item)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnsumar)))))
+                        .addComponent(btneliminar_item)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnsumar))
+                    .addComponent(panel_insertar_seg_compra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(60, Short.MAX_VALUE))
         );
 
@@ -982,7 +1094,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtprovee_ruc, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtprovee_ruc, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnbuscar_provee, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1006,24 +1118,78 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         txtnro_nota.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         txtnro_nota.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
+        jPanel3.setBackground(new java.awt.Color(255, 255, 204));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("CONDICION"));
+
+        gru_cond.add(jRcond_contado);
+        jRcond_contado.setSelected(true);
+        jRcond_contado.setText("CONTADO");
+
+        gru_cond.add(jRcond_credito);
+        jRcond_credito.setText("CREDITO");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jRcond_contado)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRcond_credito))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jRcond_contado)
+                    .addComponent(jRcond_credito)))
+        );
+
+        jPanel4.setBackground(new java.awt.Color(204, 204, 255));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("FINANCISTA"));
+
+        jCfinancista.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jCfinancista, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jCfinancista, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout panel_base_2Layout = new javax.swing.GroupLayout(panel_base_2);
         panel_base_2.setLayout(panel_base_2Layout);
         panel_base_2Layout.setHorizontalGroup(
             panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTab_producto_ingrediente, javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(panel_base_2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel12)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtidcompra, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel15)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtnro_nota, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(panel_base_2Layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGroup(panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_base_2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtidcompra, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel15)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtnro_nota, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(panel_base_2Layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(10, 10, 10))
         );
         panel_base_2Layout.setVerticalGroup(
             panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1035,10 +1201,13 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                     .addComponent(jLabel15)
                     .addComponent(txtnro_nota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jTab_producto_ingrediente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jTabbedPane_VENTA.addTab("CREAR COMPRA INSUMO", panel_base_2);
@@ -1046,7 +1215,6 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         panel_tabla_compra.setBackground(new java.awt.Color(153, 153, 255));
         panel_tabla_compra.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        tblcompra.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         tblcompra.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1058,7 +1226,6 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tblcompra.setRowHeight(30);
         tblcompra.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 tblcompraMouseReleased(evt);
@@ -1470,10 +1637,12 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnnuevo_provee;
     private javax.swing.JButton btnsumar;
     private javax.swing.ButtonGroup gru_campo;
+    private javax.swing.ButtonGroup gru_cond;
     private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCestado_anulado;
     private javax.swing.JCheckBox jCestado_confirmado;
     private javax.swing.JCheckBox jCestado_emitido;
+    private javax.swing.JComboBox<String> jCfinancista;
     private javax.swing.JFormattedTextField jFsutotal;
     private javax.swing.JFormattedTextField jFtotal_guarani;
     private javax.swing.JLabel jLabel1;
@@ -1496,6 +1665,10 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JRadioButton jRcond_contado;
+    private javax.swing.JRadioButton jRcond_credito;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane8;

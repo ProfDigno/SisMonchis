@@ -2,6 +2,49 @@ package FORMULARIO.ENTIDAD;
 
 public class compra {
 
+    /**
+     * @return the C10condicion
+     */
+    public String getC10condicion() {
+        return C10condicion;
+    }
+
+    /**
+     * @param C10condicion the C10condicion to set
+     */
+    public void setC10condicion(String C10condicion) {
+        this.C10condicion = C10condicion;
+    }
+
+    /**
+     * @return the C11fk_idfinancista
+     */
+    public int getC11fk_idfinancista() {
+        return C11fk_idfinancista;
+    }
+
+    /**
+     * @param C11fk_idfinancista the C11fk_idfinancista to set
+     */
+    public void setC11fk_idfinancista(int C11fk_idfinancista) {
+        this.C11fk_idfinancista = C11fk_idfinancista;
+    }
+/*
+    CREATE TABLE "compra" (
+	"idcompra" INTEGER NOT NULL ,
+	"fecha_emision" TIMESTAMP NOT NULL ,
+	"estado" TEXT NOT NULL ,
+	"observacion" TEXT NOT NULL ,
+	"forma_pago" TEXT NOT NULL ,
+	"monto_compra" NUMERIC(14,0) NOT NULL ,
+	"nro_nota" INTEGER NOT NULL ,
+	"condicion" TEXT NOT NULL ,
+	"fk_idproveedor" INTEGER NOT NULL ,
+	"fk_idusuario" INTEGER NOT NULL ,
+	"fk_idfinancista" INTEGER NOT NULL ,
+	PRIMARY KEY("idcompra")
+);
+    */
 //---------------DECLARAR VARIABLES---------------
     private int C1idcompra;
     private String C2fecha_emision;
@@ -12,6 +55,8 @@ public class compra {
     private int C7fk_idproveedor;
     private int C8fk_idusuario;
     private int C9nro_nota;
+    private String C10condicion;
+    private int C11fk_idfinancista;
     private static String nom_tabla;
     private static String nom_idtabla;
 //---------------TABLA-ID---------------

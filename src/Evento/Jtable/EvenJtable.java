@@ -63,7 +63,12 @@ public class EvenJtable {
         String sid = "0";
         int row = tabla.getSelectedRow();
         if (row >= 0) {
-            sid = ((tabla.getModel().getValueAt(row, columna).toString()));
+            try {
+                sid = ((tabla.getModel().getValueAt(row, columna).toString()));
+            } catch (Exception e) {
+                System.out.println("getString_select:"+e);
+                sid = "null";
+            }
         }
         return sid;
     }

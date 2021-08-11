@@ -125,7 +125,7 @@ public class FrmGasto extends javax.swing.JInternalFrame {
 
     void cargar_datos_caja() {
         caja.setC2fecha_emision(txtfecha_emision.getText());
-        caja.setC3descripcion("(GASTO) id:" + idgasto + " Tipo:" + txtbuscar_gasto_tipo.getText());
+        caja.setC3descripcion1("(GASTO) id:" + idgasto + " Tipo:" + txtbuscar_gasto_tipo.getText());
         caja.setC4monto_venta_efectivo(0);
         caja.setC5monto_venta_tarjeta(0);
         caja.setC6monto_delivery(0);
@@ -136,9 +136,10 @@ public class FrmGasto extends javax.swing.JInternalFrame {
         caja.setC11monto_cierre(0);
         caja.setC12id_origen(idgasto);
         caja.setC13tabla_origen("GASTO");
-        //        caja.setC14cierre("C");
         caja.setC15estado("EMITIDO");
         caja.setC16fk_idusuario(usu.getGlobal_idusuario());
+        caja.setC17monto_recibo_pago(0);
+        caja.setC18monto_compra_credito(0);
     }
 
     void cargar_datos_gasto() {
@@ -164,7 +165,7 @@ public class FrmGasto extends javax.swing.JInternalFrame {
 
     void cargar_datos_editar_caja() {
         caja.setC2fecha_emision(txtfecha_emision.getText());
-        caja.setC3descripcion("(GASTO) id:" + idgasto + " Tipo:" + txtbuscar_gasto_tipo.getText());
+        caja.setC3descripcion1("(GASTO) id:" + idgasto + " Tipo:" + txtbuscar_gasto_tipo.getText());
         caja.setC4monto_venta_efectivo(0);
         caja.setC6monto_delivery(0);
         caja.setC7monto_gasto(evejtf.getDouble_format_nro_entero(txtmonto_gasto));

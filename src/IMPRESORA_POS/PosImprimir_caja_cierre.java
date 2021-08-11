@@ -9,6 +9,7 @@ import BASEDATO.EvenConexion;
 import Config_JSON.json_config;
 import Config_JSON.json_imprimir_pos;
 import Evento.Mensaje.EvenMensajeJoptionpane;
+import FORMULARIO.ENTIDAD.caja_detalle;
 import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
 import java.io.FileInputStream;
@@ -34,6 +35,7 @@ public class PosImprimir_caja_cierre {
     EvenMensajeJoptionpane evemen = new EvenMensajeJoptionpane();
     private static json_config config = new json_config();
     private static json_imprimir_pos jsprint = new json_imprimir_pos();
+    caja_detalle caja = new caja_detalle();
     ClaImpresoraPos pos = new ClaImpresoraPos();
     private static String tk_usuario = "digno";
     private static String tk_nombre_empresa = config.getNombre_sistema();
@@ -55,6 +57,7 @@ public class PosImprimir_caja_cierre {
     private static String tk_venta_grupo0 = "0";
     private static String tk_venta_grupo1 = "0";
     private static String tk_venta_deli = "0";
+    private static String tk_eg_recibo="0";
     private static String nom_venta_deli = "DELIVERY";
     private static int tk_iv_fila_top;
     private static String[] iv1_cantidad_top = new String[200];
@@ -63,6 +66,8 @@ public class PosImprimir_caja_cierre {
     private static String[] compra_monto = new String[200];
     private static String[] compra_proveedor = new String[200];
     private static String[] compra_nota = new String[200];
+    private static String tk_eg_comp_credito="0";
+    
 
     private void cargar_datos_caja_cierre(Connection conn, int idcaja_cierre) {
         String titulo = "cargar_datos_caja_cierre";
@@ -75,11 +80,13 @@ public class PosImprimir_caja_cierre {
                 + "TRIM(to_char(sum(cd.monto_compra),'999G999G999')) as eg_compra,\n"
                 + "TRIM(to_char(sum(cd.monto_gasto),'999G999G999')) as eg_gasto,\n"
                 + "TRIM(to_char(sum(cd.monto_vale),'999G999G999')) as eg_vale,\n"
+                + "TRIM(to_char(sum(cd.monto_recibo_pago),'999G999G999')) as eg_recibo,\n"
+                + "TRIM(to_char(sum(cd.monto_compra_credito),'999G999G999')) as comp_credito,\n"
                 + "TRIM(to_char((sum(cd.monto_caja+cd.monto_venta_efectivo+cd.monto_venta_tarjeta))-"
-                + "(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale)),'999G999G999')) as sistema,\n"
+                + "(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale+cd.monto_recibo_pago)),'999G999G999')) as sistema,\n"
                 + "TRIM(to_char(sum(cd.monto_cierre),'999G999G999')) as cierre,\n"
                 + "TRIM(to_char((sum(cd.monto_cierre)-((sum(cd.monto_caja+cd.monto_venta_efectivo+cd.monto_venta_tarjeta))-"
-                + "(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale)))),'999G999G999')) as diferencia\n"
+                + "(sum(cd.monto_compra+cd.monto_gasto+cd.monto_vale+cd.monto_recibo_pago)))),'999G999G999')) as diferencia\n"
                 + "from caja_cierre cc,item_caja_cierre icc,caja_detalle cd\n"
                 + "where cc.idcaja_cierre=icc.fk_idcaja_cierre\n"
                 + "and cd.idcaja_detalle=icc.fk_idcaja_detalle\n"
@@ -97,6 +104,8 @@ public class PosImprimir_caja_cierre {
                 tk_eg_compra = rs.getString("eg_compra");
                 tk_eg_gasto = rs.getString("eg_gasto");
                 tk_eg_vale = rs.getString("eg_vale");
+                tk_eg_recibo = rs.getString("eg_recibo");
+                tk_eg_comp_credito = rs.getString("comp_credito");
                 tk_sistema = rs.getString("sistema");
                 tk_cierre = rs.getString("cierre");
                 tk_diferencia = rs.getString("diferencia");
@@ -169,14 +178,15 @@ public class PosImprimir_caja_cierre {
 
     private void cargar_datos_compra_proveedor(Connection conn, int idcaja_cierre) {
         String titulo = "cargar_datos_compra_proveedor";
-        String sql = "select ('Nota:('||co.nro_nota||')') as nota ,('Prov:'||pv.nombre) as provee,\n"
+        String sql = "select ('Nota:('||co.nro_nota||')') as nota ,('('||co.condicion||')'||pv.nombre) as provee,\n"
                 + "TRIM(to_char(co.monto_compra,'999G999G999')) as monto \n"
                 + "from item_caja_cierre icc,caja_detalle cd,compra co,proveedor pv\n"
                 + "where icc.fk_idcaja_cierre="+idcaja_cierre
                 + " and icc.fk_idcaja_detalle=cd.idcaja_detalle\n"
                 + "and co.fk_idproveedor=pv.idproveedor\n"
                 + "and cd.id_origen=co.idcompra\n"
-                + "and cd.tabla_origen='COMPRA'\n"
+                + "and (cd.tabla_origen='"+caja.getTabla_origen_compra_contado()+"' "
+                + "or cd.tabla_origen='"+caja.getTabla_origen_compra_credito()+"') \n"
                 + "and co.estado='EMITIDO' \n"
                 + "order by co.monto_compra desc;";
         try {
@@ -211,10 +221,13 @@ public class PosImprimir_caja_cierre {
         mensaje_impresora = mensaje_impresora + " TOTAL GASTO: " + tabular + tk_eg_gasto + saltolinea;
         mensaje_impresora = mensaje_impresora + "  TOTAL VALE: " + tabular + tk_eg_vale + saltolinea;
         mensaje_impresora = mensaje_impresora + "TOTAL COMPRA: " + tabular + tk_eg_compra + saltolinea;
+        mensaje_impresora = mensaje_impresora + "TOTAL RECIBO: " + tabular + tk_eg_recibo + saltolinea;
         mensaje_impresora = mensaje_impresora + "==========================================" + saltolinea;
         mensaje_impresora = mensaje_impresora + "SAL.SISTEMA: " + tabular + tk_sistema + saltolinea;
         mensaje_impresora = mensaje_impresora + "     CIERRE: " + tabular + tk_cierre + saltolinea;
         mensaje_impresora = mensaje_impresora + " DIFERENCIA: " + tabular + tk_diferencia + saltolinea;
+        mensaje_impresora = mensaje_impresora + "==========================================" + saltolinea;
+        mensaje_impresora = mensaje_impresora + "TOTAL COMP-CREDITO: " + tabular + tk_eg_comp_credito + saltolinea;
         return mensaje_impresora;
     }
 
@@ -250,25 +263,30 @@ public class PosImprimir_caja_cierre {
         printer.printTextWrap(14 + tempfila, 14, jsprint.getSep_numero(), totalColumna, tk_eg_vale);
         printer.printTextWrap(15 + tempfila, 15, jsprint.getSep_inicio(), totalColumna, "TOTAL COMPRA:");
         printer.printTextWrap(15 + tempfila, 15, jsprint.getSep_numero(), totalColumna, tk_eg_compra);
-        printer.printTextWrap(16 + tempfila, 16, jsprint.getSep_inicio(), totalColumna, jsprint.getLinea_separador());
-        printer.printTextWrap(17 + tempfila, 17, jsprint.getSep_inicio(), totalColumna, "SISTEMA:");
-        printer.printTextWrap(17 + tempfila, 17, jsprint.getSep_numero(), totalColumna, tk_sistema);
-        printer.printTextWrap(18 + tempfila, 18, jsprint.getSep_inicio(), totalColumna, "CIERRE:");
-        printer.printTextWrap(18 + tempfila, 18, jsprint.getSep_numero(), totalColumna, tk_cierre);
-        printer.printTextWrap(19 + tempfila, 19, jsprint.getSep_inicio(), totalColumna, "DIFERENCIA:");
-        printer.printTextWrap(19 + tempfila, 19, jsprint.getSep_numero(), totalColumna, "(" + tk_diferencia + ")");
-        printer.printTextWrap(20 + tempfila, 20, jsprint.getSep_inicio(), totalColumna,
+        printer.printTextWrap(16 + tempfila, 16, jsprint.getSep_inicio(), totalColumna, "TOTAL RECIBO:");
+        printer.printTextWrap(16 + tempfila, 16, jsprint.getSep_numero(), totalColumna, tk_eg_recibo);
+        printer.printTextWrap(17 + tempfila, 17, jsprint.getSep_inicio(), totalColumna, jsprint.getLinea_separador());
+        printer.printTextWrap(18 + tempfila, 18, jsprint.getSep_inicio(), totalColumna, "SISTEMA:");
+        printer.printTextWrap(18 + tempfila, 18, jsprint.getSep_numero(), totalColumna, tk_sistema);
+        printer.printTextWrap(19 + tempfila, 19, jsprint.getSep_inicio(), totalColumna, "CIERRE:");
+        printer.printTextWrap(19 + tempfila, 19, jsprint.getSep_numero(), totalColumna, tk_cierre);
+        printer.printTextWrap(20 + tempfila, 20, jsprint.getSep_inicio(), totalColumna, "DIFERENCIA:");
+        printer.printTextWrap(20 + tempfila, 20, jsprint.getSep_numero(), totalColumna, "(" + tk_diferencia + ")");
+        printer.printTextWrap(21 + tempfila, 21, jsprint.getSep_inicio(), totalColumna, jsprint.getLinea_separador());
+        printer.printTextWrap(22 + tempfila, 22, jsprint.getSep_inicio(), totalColumna, "TOTAL COMP-CREDITO:");
+        printer.printTextWrap(22 + tempfila, 22, jsprint.getSep_numero(), totalColumna, tk_eg_comp_credito);
+        printer.printTextWrap(23 + tempfila, 23, jsprint.getSep_inicio(), totalColumna,
                 jsprint.getLinea_ven_top_1() + jsprint.getCant_top_venta() + jsprint.getLinea_ven_top_2());
         for (int i = 0; i < tk_iv_fila_top; i++) {
-            printer.printTextWrap(21 + tempfila, 21, jsprint.getSep_inicio(), totalColumna, iv1_cantidad_top[i] + " X");
-            printer.printTextWrap(21 + tempfila, 21, jsprint.getSep_item_precio(), jsprint.getTt_text_descrip(), iv2_nombre_top[i]);
+            printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_inicio(), totalColumna, iv1_cantidad_top[i] + " X");
+            printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_item_precio(), jsprint.getTt_text_descrip(), iv2_nombre_top[i]);
             tempfila = tempfila + 1;
         }
-        printer.printTextWrap(22 + tempfila, 22, jsprint.getSep_inicio(), totalColumna, "-----COMPRA-PROVEEDOR----");
+        printer.printTextWrap(25 + tempfila, 25, jsprint.getSep_inicio(), totalColumna, "-----COMPRA-PROVEEDOR----");
         for (int i = 0; i < compra_fila; i++) {
-            printer.printTextWrap(23 + tempfila, 23, jsprint.getSep_inicio(), jsprint.getTt_text_descrip(), compra_proveedor[i]);
-            printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_inicio(), totalColumna, compra_nota[i]);
-            printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_numero(), totalColumna, compra_monto[i]);
+            printer.printTextWrap(26 + tempfila, 26, jsprint.getSep_inicio(), jsprint.getTt_text_descrip(), compra_proveedor[i]);
+            printer.printTextWrap(27 + tempfila, 27, jsprint.getSep_inicio(), totalColumna, compra_nota[i]);
+            printer.printTextWrap(27 + tempfila, 27, jsprint.getSep_numero(), totalColumna, compra_monto[i]);
             tempfila = tempfila + 2;
         }
         printer.toFile(tk_ruta_archivo);

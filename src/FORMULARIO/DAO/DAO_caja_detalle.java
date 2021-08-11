@@ -31,20 +31,23 @@ public class DAO_caja_detalle {
     private String sql_insert = "INSERT INTO public.caja_detalle(\n"
             + "idcaja_detalle, fecha_emision, descripcion, monto_venta_efectivo,monto_venta_tarjeta, monto_delivery, \n"
             + "monto_gasto, monto_compra, monto_vale,monto_caja,monto_cierre, id_origen, tabla_origen, \n"
-            + "cierre,estado,fk_idusuario)\n"
+            + "cierre,estado,fk_idusuario,monto_recibo_pago,monto_compra_credito)\n"
             + "    VALUES (?, ?, ?, ?, ?, \n"
-            + "            ?, ?, ?, ?, ?,?,?,?,?,?,?);";
+            + "            ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?);";
     private String sql_select="select date(fecha_emision) as fecha,"
                 + "TRIM(to_char(sum(monto_venta_efectivo),'999G999G999')) as v_efectivo,"
                 + "TRIM(to_char(sum(monto_venta_tarjeta),'999G999G999')) as v_tarjeta,"
                 + "TRIM(to_char(sum(monto_delivery),'999G999G999')) as delivery,"
-                + "TRIM(to_char(sum(monto_compra),'999G999G999')) as compra,\n" 
+                + "TRIM(to_char(sum(monto_compra),'999G999G999')) as comp_contado,\n" 
+                + "TRIM(to_char(sum(monto_compra_credito),'999G999G999')) as comp_credito,\n" 
                 + "TRIM(to_char(sum(monto_gasto),'999G999G999')) as gasto,"
-                + "TRIM(to_char(sum(monto_vale),'999G999G999')) as vale "
+                + "TRIM(to_char(sum(monto_vale),'999G999G999')) as vale, "
+                + "TRIM(to_char(sum(monto_recibo_pago),'999G999G999')) as rec_pag_compra "
                 + "from caja_detalle "
                 + "group by 1 order by 1 desc";
     private String sql_anular="update caja_detalle set descripcion=(descripcion||'-(ANULADO)'),"
                 + "monto_venta_efectivo=0,monto_venta_tarjeta=0,monto_delivery=0,monto_gasto=0,monto_compra=0,monto_vale=0,\n"
+                + "monto_recibo_pago=0,monto_compra_credito=0, "
                 + "estado=? "
                 + "where tabla_origen=? and id_origen=?;";
     private String sql_forma_pago="update caja_detalle set "
@@ -58,7 +61,7 @@ public class DAO_caja_detalle {
 //    private String sql_cargar = "select idcaja_detalle, fecha_emision, descripcion, monto_venta_efectivo,monto_venta_tarjeta, monto_delivery, \n"
 //            + "monto_gasto, monto_compra, monto_vale,monto_caja,monto_cierre, id_origen, tabla_origen, \n"
 //            + "cierre,estado,fk_idusuario from caja_detalle where idcaja_detalle=";
-    public void insertar_caja_detalle(Connection conn, caja_detalle caja) {
+    public void insertar_caja_detalle1(Connection conn, caja_detalle caja) {
         int idcaja_detalle = (eveconn.getInt_ultimoID_mas_uno(conn, caja.getTabla(), caja.getIdtabla()));
         caja.setC1idcaja_detalle(idcaja_detalle);
         String titulo = "insertar_caja_detalle";
@@ -82,6 +85,8 @@ public class DAO_caja_detalle {
             pst.setString(14,caja.getC14cierre());
             pst.setString(15,caja.getC15estado());
             pst.setInt(16, caja.getC16fk_idusuario());
+            pst.setDouble(17,caja.getC17monto_recibo_pago());
+            pst.setDouble(18,caja.getC18monto_compra_credito());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + caja.toString(), titulo);
@@ -93,14 +98,14 @@ public class DAO_caja_detalle {
         String titulo = "cargar_caja_detalle";
         String sql_cargar = "select idcaja_detalle, fecha_emision, descripcion, monto_venta_efectivo,monto_venta_tarjeta, monto_delivery, \n"
             + "monto_gasto, monto_compra, monto_vale,monto_caja,monto_cierre, id_origen, tabla_origen, \n"
-            + "cierre,estado,fk_idusuario from caja_detalle where tabla_origen='"+tabla_origen+"' and id_origen='"+id_origen+"';";
+            + "cierre,estado,fk_idusuario,monto_recibo_pago,monto_compra_credito from caja_detalle where tabla_origen='"+tabla_origen+"' and id_origen='"+id_origen+"';";
         Connection conn = ConnPostgres.getConnPosgres();
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql_cargar, titulo);
             if (rs.next()) {
                 caja.setC1idcaja_detalle(rs.getInt(1));
                 caja.setC2fecha_emision(rs.getString(2));
-                caja.setC3descripcion(rs.getString(3));
+                caja.setC3descripcion1(rs.getString(3));
                 caja.setC4monto_venta_efectivo(rs.getDouble(4));
                 caja.setC5monto_venta_tarjeta(rs.getDouble(5));
                 caja.setC6monto_delivery(rs.getDouble(6));
@@ -114,6 +119,8 @@ public class DAO_caja_detalle {
                 caja.setC14cierre(rs.getString(14));
                 caja.setC15estado(rs.getString(15));
                 caja.setC16fk_idusuario(rs.getInt(16));
+                caja.setC17monto_recibo_pago(rs.getDouble(17));
+                caja.setC18monto_compra_credito(rs.getDouble(18));
             }
         } catch (Exception e) {
             evemen.mensaje_error(e, sql_cargar + "\n" + caja.toString(), titulo);

@@ -33,7 +33,7 @@ public class BO_vale {
                 conn.setAutoCommit(false);
             }
             vdao.insertar_vale(conn, vale);
-            cdao.insertar_caja_detalle(conn, caja);
+            cdao.insertar_caja_detalle1(conn, caja);
             conn.commit();
             return true;
         } catch (SQLException e) {

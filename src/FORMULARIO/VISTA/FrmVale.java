@@ -127,7 +127,7 @@ public class FrmVale extends javax.swing.JInternalFrame {
 
     void cargar_datos_caja() {
         caja.setC2fecha_emision(txtfecha_emision.getText());
-        caja.setC3descripcion("(VALE) id:" + idvale + " Funcionario:" + txtbuscar_cliente.getText());
+        caja.setC3descripcion1("(VALE) id:" + idvale + " Funcionario:" + txtbuscar_cliente.getText());
         caja.setC4monto_venta_efectivo(0);
         caja.setC5monto_venta_tarjeta(0);
         caja.setC6monto_delivery(0);
@@ -141,6 +141,8 @@ public class FrmVale extends javax.swing.JInternalFrame {
         //        caja.setC14cierre("C");
         caja.setC15estado("EMITIDO");
         caja.setC16fk_idusuario(usu.getGlobal_idusuario());
+        caja.setC17monto_recibo_pago(0);
+        caja.setC18monto_compra_credito(0);
     }
 
     void cargar_datos_vale() {
@@ -168,7 +170,7 @@ public class FrmVale extends javax.swing.JInternalFrame {
 
     void cargar_datos_editar_caja() {
         caja.setC2fecha_emision(txtfecha_emision.getText());
-        caja.setC3descripcion("(VALE) id:" + idvale + " Funcionario:" + txtbuscar_cliente.getText());
+        caja.setC3descripcion1("(VALE) id:" + idvale + " Funcionario:" + txtbuscar_cliente.getText());
         caja.setC4monto_venta_efectivo(0);
         caja.setC6monto_delivery(0);
         caja.setC7monto_gasto(0);

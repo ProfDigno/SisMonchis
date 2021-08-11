@@ -26,6 +26,7 @@ import FORMULARIO.DAO.DAO_venta;
 import FORMULARIO.ENTIDAD.caja_cierre;
 import FORMULARIO.ENTIDAD.cotizacion;
 import FORMULARIO.ENTIDAD.factura;
+import FORMULARIO.ENTIDAD.financista;
 import INSERT_AUTO.Cla_insert_automatico;
 import java.awt.Color;
 import java.sql.Connection;
@@ -57,8 +58,9 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     DAO_cliente cdao = new DAO_cliente();
     DAO_venta vdao = new DAO_venta();
     DAO_producto pdao = new DAO_producto();
-    DAO_producto_categoria pcDAO=new DAO_producto_categoria();
+    DAO_producto_categoria pcDAO = new DAO_producto_categoria();
     Cla_insert_automatico ins_auto = new Cla_insert_automatico();
+    private financista fina = new financista();
     EvenConexion eveconn = new EvenConexion();
     caja_cierre cjcie = new caja_cierre();
     DAO_caja_cierre cjcie_dao = new DAO_caja_cierre();
@@ -92,8 +94,10 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         pcDAO.update_orden_categoria_mas_vendido_mes();
         iniciar_color();
         actualizacion_version_v1();
+//        primer_finanza();
     }
-void actualizacion_version_v1() {
+
+    void actualizacion_version_v1() {
         /**
          * ALTER TABLE cliente ADD COLUMN delivery boolean; update cliente set
          * delivery=true; update gastos set fk_idusuario=7 where fk_idusuario=1;
@@ -103,27 +107,86 @@ void actualizacion_version_v1() {
         String sql = "DO $$ \n"
                 + "    BEGIN\n"
                 + "        BEGIN\n"
-                //                + "        update producto set orden='0'  where orden is null;\n "
-//                + "ALTER TABLE venta ADD COLUMN forma_pago text;\n "
-//                + "update venta set forma_pago='EFECTIVO';\n "
-//                + "ALTER TABLE caja_detalle ADD COLUMN estado text;\n"
-//                + "update caja_detalle set estado='temp';\n"
-//                + "update caja_detalle set estado='EMITIDO' where tabla_origen='VENTA' and monto_venta>0;\n"
-//                + "update caja_detalle set estado='ANULADO' where tabla_origen='VENTA' and monto_venta=0;\n"
-//                + "update caja_detalle set estado='CERRADO' where tabla_origen='CAJA_CERRAR';\n"
-//                + "update caja_detalle set estado='ABIERTO' where tabla_origen='CAJA_ABRIR';\n"
-                + "ALTER TABLE venta RENAME COLUMN monto_venta TO monto_venta_efectivo;\n"
-                + "ALTER TABLE venta ADD COLUMN monto_venta_tarjeta numeric(14,0);\n"
-                + "update venta set monto_venta_tarjeta=0;\n"
-                + "update venta set monto_venta_tarjeta=monto_venta_efectivo where forma_pago='TARJETA';\n"
-                + "update venta set monto_venta_efectivo=0 where forma_pago='TARJETA';\n"
+                + " ALTER TABLE compra ADD COLUMN condicion text; \n"
+                + "ALTER TABLE compra ADD COLUMN fk_idfinancista INTEGER;\n"
+                + "\n"
+                + "update compra set condicion='CONTADO';\n"
+                + "update compra set fk_idfinancista=0;\n"
+                + "\n"
+                + "ALTER TABLE caja_detalle ADD COLUMN monto_recibo_pago NUMERIC(14,0);\n"
+                + "update caja_detalle set monto_recibo_pago=0;\n"
+                + "update caja_detalle set tabla_origen='COMPRA_CONTADO' where tabla_origen='COMPRA';\n"
+                + "ALTER TABLE caja_detalle ADD COLUMN monto_compra_credito NUMERIC(14,0);\n"
+                + "update caja_detalle set monto_compra_credito=0;\n"
+                + "CREATE TABLE \"financista\" (\n"
+                + "	\"idfinancista\" INTEGER NOT NULL ,\n"
+                + "	\"nombre\" TEXT NOT NULL ,\n"
+                + "	\"direccion\" TEXT NOT NULL ,\n"
+                + "	\"telefono\" TEXT NOT NULL ,\n"
+                + "	\"descripcion\" TEXT NOT NULL ,\n"
+                + "	\"escredito\" BOOLEAN NOT NULL ,\n"
+                + "	\"saldo_credito\" NUMERIC(14,0) NOT NULL ,\n"
+                + "	\"fecha_inicio_credito\" DATE NOT NULL ,\n"
+                + "	\"dia_limite_credito\" INTEGER NOT NULL ,\n"
+                + "	PRIMARY KEY(\"idfinancista\")\n"
+                + ");\n"
+                + "CREATE TABLE \"grupo_credito_finanza\" (\n"
+                + "	\"idgrupo_credito_finanza\" INTEGER NOT NULL ,\n"
+                + "	\"fecha_inicio\" TIMESTAMP NOT NULL ,\n"
+                + "	\"fecha_fin\" TIMESTAMP NOT NULL ,\n"
+                + "	\"estado\" TEXT NOT NULL ,\n"
+                + "	\"fk_idfinancista\" INTEGER NOT NULL ,\n"
+                + "	PRIMARY KEY(\"idgrupo_credito_finanza\")\n"
+                + ");\n"
+                + "CREATE TABLE \"saldo_credito_finanza\" (\n"
+                + "	\"idsaldo_credito_finanza\" INTEGER NOT NULL ,\n"
+                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
+                + "	\"descripcion\" TEXT NOT NULL ,\n"
+                + "	\"monto_saldo_credito\" NUMERIC(14,0) NOT NULL ,\n"
+                + "	\"monto_letra\" TEXT NOT NULL ,\n"
+                + "	\"estado\" TEXT NOT NULL ,\n"
+                + "	\"fk_idfinancista\" INTEGER NOT NULL ,\n"
+                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
+                + "	PRIMARY KEY(\"idsaldo_credito_finanza\")\n"
+                + ");\n"
+                + "CREATE TABLE \"recibo_pago_finanza\" (\n"
+                + "	\"idrecibo_pago_finanza\" INTEGER NOT NULL ,\n"
+                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
+                + "	\"descripcion\" TEXT NOT NULL ,\n"
+                + "	\"monto_recibo_pago\" NUMERIC(14,0) NOT NULL ,\n"
+                + "	\"monto_letra\" TEXT NOT NULL ,\n"
+                + "	\"estado\" TEXT NOT NULL ,\n"
+                + "	\"fk_idfinancista\" INTEGER NOT NULL ,\n"
+                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
+                + "	PRIMARY KEY(\"idrecibo_pago_finanza\")\n"
+                + ");\n"
+                + "CREATE TABLE \"credito_finanza\" (\n"
+                + "	\"idcredito_finanza\" INTEGER NOT NULL ,\n"
+                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
+                + "	\"descripcion\" TEXT NOT NULL ,\n"
+                + "	\"estado\" TEXT NOT NULL ,\n"
+                + "	\"monto_contado\" NUMERIC(14,0) NOT NULL ,\n"
+                + "	\"monto_credito\" NUMERIC(14,0) NOT NULL ,\n"
+                + "	\"tabla_origen\" TEXT NOT NULL ,\n"
+                + "	\"fk_idgrupo_credito_finanza\" INTEGER NOT NULL ,\n"
+                + "	\"fk_idsaldo_credito_finanza\" INTEGER NOT NULL ,\n"
+                + "	\"fk_idrecibo_pago_finanza\" INTEGER NOT NULL ,\n"
+                + "	\"fk_idcompra\" INTEGER NOT NULL ,\n"
+                + "	PRIMARY KEY(\"idcredito_finanza\")\n"
+                + "); "
                 + "        EXCEPTION\n"
                 + "            WHEN duplicate_column THEN RAISE NOTICE 'duplicate_column.';\n"
                 + "        END;\n"
                 + "    END;\n"
                 + "$$ ";
-//        eveconn.SQL_execute_libre(conn, sql);
+        eveconn.SQL_execute_libre(conn, sql);
     }
+//    void primer_finanza(){
+//        int idfinancista = (eveconn.getInt_ultimoID_mas_uno(conn, fina.getTb_financista(), fina.getId_idfinancista()));
+//        if(idfinancista==0){
+//            evetbl.abrir_TablaJinternal(new FrmFinancista());
+//        }
+//    }
     void ocultar_grafico() {
         panel_mas_vendidos.setVisible(!jCocultar_grafico.isSelected());
         panel_stock_minimo.setVisible(!jCocultar_grafico.isSelected());
@@ -331,6 +394,8 @@ void actualizacion_version_v1() {
         jMenu_inventario = new javax.swing.JMenu();
         jMenuItem24 = new javax.swing.JMenuItem();
         jMenuItem25 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -1025,6 +1090,18 @@ void actualizacion_version_v1() {
 
         jMenuBar1.add(jMenu_inventario);
 
+        jMenu2.setText("FINANZA");
+
+        jMenuItem7.setText("FINANCISTA");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem7);
+
+        jMenuBar1.add(jMenu2);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1279,6 +1356,11 @@ void actualizacion_version_v1() {
         ocultar_grafico();
     }//GEN-LAST:event_jCocultar_graficoActionPerformed
 
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        // TODO add your handling code here:
+        evetbl.abrir_TablaJinternal(new FrmFinancista());
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1344,6 +1426,7 @@ void actualizacion_version_v1() {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
@@ -1378,6 +1461,7 @@ void actualizacion_version_v1() {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     public static javax.swing.JMenu jMenu_caja;

@@ -116,11 +116,11 @@ public class FrmVenta extends javax.swing.JInternalFrame {
     private int Iidproducto;
     private boolean esCargadoCodBarra;
     private String forma_pago_EFECTIVO = "EFECTIVO";
-    private String tabla_origen_EFECTIVO = "VENTA_EFECTIVO";
+//    private String tabla_origen_EFECTIVO = "VENTA_EFECTIVO";
     private String forma_pago_TARJETA = "TARJETA";
-    private String tabla_origen_TARJETA = "VENTA_TARJETA";
+//    private String tabla_origen_TARJETA = "VENTA_TARJETA";
     private String forma_pago_COMBINADO = "COMBINADO";
-    private String tabla_origen_COMBINADO = "VENTA_COMBI";
+//    private String tabla_origen_COMBINADO = "VENTA_COMBI";
     private boolean habilitar_editar_precio_venta;
     private boolean hab_venta_combinado;
 
@@ -751,7 +751,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
 
     void cargar_datos_caja() {
         caja.setC2fecha_emision(evefec.getString_formato_fecha_hora());
-        caja.setC3descripcion("(VENTA) id:" + idventa_ultimo + " Cli:" + txtbucarCliente_nombre.getText());
+        caja.setC3descripcion1("(VENTA) id:" + idventa_ultimo + " Cli:" + txtbucarCliente_nombre.getText());
         caja.setC4monto_venta_efectivo(venta_efectivo);
         caja.setC5monto_venta_tarjeta(venta_tarjeta);
         caja.setC6monto_delivery(monto_delivery);
@@ -764,6 +764,8 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         caja.setC13tabla_origen(tabla_origen);
         caja.setC15estado(estado_EMITIDO);
         caja.setC16fk_idusuario(usu.getGlobal_idusuario());
+        caja.setC17monto_recibo_pago(0);
+        caja.setC18monto_compra_credito(0);
     }
 
     void boton_guardar_venta() {
@@ -860,13 +862,13 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                 caja.setC15estado(estado_ANULADO);
                 String tabla_origen = "";
                 if (forma_pago.equals(forma_pago_EFECTIVO)) {
-                    tabla_origen = tabla_origen_EFECTIVO;
+                    tabla_origen = caja.getTabla_origen_venta_efectivo();
                 }
                 if (forma_pago.equals(forma_pago_TARJETA)) {
-                    tabla_origen = tabla_origen_TARJETA;
+                    tabla_origen = caja.getTabla_origen_venta_tarjeta();
                 }
                 if (forma_pago.equals(forma_pago_COMBINADO)) {
-                    tabla_origen = tabla_origen_COMBINADO;
+                    tabla_origen = caja.getTabla_origen_venta_combinado();
                 }
                 caja.setC13tabla_origen(tabla_origen);
                 caja.setC12id_origen(idventa);
@@ -883,15 +885,15 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                 String forma_pago = evejt.getString_select(tblventa, 5);
                 String tabla_origen = "";
                 if (forma_pago.equals(forma_pago_EFECTIVO)) {
-                    tabla_origen = tabla_origen_EFECTIVO;
+                    tabla_origen = caja.getTabla_origen_venta_efectivo();
                 }
                 if (forma_pago.equals(forma_pago_TARJETA)) {
-                    tabla_origen = tabla_origen_TARJETA;
+                    tabla_origen = caja.getTabla_origen_venta_tarjeta();
                 }
                 vdao.cargar_venta(ven, idventa);
                 caja.setC4monto_venta_efectivo(ven.getC5redondeo());
                 caja.setC5monto_venta_tarjeta(0);
-                caja.setC13tabla_origen_update(tabla_origen_EFECTIVO);
+                caja.setC13tabla_origen_update(caja.getTabla_origen_venta_efectivo());
                 caja.setC13tabla_origen(tabla_origen);
                 caja.setC12id_origen(idventa);
                 ven.setC8forma_pago(forma_pago_EFECTIVO);
@@ -909,15 +911,15 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                 String forma_pago = evejt.getString_select(tblventa, 5);
                 String tabla_origen = "";
                 if (forma_pago.equals(forma_pago_EFECTIVO)) {
-                    tabla_origen = tabla_origen_EFECTIVO;
+                    tabla_origen = caja.getTabla_origen_venta_efectivo();
                 }
                 if (forma_pago.equals(forma_pago_TARJETA)) {
-                    tabla_origen = tabla_origen_TARJETA;
+                    tabla_origen = caja.getTabla_origen_venta_tarjeta();
                 }
                 vdao.cargar_venta(ven, idventa);
                 caja.setC4monto_venta_efectivo(0);
                 caja.setC5monto_venta_tarjeta(ven.getC5redondeo());
-                caja.setC13tabla_origen_update(tabla_origen_TARJETA);
+                caja.setC13tabla_origen_update(caja.getTabla_origen_venta_tarjeta());
                 caja.setC13tabla_origen(tabla_origen);
                 caja.setC12id_origen(idventa);
                 ven.setC8forma_pago(forma_pago_TARJETA);
@@ -1107,7 +1109,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         venta_efectivo = redondeo;
         venta_tarjeta = 0;
         forma_pago = forma_pago_EFECTIVO;//"EFECTIVO";
-        tabla_origen = tabla_origen_EFECTIVO;//"VENTA_EFECTIVO";
+        tabla_origen = caja.getTabla_origen_venta_efectivo();//"VENTA_EFECTIVO";
         hab_venta_combinado = false;
         boton_guardar_venta();
     }
@@ -1117,7 +1119,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         venta_efectivo = 0;
         venta_tarjeta = redondeo;
         forma_pago = forma_pago_TARJETA;//"TARJETA";
-        tabla_origen = tabla_origen_TARJETA;//"VENTA_TARJETA";
+        tabla_origen = caja.getTabla_origen_venta_tarjeta();//"VENTA_TARJETA";
         hab_venta_combinado = false;
         boton_guardar_venta();
     }
@@ -1127,7 +1129,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         venta_efectivo = redondeo;
         venta_tarjeta = 0;
         forma_pago = forma_pago_EFECTIVO;//"EFECTIVO";
-        tabla_origen = tabla_origen_EFECTIVO;//"VENTA_EFECTIVO";
+        tabla_origen = caja.getTabla_origen_venta_efectivo();//"VENTA_EFECTIVO";
         hab_venta_combinado = true;
         boton_guardar_venta();
     }
