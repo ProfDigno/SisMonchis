@@ -21,7 +21,7 @@ import java.sql.Connection;
 public class JDpago_combinado extends javax.swing.JDialog {
 
     venta ven = new venta();
-    PosImprimir_Venta posv = new PosImprimir_Venta();
+//    PosImprimir_Venta posv = new PosImprimir_Venta();
     Connection connLocal = null;
     ConnPostgres cpt = new ConnPostgres();
     EvenJTextField evejtf = new EvenJTextField();
