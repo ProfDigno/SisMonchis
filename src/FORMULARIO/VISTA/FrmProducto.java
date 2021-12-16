@@ -127,6 +127,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
             prod.setC10activar(jC10_activar.isSelected());
             prod.setC11venta_mayorista(JC11ventamayorista.isSelected());
             prod.setC12promocion(jC12_promocion.isSelected());
+            prod.setC18alquilado(jC18_alquilado.isSelected());
             pBO.insertar_producto(prod, tblproducto);
             reestableser();
         }
@@ -145,6 +146,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
             prod.setC10activar(jC10_activar.isSelected());
             prod.setC11venta_mayorista(JC11ventamayorista.isSelected());
             prod.setC12promocion(jC12_promocion.isSelected());
+            prod.setC18alquilado(jC18_alquilado.isSelected());
             pBO.update_producto(prod, tblproducto);
         }
     }
@@ -162,6 +164,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
         txt8_stock.setText(evejtf.getString_format_nro_entero(prod.getC8stock()));
         txt9_stock_min.setText(evejtf.getString_format_nro_entero(prod.getC9stock_min()));
         jC10_activar.setSelected(prod.getC10activar());
+        jC18_alquilado.setSelected(prod.getC18alquilado());
         JC11ventamayorista.setSelected(prod.getC11venta_mayorista());
         jC12_promocion.setSelected(prod.getC12promocion());
         txt16_categoria.setText(prod.getC19_categoria());
@@ -193,6 +196,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
         jC10_activar.setSelected(true);
         JC11ventamayorista.setSelected(false);
         jC12_promocion.setSelected(true);
+        jC18_alquilado.setSelected(false);
         txt16_categoria.setText(null);
         txt15_unidad.setText(null);
         txt17_marca.setText(null);
@@ -241,6 +245,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
             jC10_activar.setSelected(prod.getC10activar());
             JC11ventamayorista.setSelected(prod.getC11venta_mayorista());
             jC12_promocion.setSelected(prod.getC12promocion());
+            jC18_alquilado.setSelected(prod.getC18alquilado());
             txt16_categoria.setText(prod.getC19_categoria());
             txt15_unidad.setText(prod.getC18_unidad());
             txt17_marca.setText(prod.getC20_marca());
@@ -313,6 +318,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
         txt8_stock = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
         txt9_stock_min = new javax.swing.JTextField();
+        jC18_alquilado = new javax.swing.JCheckBox();
         panel_tabla_producto = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblproducto = new javax.swing.JTable();
@@ -370,13 +376,10 @@ public class FrmProducto extends javax.swing.JInternalFrame {
             }
         });
 
-        jC10_activar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jC10_activar.setText("ACTIVAR (MOSTRAR)");
 
-        JC11ventamayorista.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         JC11ventamayorista.setText("VENTA MAYORISTA");
 
-        jC12_promocion.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jC12_promocion.setText("PROMOCION");
 
         jLayeredPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -745,6 +748,8 @@ public class FrmProducto extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jC18_alquilado.setText("ALQUILAR");
+
         javax.swing.GroupLayout panel_insertar_productoLayout = new javax.swing.GroupLayout(panel_insertar_producto);
         panel_insertar_producto.setLayout(panel_insertar_productoLayout);
         panel_insertar_productoLayout.setHorizontalGroup(
@@ -761,7 +766,9 @@ public class FrmProducto extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jC10_activar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jC12_promocion))
+                        .addComponent(jC12_promocion)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jC18_alquilado))
                     .addGroup(panel_insertar_productoLayout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(44, 44, 44)
@@ -800,7 +807,8 @@ public class FrmProducto extends javax.swing.JInternalFrame {
                 .addGroup(panel_insertar_productoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(JC11ventamayorista)
                     .addComponent(jC10_activar)
-                    .addComponent(jC12_promocion))
+                    .addComponent(jC12_promocion)
+                    .addComponent(jC18_alquilado))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLayeredPane1)
                 .addContainerGap())
@@ -1204,6 +1212,7 @@ public class FrmProducto extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnnuevo_unidad;
     private javax.swing.JCheckBox jC10_activar;
     private javax.swing.JCheckBox jC12_promocion;
+    private javax.swing.JCheckBox jC18_alquilado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

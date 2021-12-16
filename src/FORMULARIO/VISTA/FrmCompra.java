@@ -126,7 +126,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         crear_item_producto();
         cargar_finanza();
         reestableser_compra();
-        color_formulario();
+        color_formulario(clacolor.getColor_insertar_primario());
     }
 
     private void cargar_finanza() {
@@ -141,13 +141,14 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         txtprovee_ruc.setText(ent_prov.getC6ruc());
     }
 
-    private void color_formulario() {
-        panel_tabla_compra.setBackground(clacolor.getColor_tabla());
-        panel_insertar_pri_compra.setBackground(clacolor.getColor_insertar_primario());
-        panel_insertar_seg_compra.setBackground(clacolor.getColor_insertar_secundario());
-        panel_referencia_filtro.setBackground(clacolor.getColor_referencia());
-        panel_base_1.setBackground(clacolor.getColor_base());
-        panel_base_2.setBackground(clacolor.getColor_base());
+    private void color_formulario(Color colorpanel) {
+        panel_proveedor.setBackground(colorpanel);
+        panel_tabla_compra.setBackground(colorpanel);
+        panel_insertar_pri_compra.setBackground(colorpanel);
+        panel_insertar_seg_compra.setBackground(colorpanel);
+        panel_referencia_filtro.setBackground(colorpanel);
+        panel_base_1.setBackground(colorpanel);
+        panel_crear_compra.setBackground(colorpanel);
     }
 
     private void crear_item_producto() {
@@ -182,6 +183,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         txtnro_nota.setText(null);
         jRcond_contado.setSelected(true);
         jList_producto.setVisible(false);
+        jCalquiler.setSelected(false);
         evejt.limpiar_tabla_datos(model_itemf);
         txtobservacion.setText("Ninguna");
         monto_compra = 0;
@@ -191,6 +193,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         habilitar_editar = false;
         btnconfirmar_insertar.setText("CONFIRMAR");
         cargar_proveedor();
+        select_alquiler();
         txtprod_buscar_nombre.grabFocus();
     }
 
@@ -360,6 +363,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         fk_idfinancista = cmb.getInt_seleccionar_COMBOBOX(conn, jCfinancista, "idfinancista", "nombre", "financista");
         compi.setC10condicion(condicion);
         compi.setC11fk_idfinancista(fk_idfinancista);
+        compi.setC12alquilado(jCalquiler.isSelected());
     }
 
     private void cargar_datos_caja() {
@@ -415,11 +419,6 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                 cargar_datos_compra();
                 cargar_datos_caja();
                 if (ciBO.getBoolean_compra1(tblitem_producto, compi, caja)) {
-//                    if (habilitar_editar) {
-//                        habilitar_editar = false;
-//                        btnconfirmar_insertar.setText("CONFIRMAR");
-//                        anular_compra(idcompra_insumo_editar);
-//                    }
                     poscomp.boton_imprimir_pos_compra(conn, idcompra_ultimo);
                     reestableser_compra();
                 }
@@ -610,6 +609,17 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         }
     }
 
+    private void select_alquiler() {
+        if (jCalquiler.isSelected()) {
+            jCalquiler.setForeground(Color.RED);
+            color_formulario(clacolor.getColor_shopp());
+            
+        } else {
+            jCalquiler.setForeground(Color.BLACK);
+            color_formulario(clacolor.getColor_insertar_primario());
+        }
+    }
+
     public FrmCompra() {
         initComponents();
         abrir_formulario();
@@ -627,7 +637,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         gru_campo = new javax.swing.ButtonGroup();
         gru_cond = new javax.swing.ButtonGroup();
         jTabbedPane_VENTA = new javax.swing.JTabbedPane();
-        panel_base_2 = new javax.swing.JPanel();
+        panel_crear_compra = new javax.swing.JPanel();
         jTab_producto_ingrediente = new javax.swing.JTabbedPane();
         panel_insertar_pri_compra = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -660,7 +670,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         btnsumar = new javax.swing.JButton();
         jLabel12 = new javax.swing.JLabel();
         txtidcompra = new javax.swing.JTextField();
-        jPanel1 = new javax.swing.JPanel();
+        panel_proveedor = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         txtprovee_nombre = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
@@ -675,6 +685,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         jRcond_credito = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
         jCfinancista = new javax.swing.JComboBox<>();
+        jCalquiler = new javax.swing.JCheckBox();
         panel_base_1 = new javax.swing.JPanel();
         panel_tabla_compra = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -1054,8 +1065,8 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         txtidcompra.setForeground(new java.awt.Color(255, 255, 0));
         txtidcompra.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 255));
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("PROVEEDOR"));
+        panel_proveedor.setBackground(new java.awt.Color(204, 204, 255));
+        panel_proveedor.setBorder(javax.swing.BorderFactory.createTitledBorder("PROVEEDOR"));
 
         jLabel8.setText("PROVEEDOR:");
 
@@ -1080,11 +1091,11 @@ public class FrmCompra extends javax.swing.JInternalFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout panel_proveedorLayout = new javax.swing.GroupLayout(panel_proveedor);
+        panel_proveedor.setLayout(panel_proveedorLayout);
+        panel_proveedorLayout.setHorizontalGroup(
+            panel_proveedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_proveedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1101,10 +1112,10 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                 .addComponent(btnnuevo_provee, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        panel_proveedorLayout.setVerticalGroup(
+            panel_proveedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(btnbuscar_provee, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_proveedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(jLabel8)
                 .addComponent(txtprovee_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(jLabel13)
@@ -1166,14 +1177,22 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout panel_base_2Layout = new javax.swing.GroupLayout(panel_base_2);
-        panel_base_2.setLayout(panel_base_2Layout);
-        panel_base_2Layout.setHorizontalGroup(
-            panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jCalquiler.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jCalquiler.setText("ALQUILER");
+        jCalquiler.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCalquilerItemStateChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_crear_compraLayout = new javax.swing.GroupLayout(panel_crear_compra);
+        panel_crear_compra.setLayout(panel_crear_compraLayout);
+        panel_crear_compraLayout.setHorizontalGroup(
+            panel_crear_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTab_producto_ingrediente, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(panel_base_2Layout.createSequentialGroup()
-                .addGroup(panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_base_2Layout.createSequentialGroup()
+            .addGroup(panel_crear_compraLayout.createSequentialGroup()
+                .addGroup(panel_crear_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_crear_compraLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel12)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1182,35 +1201,38 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                         .addComponent(jLabel15)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtnro_nota, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jCalquiler)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panel_base_2Layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panel_crear_compraLayout.createSequentialGroup()
+                        .addComponent(panel_proveedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGap(10, 10, 10))
         );
-        panel_base_2Layout.setVerticalGroup(
-            panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_base_2Layout.createSequentialGroup()
-                .addGap(8, 8, 8)
-                .addGroup(panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+        panel_crear_compraLayout.setVerticalGroup(
+            panel_crear_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_crear_compraLayout.createSequentialGroup()
+                .addGap(7, 7, 7)
+                .addGroup(panel_crear_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel12)
                     .addComponent(txtidcompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel15)
-                    .addComponent(txtnro_nota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtnro_nota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCalquiler))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_base_2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panel_crear_compraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panel_proveedor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jTab_producto_ingrediente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        jTabbedPane_VENTA.addTab("CREAR COMPRA INSUMO", panel_base_2);
+        jTabbedPane_VENTA.addTab("CREAR COMPRA INSUMO", panel_crear_compra);
 
         panel_tabla_compra.setBackground(new java.awt.Color(153, 153, 255));
         panel_tabla_compra.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -1626,6 +1648,11 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txtprod_codbarraKeyPressed
 
+    private void jCalquilerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCalquilerItemStateChanged
+        // TODO add your handling code here:
+        select_alquiler();
+    }//GEN-LAST:event_jCalquilerItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnanularventa;
@@ -1639,6 +1666,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private javax.swing.ButtonGroup gru_campo;
     private javax.swing.ButtonGroup gru_cond;
     private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBox jCalquiler;
     private javax.swing.JCheckBox jCestado_anulado;
     private javax.swing.JCheckBox jCestado_confirmado;
     private javax.swing.JCheckBox jCestado_emitido;
@@ -1662,7 +1690,6 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JList<String> jList_producto;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1675,9 +1702,10 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private javax.swing.JTabbedPane jTab_producto_ingrediente;
     private javax.swing.JTabbedPane jTabbedPane_VENTA;
     private javax.swing.JPanel panel_base_1;
-    private javax.swing.JPanel panel_base_2;
+    private javax.swing.JPanel panel_crear_compra;
     private javax.swing.JPanel panel_insertar_pri_compra;
     private javax.swing.JPanel panel_insertar_seg_compra;
+    private javax.swing.JPanel panel_proveedor;
     private javax.swing.JPanel panel_referencia_filtro;
     private javax.swing.JPanel panel_tabla_compra;
     private javax.swing.JTable tblcompra;

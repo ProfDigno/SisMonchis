@@ -57,6 +57,7 @@ public class compra {
     private int C9nro_nota;
     private String C10condicion;
     private int C11fk_idfinancista;
+    private boolean C12alquilado;
     private static String nom_tabla;
     private static String nom_idtabla;
 //---------------TABLA-ID---------------
@@ -163,5 +164,19 @@ public class compra {
      */
     public void setC9nro_nota(int C9indice) {
         this.C9nro_nota = C9indice;
+    }
+
+    /**
+     * @return the C12alquilado
+     */
+    public boolean getC12alquilado() {
+        return C12alquilado;
+    }
+
+    /**
+     * @param C12alquilado the C12alquilado to set
+     */
+    public void setC12alquilado(boolean C12alquilado) {
+        this.C12alquilado = C12alquilado;
     }
 }

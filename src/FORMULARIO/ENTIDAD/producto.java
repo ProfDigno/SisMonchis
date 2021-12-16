@@ -61,6 +61,7 @@ private String C14ult_compra;
 private int C15fk_idproducto_unidad;
 private int C16fk_idproducto_categoria;
 private int C17fk_idproducto_marca;
+private boolean C18alquilado;
 private String C18_unidad;
 private String C19_categoria;
 private String C20_marca;
@@ -203,5 +204,19 @@ private static String nom_idtabla;
      */
     public void setC21_aux_cantidad(int C21_aux_cantidad) {
         this.C21_aux_cantidad = C21_aux_cantidad;
+    }
+
+    /**
+     * @return the C18alquilado
+     */
+    public boolean getC18alquilado() {
+        return C18alquilado;
+    }
+
+    /**
+     * @param C18alquilado the C18alquilado to set
+     */
+    public void setC18alquilado(boolean C18alquilado) {
+        this.C18alquilado = C18alquilado;
     }
 }

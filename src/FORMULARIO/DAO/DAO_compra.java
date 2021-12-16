@@ -22,7 +22,7 @@ public class DAO_compra {
     private String mensaje_insert = "COMPRA GUARDADO CORRECTAMENTE";
     private String mensaje_update = "COMPRA MODIFICADO CORECTAMENTE";
     private String sql_insert = "INSERT INTO compra(idcompra,fecha_emision,estado,observacion,forma_pago,monto_compra,"
-            + "fk_idproveedor,fk_idusuario,nro_nota,condicion,fk_idfinancista) VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+            + "fk_idproveedor,fk_idusuario,nro_nota,condicion,fk_idfinancista,alquilado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
     private String sql_update = "UPDATE compra SET fecha_emision=?,estado=?,observacion=?,forma_pago=?,monto_compra=?,fk_idproveedor=?,fk_idusuario=?,nro_nota=? WHERE idcompra=?;";
     private String sql_select = "select c.idcompra as idc,to_char(c.fecha_emision,'dd-MM-yyyy HH24:MI') as fecha, \n"
             + "p.nombre as provee,p.ruc,c.estado,c.condicion,\n"
@@ -58,6 +58,7 @@ public class DAO_compra {
             pst.setInt(9, com.getC9nro_nota());
             pst.setString(10, com.getC10condicion());
             pst.setInt(11, com.getC11fk_idfinancista());
+            pst.setBoolean(12, com.getC12alquilado());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + com.toString(), titulo);

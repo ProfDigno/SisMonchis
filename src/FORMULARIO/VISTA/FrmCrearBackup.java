@@ -36,7 +36,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
     private Timer tiempo;
     private int contartiempo;
     EvenJFRAME evetbl = new EvenJFRAME();
-    EvenFecha evefec=new EvenFecha();
+    EvenFecha evefec = new EvenFecha();
     backup bac = new backup();
     BO_backup bBO = new BO_backup();
     DAO_backup bdao = new DAO_backup();
@@ -44,7 +44,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
     Connection conn = ConnPostgres.getConnPosgres();
     private static String fecha;
     boolean hab_realizar_backup = true;
-    private static boolean sin_error_backup=true;
+    private static boolean sin_error_backup = true;
 
     public static void realizaBackup(backup bac) throws IOException, InterruptedException {
         final List<String> comandos = new ArrayList<String>();
@@ -60,16 +60,16 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
         comandos.add("-b");
         comandos.add("-v");
         comandos.add("-f");
-        comandos.add(bac.getB4direc_backup()+fecha);   // eu utilizei meu C:\ e D:\ para os testes e gravei o backup com sucesso.  
+        comandos.add(bac.getB4direc_backup() + fecha);   // eu utilizei meu C:\ e D:\ para os testes e gravei o backup com sucesso.  
         comandos.add(bac.getB5basedato());
         ProcessBuilder pb = new ProcessBuilder(comandos);
-        pb.environment().put("PGPASSWORD",bac.getB9senha());      //Somente coloque sua senha         
+        pb.environment().put("PGPASSWORD", bac.getB9senha());      //Somente coloque sua senha         
         try {
             final Process process = pb.start();
             final BufferedReader r = new BufferedReader(
                     new InputStreamReader(process.getErrorStream()));
             String line = r.readLine();
-            informebackup = informebackup +  "###INFORME DE BACKUP###\n";
+            informebackup = informebackup + "###INFORME DE BACKUP###\n";
             while (line != null) {
                 System.err.println(line);
                 informebackup = informebackup + line + "\r\n";
@@ -80,12 +80,12 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
             process.destroy();
         } catch (IOException e) {
             e.printStackTrace();
-            informebackup = informebackup +comandos+ e + "\r\n";
-            sin_error_backup=false;
+            informebackup = informebackup + comandos + e + "\r\n";
+            sin_error_backup = false;
         } catch (InterruptedException ie) {
             ie.printStackTrace();
-            informebackup = informebackup +comandos+ ie + "\r\n";
-            sin_error_backup=false;
+            informebackup = informebackup + comandos + ie + "\r\n";
+            sin_error_backup = false;
         }
     }
 
@@ -99,8 +99,8 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
     void abrir() {
         this.setTitle("BACKUP");
         evetbl.centrar_formulario_internalframa(this);
-        fecha=evefec.getString_formato_fecha();
-        fecha=fecha+".backup";
+        fecha = evefec.getString_formato_fecha();
+        fecha = fecha + ".backup";
         iniciarTiempo();
     }
 
@@ -130,14 +130,22 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
                 if (contartiempo == 4) {
                     try {
                         bdao.cargar_backup(bac);
-                        realizaBackup(bac);
+                        if (bdao.getBoolean_existe_archivo_dump(bac)) {
+                            realizaBackup(bac);
+                        }else{
+                            cargar_textArea(txtenviobackup, "####---NO SE ENCONTRO LA RUTA DUMP O DE BACKUP---####");
+                            cargar_textArea(txtenviobackup, bac.getB3direc_dump());
+                            cargar_textArea(txtenviobackup,bac.getB4direc_backup());
+                            informebackup="ERROR AL CREAR BACKUP";
+                            contartiempo=21;
+                        }
                         cargar_textArea(txtenviobackup, informebackup);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        sin_error_backup=false;
+                        sin_error_backup = false;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                        sin_error_backup=false;
+                        sin_error_backup = false;
                     }
 
                 }
@@ -145,14 +153,14 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
                     cargar_textArea(txtenviobackup, "####--INSERTADO FECHA BACKUP--####");
                 }
                 if (contartiempo == 10) {
-                    cargar_textArea(txtenviobackup,"LOCALHOST:"+bac.getB6localhost());
+                    cargar_textArea(txtenviobackup, "LOCALHOST:" + bac.getB6localhost());
                 }
                 if (contartiempo == 11) {
-                    cargar_textArea(txtenviobackup,"DATOS:"+bac.toString());
+                    cargar_textArea(txtenviobackup, "DATOS:" + bac.toString());
                 }
                 if (contartiempo == 12) {
                     cargar_textArea(txtenviobackup, "####---backup Terminado---####");
-                    if(sin_error_backup){
+                    if (sin_error_backup) {
 //                        bBO.update_backup_creado_hoy();
                     }
                 }
@@ -160,6 +168,10 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
                     cerrar_formulario();
                     pararTiempos();
                     bBO.update_backup_creado_hoy();
+                }
+                if (contartiempo == 25) {
+                    cerrar_formulario();
+                    pararTiempos();
                 }
             } else {
                 if (contartiempo == 5) {

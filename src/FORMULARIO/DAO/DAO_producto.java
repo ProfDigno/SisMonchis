@@ -21,11 +21,11 @@ public class DAO_producto {
     EvenFecha evefec = new EvenFecha();
     private String mensaje_insert = "PRODUCTO GUARDADO CORRECTAMENTE";
     private String mensaje_update = "PRODUCTO MODIFICADO CORECTAMENTE";
-    private String sql_insert = "INSERT INTO producto(idproducto,cod_barra,nombre,precio_venta_minorista,precio_venta_mayorista,cantidad_mayorista,precio_compra,stock,stock_min,activar,venta_mayorista,promocion,ult_venta,ult_compra,fk_idproducto_unidad,fk_idproducto_categoria,fk_idproducto_marca) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+    private String sql_insert = "INSERT INTO producto(idproducto,cod_barra,nombre,precio_venta_minorista,precio_venta_mayorista,cantidad_mayorista,precio_compra,stock,stock_min,activar,venta_mayorista,promocion,ult_venta,ult_compra,fk_idproducto_unidad,fk_idproducto_categoria,fk_idproducto_marca,alquilado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     private String sql_update = "UPDATE producto SET cod_barra=?,nombre=?,precio_venta_minorista=?,precio_venta_mayorista=?,"
             + "cantidad_mayorista=?,precio_compra=?,stock=?,stock_min=?,"
             + "activar=?,venta_mayorista=?,promocion=?,ult_venta=?,ult_compra=?,"
-            + "fk_idproducto_unidad=?,fk_idproducto_categoria=?,fk_idproducto_marca=? "
+            + "fk_idproducto_unidad=?,fk_idproducto_categoria=?,fk_idproducto_marca=?,alquilado=? "
             + "WHERE idproducto=?;";
     private String sql_select = "SELECT p.idproducto as idp,p.cod_barra,pc.nombre as categoria,\n"
             + "(pm.nombre||'-'||pu.nombre||'-'||p.nombre) as marca_unid_nombre,\n"
@@ -39,7 +39,7 @@ public class DAO_producto {
     private String sql_cargar = "SELECT p.idproducto,p.cod_barra,p.nombre,p.precio_venta_minorista,p.precio_venta_mayorista,p.cantidad_mayorista,p.precio_compra,\n"
             + "p.stock,p.stock_min,p.activar,p.venta_mayorista,p.promocion,\n"
             + "p.ult_venta,p.ult_compra,p.fk_idproducto_unidad,p.fk_idproducto_categoria,p.fk_idproducto_marca,\n"
-            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca \n"
+            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca,p.alquilado \n"
             + "FROM producto p,producto_unidad pu,producto_categoria pc, producto_marca pm \n"
             + "where p.fk_idproducto_unidad=pu.idproducto_unidad\n"
             + "and p.fk_idproducto_categoria=pc.idproducto_categoria\n"
@@ -57,7 +57,7 @@ public class DAO_producto {
     private String sql_cargar_codbarra = "SELECT p.idproducto,p.cod_barra,p.nombre,p.precio_venta_minorista,p.precio_venta_mayorista,p.cantidad_mayorista,p.precio_compra,\n"
             + "p.stock,p.stock_min,p.activar,p.venta_mayorista,p.promocion,\n"
             + "p.ult_venta,p.ult_compra,p.fk_idproducto_unidad,p.fk_idproducto_categoria,p.fk_idproducto_marca,\n"
-            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca \n"
+            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca,p.alquilado \n"
             + "FROM producto p,producto_unidad pu,producto_categoria pc, producto_marca pm \n"
             + "where p.fk_idproducto_unidad=pu.idproducto_unidad\n"
             + "and p.fk_idproducto_categoria=pc.idproducto_categoria\n"
@@ -105,7 +105,7 @@ public class DAO_producto {
             pst.setInt(15, pro.getC15fk_idproducto_unidad());
             pst.setInt(16, pro.getC16fk_idproducto_categoria());
             pst.setInt(17, pro.getC17fk_idproducto_marca());
-
+            pst.setBoolean(18, pro.getC18alquilado());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + pro.toString(), titulo);
@@ -136,7 +136,8 @@ public class DAO_producto {
             pst.setInt(14, pro.getC15fk_idproducto_unidad());
             pst.setInt(15, pro.getC16fk_idproducto_categoria());
             pst.setInt(16, pro.getC17fk_idproducto_marca());
-            pst.setInt(17, pro.getC1idproducto());
+            pst.setBoolean(17, pro.getC18alquilado());
+            pst.setInt(18, pro.getC1idproducto());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_update + "\n" + pro.toString(), titulo);
@@ -171,6 +172,7 @@ public class DAO_producto {
                 pro.setC18_unidad(rs.getString(18));
                 pro.setC19_categoria(rs.getString(19));
                 pro.setC20_marca(rs.getString(20));
+                pro.setC18alquilado(rs.getBoolean(21));
                 evemen.Imprimir_serial_sql(sql_cargar + "\n" + pro.toString(), titulo);
             }
         } catch (Exception e) {
@@ -204,6 +206,7 @@ public class DAO_producto {
                 pro.setC18_unidad(rs.getString(18));
                 pro.setC19_categoria(rs.getString(19));
                 pro.setC20_marca(rs.getString(20));
+                pro.setC18alquilado(rs.getBoolean(21));
                 encontado = true;
                 evemen.Imprimir_serial_sql(sql_cargar + "\n" + pro.toString(), titulo);
             }

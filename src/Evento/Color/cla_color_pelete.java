@@ -31,6 +31,7 @@ public class cla_color_pelete {
     public static Color color_tabla;
     public static Color color_referencia;
     private static Color color_base;
+    private static Color color_shopp;
 
     public static Color getColor_insertar_primario() {
         return color_insertar_primario;
@@ -62,6 +63,20 @@ public class cla_color_pelete {
 
     public static void setColor_referencia(Color color_referencia) {
         cla_color_pelete.color_referencia = color_referencia;
+    }
+
+    /**
+     * @return the color_shopp
+     */
+    public static Color getColor_shopp() {
+        return color_shopp;
+    }
+
+    /**
+     * @param aColor_shopp the color_shopp to set
+     */
+    public static void setColor_shopp(Color aColor_shopp) {
+        color_shopp = aColor_shopp;
     }
     
 }

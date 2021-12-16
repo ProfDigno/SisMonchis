@@ -12,6 +12,7 @@ import Evento.Jtable.EvenJtable;
 import Evento.Mensaje.EvenMensajeJoptionpane;
 import FORMULARIO.ENTIDAD.backup;
 import FORMULARIO.ENTIDAD.usuario;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +45,7 @@ public class DAO_backup {
     private String sql_update_creado_hoy = "UPDATE public.backup\n"
             + "   SET fecha='now()',  cantidad=(cantidad+1)\n"
             + " WHERE idbackup=?;";
+
     public void insertar_backup(Connection conn, backup bac) {
         String titulo = "insertar_backup";
         PreparedStatement pst = null;
@@ -91,18 +93,19 @@ public class DAO_backup {
             evemen.mensaje_error(e, sql_update + "\n" + bac.toString(), titulo);
         }
     }
+
     public void update_backup_creado_hoy(Connection conn) {
         String titulo = "update_backup_creado_hoy";
         PreparedStatement pst = null;
         try {
             pst = conn.prepareStatement(sql_update_creado_hoy);
-            pst.setInt(1,1);
+            pst.setInt(1, 1);
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_update_creado_hoy + "\n", titulo);
 //            evemen.modificado_correcto(sql_update_creado_hoy, true);
         } catch (Exception e) {
-            evemen.mensaje_error(e, sql_update_creado_hoy + "\n" , titulo);
+            evemen.mensaje_error(e, sql_update_creado_hoy + "\n", titulo);
         }
     }
 
@@ -121,40 +124,63 @@ public class DAO_backup {
                 bac.setB9senha(rs.getString(7));
                 bac.setB10cantidad(rs.getInt(8));
             }
+
         } catch (Exception e) {
             evemen.mensaje_error(e, sql_cargar + "\n" + bac.toString(), titulo);
         }
     }
+
+    public boolean getBoolean_existe_archivo_dump(backup bac) {
+//        boolean existe = false;
+        File file2 = new File(bac.getB3direc_dump());
+        File file3 = new File(bac.getB4direc_backup());
+        //Checks if file2 exists
+        if (file2.exists()) {
+            System.out.println(file2 + " Exists :"+bac.getB3direc_dump());
+        } else {
+            System.out.println(file2 + " Does not exists :"+bac.getB3direc_dump());
+            return false;
+        }
+        if (file3.exists()) {
+            System.out.println(file2 + " Exists:"+bac.getB4direc_backup());
+        } else {
+            System.out.println(file2 + " Does not exists:"+bac.getB4direc_backup());
+            return false;
+        }
+        return true;
+    }
+
     public boolean getBoolean_backup_existente(Connection conn) {
         String titulo = "getBoolean_backup_existente";
         String sql = "select count(*) as cant from backup ";
-        int cantidad=0;
+        int cantidad = 0;
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
             if (rs.next()) {
-                cantidad=rs.getInt("cant");
+                cantidad = rs.getInt("cant");
             }
         } catch (Exception e) {
             evemen.mensaje_error(e, sql, titulo);
         }
-        if(cantidad>0){
+        if (cantidad > 0) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
+
     public boolean getBoolean_backup_creado_hoy(Connection conn) {
         String titulo = "getBoolean_backup_creado_hoy";
-        String hoy=evefec.getString_formato_fecha();
-        String sql = "SELECT (date(fecha)<date('"+hoy+"')) as fecha FROM BACKUP where idbackup=1 ";
-        boolean fecha=false;
+        String hoy = evefec.getString_formato_fecha();
+        String sql = "SELECT (date(fecha)<date('" + hoy + "')) as fecha FROM BACKUP where idbackup=1 ";
+        boolean fecha = false;
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
             if (rs.next()) {
-                fecha=rs.getBoolean("fecha");
-                if(fecha){
+                fecha = rs.getBoolean("fecha");
+                if (fecha) {
                     System.out.println("EL BACKUP AUN NO FUE CREDO");
-                }else{
+                } else {
                     System.out.println("HOY YA FUE CREDO EL BACKUP");
                 }
             }

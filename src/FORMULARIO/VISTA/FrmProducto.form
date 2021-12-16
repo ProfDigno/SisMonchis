@@ -108,6 +108,8 @@
                                   <Component id="jC10_activar" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jC12_promocion" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="jC18_alquilado" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
@@ -157,6 +159,7 @@
                               <Component id="JC11ventamayorista" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jC10_activar" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jC12_promocion" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jC18_alquilado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLayeredPane1" max="32767" attributes="0"/>
@@ -208,25 +211,16 @@
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jC10_activar">
                   <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Tahoma" size="12" style="1"/>
-                    </Property>
                     <Property name="text" type="java.lang.String" value="ACTIVAR (MOSTRAR)"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="JC11ventamayorista">
                   <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Tahoma" size="12" style="1"/>
-                    </Property>
                     <Property name="text" type="java.lang.String" value="VENTA MAYORISTA"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jC12_promocion">
                   <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Tahoma" size="12" style="1"/>
-                    </Property>
                     <Property name="text" type="java.lang.String" value="PROMOCION"/>
                   </Properties>
                 </Component>
@@ -823,6 +817,11 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="javax.swing.JCheckBox" name="jC18_alquilado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ALQUILAR"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="panel_tabla_producto">
