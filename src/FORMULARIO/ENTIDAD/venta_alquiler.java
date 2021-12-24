@@ -1,6 +1,20 @@
 	package FORMULARIO.ENTIDAD;
 public class venta_alquiler {
 
+    /**
+     * @return the C21monto_alquilado_credito
+     */
+    public double getC21monto_alquilado_credito() {
+        return C21monto_alquilado_credito;
+    }
+
+    /**
+     * @param C21monto_alquilado_credito the C21monto_alquilado_credito to set
+     */
+    public void setC21monto_alquilado_credito(double C21monto_alquilado_credito) {
+        this.C21monto_alquilado_credito = C21monto_alquilado_credito;
+    }
+
 //---------------DECLARAR VARIABLES---------------
 private int C1idventa_alquiler;
 private String C2fecha_creado;
@@ -22,6 +36,7 @@ private String C17observacion;
 private String C18estado;
 private int C19fk_idcliente;
 private int C20fk_identregador;
+private double C21monto_alquilado_credito;
 private static String nom_tabla;
 private static String nom_idtabla;
 //---------------TABLA-ID---------------

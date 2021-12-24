@@ -107,154 +107,159 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         String sql = "DO $$ \n"
                 + "    BEGIN\n"
                 + "        BEGIN\n"
-                + " ALTER TABLE producto ADD COLUMN alquilado boolean; \n"
-                + " update producto set alquilado=false;\n"
-                + " ALTER TABLE compra ADD COLUMN alquilado boolean; \n"
-                + " update compra set alquilado=false;\n"
-                + "CREATE TABLE \"venta_alquiler\" (\n"
-                + "	\"idventa_alquiler\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_creado\" TIMESTAMP NOT NULL ,\n"
-                + "	\"fecha_retirado_previsto\" TIMESTAMP NOT NULL ,\n"
-                + "	\"fecha_retirado_real\" TIMESTAMP NOT NULL ,\n"
-                + "	\"fecha_devolusion_previsto\" TIMESTAMP NOT NULL ,\n"
-                + "	\"fecha_devolusion_real\" TIMESTAMP NOT NULL ,\n"
-                + "	\"monto_total\" NUMERIC(15,0) NOT NULL ,\n"
-                + "	\"monto_alquilado_efectivo\" NUMERIC(15,0) NOT NULL ,\n"
-                + "	\"monto_alquilado_tarjeta\" NUMERIC(15,0) NOT NULL ,\n"
-                + "	\"monto_alquilado_transferencia\" NUMERIC(15,0) NOT NULL ,\n"
-                + "	\"monto_delivery\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"forma_pago\" TEXT NOT NULL ,\n"
-                + "	\"condicion\" TEXT NOT NULL ,\n"
-                + "	\"alquiler_retirado\" BOOLEAN NOT NULL ,\n"
-                + "	\"alquiler_devolusion\" BOOLEAN NOT NULL ,\n"
-                + "	\"direccion_alquiler\" TEXT NOT NULL ,\n"
-                + "	\"observacion\" TEXT NOT NULL ,\n"
-                + "	\"estado\" TEXT NOT NULL ,\n"
-                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_identregador\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idventa_alquiler\")\n"
-                + ");\n"
-                + "CREATE TABLE \"item_venta_alquiler\" (\n"
-                + "	\"iditem_venta_alquiler\" INTEGER NOT NULL ,\n"
-                + "	\"descripcion\" TEXT NOT NULL ,\n"
-                + "	\"precio_venta\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"precio_compra\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"cantidad_total\" NUMERIC(10,0) NOT NULL ,\n"
-                + "	\"cantidad_pagado\" NUMERIC(10,0) NOT NULL ,\n"
-                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idproducto\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"iditem_venta_alquiler\")\n"
-                + ");\n"
-                + "CREATE TABLE \"banco\" (\n"
-                + "	\"idbanco\" INTEGER NOT NULL ,\n"
-                + "	\"nombre\" TEXT NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idbanco\")\n"
-                + ");\n"
-                + "CREATE TABLE \"dato_banco\" (\n"
-                + "	\"iddato_banco\" INTEGER NOT NULL ,\n"
-                + "	\"titular\" TEXT NOT NULL ,\n"
-                + "	\"documento\" TEXT NOT NULL ,\n"
-                + "	\"nro_cuenta\" TEXT NOT NULL ,\n"
-                + "	\"mibanco\" BOOLEAN NOT NULL ,\n"
-                + "	\"fk_idbanco\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"iddato_banco\")\n"
-                + ");\n"
-                + "CREATE TABLE \"transaccion_banco\" (\n"
-                + "	\"idtransaccion_banco\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_creado\" TIMESTAMP NOT NULL ,\n"
-                + "	\"nro_transaccion\" TEXT NOT NULL ,\n"
-                + "	\"monto\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"observacion\" TEXT NOT NULL ,\n"
-                + "	\"concepto\" TEXT NOT NULL ,\n"
-                + "	\"fk_iddato_banco_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_iddato_banco_local\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idtransaccion_banco\")\n"
-                + ");\n"
-                + "CREATE TABLE \"grupo_credito_cliente\" (\n"
-                + "	\"idgrupo_credito_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_inicio\" TIMESTAMP NOT NULL ,\n"
-                + "	\"fecha_fin\" TIMESTAMP NOT NULL ,\n"
-                + "	\"estado\" TEXT NOT NULL ,\n"
-                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idgrupo_credito_cliente\")\n"
-                + ");\n"
-                + "CREATE TABLE \"saldo_credito_cliente\" (\n"
-                + "	\"idsaldo_credito_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
-                + "	\"descripcion\" TEXT NOT NULL ,\n"
-                + "	\"monto_saldo_credito\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_letra\" TEXT NOT NULL ,\n"
-                + "	\"estado\" TEXT NOT NULL ,\n"
-                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idsaldo_credito_cliente\")\n"
-                + ");\n"
-                + "CREATE TABLE \"recibo_pago_cliente\" (\n"
-                + "	\"idrecibo_pago_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
-                + "	\"descripcion\" TEXT NOT NULL ,\n"
-                + "	\"monto_recibo_pago\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_letra\" TEXT NOT NULL ,\n"
-                + "	\"estado\" TEXT NOT NULL ,\n"
-                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idrecibo_pago_cliente\")\n"
-                + ");\n"
-                + "CREATE TABLE \"credito_cliente\" (\n"
-                + "	\"idcredito_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
-                + "	\"descripcion\" TEXT NOT NULL ,\n"
-                + "	\"estado\" TEXT NOT NULL ,\n"
-                + "	\"monto_contado\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_credito\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"tabla_origen\" TEXT NOT NULL ,\n"
-                + "	\"fk_idgrupo_credito_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idsaldo_credito_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idrecibo_pago_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idcredito_cliente\")\n"
-                + ");\n"
-                + "CREATE TABLE \"caja_cierre_alquilado\" (\n"
-                + "	\"idcaja_cierre_alquilado\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_inicio\" TIMESTAMP NOT NULL ,\n"
-                + "	\"fecha_fin\" TIMESTAMP NOT NULL ,\n"
-                + "	\"estado\" TEXT NOT NULL ,\n"
-                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idcaja_cierre_alquilado\")\n"
-                + ");\n"
-                + "CREATE TABLE \"item_caja_cierre_alquilado\" (\n"
-                + "	\"iditem_caja_cierre_alquilado\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idcaja_cierre_alquilado\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idcaja_detalle_alquilado\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"iditem_caja_cierre_alquilado\")\n"
-                + ");\n"
-                + "CREATE TABLE \"caja_detalle_alquilado\" (\n"
-                + "	\"idcaja_detalle_alquilado\" INTEGER NOT NULL ,\n"
-                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
-                + "	\"descripcion\" TEXT NOT NULL ,\n"
-                + "	\"tabla_origen\" TEXT NOT NULL ,\n"
-                + "	\"estado\" TEXT NOT NULL ,\n"
-                + "	\"cierre\" CHAR(2) NOT NULL ,\n"
-                + "	\"monto_alquilado_efectivo\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_alquilado_tarjeta\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_alquilado_transferencia\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_recibo_pago\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_delivery\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_gasto\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_vale\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_compra_contado\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_compra_credito\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_apertura_caja\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"monto_cierre_caja\" NUMERIC(14,0) NOT NULL ,\n"
-                + "	\"fk_idgasto\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idcompra\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idvale\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idrecibo_pago_cliente\" INTEGER NOT NULL ,\n"
-                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
-                + "	PRIMARY KEY(\"idcaja_detalle_alquilado\")\n"
-                + ");\n"
+//                + " ALTER TABLE producto ADD COLUMN alquilado boolean; \n"
+//                + " update producto set alquilado=false;\n"
+//                + " ALTER TABLE compra ADD COLUMN alquilado boolean; \n"
+//                + " update compra set alquilado=false;\n"
+                + " ALTER TABLE cliente ADD COLUMN escredito boolean DEFAULT false; \n"
+                + " ALTER TABLE cliente ADD COLUMN saldo_credito NUMERIC(15,0) DEFAULT 0; \n"
+                + " ALTER TABLE cliente ADD COLUMN fecha_inicio_credito date DEFAULT 'now()'; \n"
+                + " ALTER TABLE cliente ADD COLUMN dia_limite_credito INTEGER DEFAULT 0; \n"
+//                + "CREATE TABLE \"venta_alquiler\" (\n"
+//                + "	\"idventa_alquiler\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_creado\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"fecha_retirado_previsto\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"fecha_retirado_real\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"fecha_devolusion_previsto\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"fecha_devolusion_real\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"monto_total\" NUMERIC(15,0) NOT NULL ,\n"
+//                + "	\"monto_alquilado_efectivo\" NUMERIC(15,0) NOT NULL ,\n"
+//                + "	\"monto_alquilado_tarjeta\" NUMERIC(15,0) NOT NULL ,\n"
+//                + "	\"monto_alquilado_transferencia\" NUMERIC(15,0) NOT NULL ,\n"
+//                + "	\"monto_alquilado_credito\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_delivery\" NUMERIC(14,0) NOT NULL ,\n" 
+//                + "	\"forma_pago\" TEXT NOT NULL ,\n"
+//                + "	\"condicion\" TEXT NOT NULL ,\n"
+//                + "	\"alquiler_retirado\" BOOLEAN NOT NULL ,\n"
+//                + "	\"alquiler_devolusion\" BOOLEAN NOT NULL ,\n"
+//                + "	\"direccion_alquiler\" TEXT NOT NULL ,\n"
+//                + "	\"observacion\" TEXT NOT NULL ,\n"
+//                + "	\"estado\" TEXT NOT NULL ,\n"
+//                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_identregador\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idventa_alquiler\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"item_venta_alquiler\" (\n"
+//                + "	\"iditem_venta_alquiler\" INTEGER NOT NULL ,\n"
+//                + "	\"descripcion\" TEXT NOT NULL ,\n"
+//                + "	\"precio_venta\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"precio_compra\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"cantidad_total\" NUMERIC(10,0) NOT NULL ,\n"
+//                + "	\"cantidad_pagado\" NUMERIC(10,0) NOT NULL ,\n"
+//                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idproducto\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"iditem_venta_alquiler\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"banco\" (\n"
+//                + "	\"idbanco\" INTEGER NOT NULL ,\n"
+//                + "	\"nombre\" TEXT NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idbanco\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"dato_banco\" (\n"
+//                + "	\"iddato_banco\" INTEGER NOT NULL ,\n"
+//                + "	\"titular\" TEXT NOT NULL ,\n"
+//                + "	\"documento\" TEXT NOT NULL ,\n"
+//                + "	\"nro_cuenta\" TEXT NOT NULL ,\n"
+//                + "	\"mibanco\" BOOLEAN NOT NULL ,\n"
+//                + "	\"fk_idbanco\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"iddato_banco\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"transaccion_banco\" (\n"
+//                + "	\"idtransaccion_banco\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_creado\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"nro_transaccion\" TEXT NOT NULL ,\n"
+//                + "	\"monto\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"observacion\" TEXT NOT NULL ,\n"
+//                + "	\"concepto\" TEXT NOT NULL ,\n"
+//                + "	\"fk_iddato_banco_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_iddato_banco_local\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idtransaccion_banco\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"grupo_credito_cliente\" (\n"
+//                + "	\"idgrupo_credito_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_inicio\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"fecha_fin\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"estado\" TEXT NOT NULL ,\n"
+//                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idgrupo_credito_cliente\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"saldo_credito_cliente\" (\n"
+//                + "	\"idsaldo_credito_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"descripcion\" TEXT NOT NULL ,\n"
+//                + "	\"monto_saldo_credito\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_letra\" TEXT NOT NULL ,\n"
+//                + "	\"estado\" TEXT NOT NULL ,\n"
+//                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idsaldo_credito_cliente\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"recibo_pago_cliente\" (\n"
+//                + "	\"idrecibo_pago_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"descripcion\" TEXT NOT NULL ,\n"
+//                + "	\"monto_recibo_pago\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_letra\" TEXT NOT NULL ,\n"
+//                + "	\"estado\" TEXT NOT NULL ,\n"
+//                + "	\"fk_idcliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idrecibo_pago_cliente\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"credito_cliente\" (\n"
+//                + "	\"idcredito_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"descripcion\" TEXT NOT NULL ,\n"
+//                + "	\"estado\" TEXT NOT NULL ,\n"
+//                + "	\"monto_contado\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_credito\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"tabla_origen\" TEXT NOT NULL ,\n"
+//                + "	\"fk_idgrupo_credito_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idsaldo_credito_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idrecibo_pago_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idcredito_cliente\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"caja_cierre_alquilado\" (\n"
+//                + "	\"idcaja_cierre_alquilado\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_inicio\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"fecha_fin\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"estado\" TEXT NOT NULL ,\n"
+//                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idcaja_cierre_alquilado\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"item_caja_cierre_alquilado\" (\n"
+//                + "	\"iditem_caja_cierre_alquilado\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idcaja_cierre_alquilado\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idcaja_detalle_alquilado\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"iditem_caja_cierre_alquilado\")\n"
+//                + ");\n"
+//                + "CREATE TABLE \"caja_detalle_alquilado\" (\n"
+//                + "	\"idcaja_detalle_alquilado\" INTEGER NOT NULL ,\n"
+//                + "	\"fecha_emision\" TIMESTAMP NOT NULL ,\n"
+//                + "	\"descripcion\" TEXT NOT NULL ,\n"
+//                + "	\"tabla_origen\" TEXT NOT NULL ,\n"
+//                + "	\"estado\" TEXT NOT NULL ,\n"
+//                + "	\"cierre\" CHAR(2) NOT NULL ,\n"
+//                + "	\"monto_alquilado_efectivo\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_alquilado_tarjeta\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_alquilado_transferencia\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_recibo_pago\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_delivery\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_gasto\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_vale\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_compra_contado\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_compra_credito\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_apertura_caja\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_cierre_caja\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"fk_idgasto\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idcompra\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idvale\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idrecibo_pago_cliente\" INTEGER NOT NULL ,\n"
+//                + "	\"fk_idusuario\" INTEGER NOT NULL ,\n"
+//                + "	PRIMARY KEY(\"idcaja_detalle_alquilado\")\n"
+//                + ");\n"
                 + "        EXCEPTION\n"
                 + "            WHEN duplicate_column THEN RAISE NOTICE 'duplicate_column.';\n"
                 + "        END;\n"
@@ -304,7 +309,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         FrmMenuMonchis.btnvale.setEnabled(blo);
         FrmMenuMonchis.btnventa.setEnabled(blo);
         FrmMenuMonchis.btncategoria.setEnabled(blo);
-        FrmMenuMonchis.btnbalance.setEnabled(blo);
+        FrmMenuMonchis.btnshopp.setEnabled(blo);
         FrmMenuMonchis.btncambiar_usuario.setEnabled(blo);
         FrmMenuMonchis.btncaja_cierre.setEnabled(blo);
         FrmMenuMonchis.btndelivery_venta.setEnabled(blo);
@@ -409,7 +414,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         btnvale = new javax.swing.JButton();
         lblusuario = new javax.swing.JLabel();
         btncategoria = new javax.swing.JButton();
-        btnbalance = new javax.swing.JButton();
+        btnshopp = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -479,6 +484,9 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         jMenuItem25 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem26 = new javax.swing.JMenuItem();
+        jMenuItem31 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -561,13 +569,13 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
             }
         });
 
-        btnbalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/MENU/balance.png"))); // NOI18N
-        btnbalance.setText("BALANCE");
-        btnbalance.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnbalance.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnbalance.addActionListener(new java.awt.event.ActionListener() {
+        btnshopp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/MENU/shopp.png"))); // NOI18N
+        btnshopp.setText("CHOPP");
+        btnshopp.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnshopp.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnshopp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnbalanceActionPerformed(evt);
+                btnshoppActionPerformed(evt);
             }
         });
 
@@ -752,7 +760,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         escritorio.setLayer(btnvale, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(lblusuario, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(btncategoria, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        escritorio.setLayer(btnbalance, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        escritorio.setLayer(btnshopp, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(btncambiar_usuario, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(txtfechahora, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -798,7 +806,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btndelivery_venta))
                             .addGroup(escritorioLayout.createSequentialGroup()
-                                .addComponent(btnbalance, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnshopp, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btninventario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGap(14, 14, 14)
@@ -845,7 +853,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(btnvale, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnbalance, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnshopp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btngasto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btncaja_detalle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btncaja_cierre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1185,6 +1193,26 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu4.setText("BANCO");
+
+        jMenuItem26.setText("NOMBRE BANCO");
+        jMenuItem26.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem26ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem26);
+
+        jMenuItem31.setText("DATO BANCO");
+        jMenuItem31.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem31ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem31);
+
+        jMenuBar1.add(jMenu4);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1301,10 +1329,11 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         evetbl.abrir_TablaJinternal(new FrmProducto_categoria());
     }//GEN-LAST:event_btncategoriaActionPerformed
 
-    private void btnbalanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnbalanceActionPerformed
+    private void btnshoppActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnshoppActionPerformed
         // TODO add your handling code here:
 //        evetbl.abrir_TablaJinternal(new FrmBalanceCaja());
-    }//GEN-LAST:event_btnbalanceActionPerformed
+        evetbl.abrir_TablaJinternal(new FrmVenta_alquiler());
+    }//GEN-LAST:event_btnshoppActionPerformed
 
     private void jMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem17ActionPerformed
         // TODO add your handling code here:
@@ -1444,6 +1473,16 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         evetbl.abrir_TablaJinternal(new FrmFinancista());
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
+    private void jMenuItem26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem26ActionPerformed
+        // TODO add your handling code here:
+        evetbl.abrir_TablaJinternal(new FrmBanco());
+    }//GEN-LAST:event_jMenuItem26ActionPerformed
+
+    private void jMenuItem31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem31ActionPerformed
+        // TODO add your handling code here:
+        evetbl.abrir_TablaJinternal(new FrmDato_Banco());
+    }//GEN-LAST:event_jMenuItem31ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1487,7 +1526,6 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public static javax.swing.JButton btnbalance;
     public static javax.swing.JButton btncaja_cierre;
     public static javax.swing.JButton btncaja_detalle;
     public static javax.swing.JButton btncajacerrar;
@@ -1500,6 +1538,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     public static javax.swing.JButton btngasto;
     public static javax.swing.JButton btninventario;
     public static javax.swing.JButton btnproducto;
+    public static javax.swing.JButton btnshopp;
     public static javax.swing.JButton btnvale;
     public static javax.swing.JButton btnventa;
     public static javax.swing.JDesktopPane escritorio;
@@ -1511,6 +1550,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuBar jMenuBar1;
@@ -1532,11 +1572,13 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem23;
     private javax.swing.JMenuItem jMenuItem24;
     private javax.swing.JMenuItem jMenuItem25;
+    private javax.swing.JMenuItem jMenuItem26;
     private javax.swing.JMenuItem jMenuItem27;
     private javax.swing.JMenuItem jMenuItem28;
     private javax.swing.JMenuItem jMenuItem29;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem30;
+    private javax.swing.JMenuItem jMenuItem31;
     private javax.swing.JMenuItem jMenuItem32;
     private javax.swing.JMenuItem jMenuItem33;
     private javax.swing.JMenuItem jMenuItem34;

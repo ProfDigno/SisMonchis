@@ -17,6 +17,62 @@ import java.sql.Date;
 public class cliente {
 
     /**
+     * @return the c12escredito
+     */
+    public boolean isC12escredito() {
+        return c12escredito;
+    }
+
+    /**
+     * @param c12escredito the c12escredito to set
+     */
+    public void setC12escredito(boolean c12escredito) {
+        this.c12escredito = c12escredito;
+    }
+
+    /**
+     * @return the c13saldo_credito
+     */
+    public double getC13saldo_credito() {
+        return c13saldo_credito;
+    }
+
+    /**
+     * @param c13saldo_credito the c13saldo_credito to set
+     */
+    public void setC13saldo_credito(double c13saldo_credito) {
+        this.c13saldo_credito = c13saldo_credito;
+    }
+
+    /**
+     * @return the c14fecha_inicio_credito
+     */
+    public String getC14fecha_inicio_credito() {
+        return c14fecha_inicio_credito;
+    }
+
+    /**
+     * @param c14fecha_inicio_credito the c14fecha_inicio_credito to set
+     */
+    public void setC14fecha_inicio_credito(String c14fecha_inicio_credito) {
+        this.c14fecha_inicio_credito = c14fecha_inicio_credito;
+    }
+
+    /**
+     * @return the c15dia_limite_credito
+     */
+    public int getC15dia_limite_credito() {
+        return c15dia_limite_credito;
+    }
+
+    /**
+     * @param c15dia_limite_credito the c15dia_limite_credito to set
+     */
+    public void setC15dia_limite_credito(int c15dia_limite_credito) {
+        this.c15dia_limite_credito = c15dia_limite_credito;
+    }
+
+    /**
      * @return the c11deliveryDouble
      */
     public double getC11deliveryDouble() {
@@ -30,6 +86,7 @@ public class cliente {
         this.c11deliveryDouble = c11deliveryDouble;
     }
     private int c1idcliente;
+    private static int c1idcliente_global;
     private String c2fecha_inicio;
     private String c3nombre;
     private String c4direccion;
@@ -41,6 +98,10 @@ public class cliente {
     private String c10zona;
     private String c11delivery;
     private double c11deliveryDouble;
+    private boolean c12escredito;
+    private double c13saldo_credito;
+    private String c14fecha_inicio_credito;
+    private int c15dia_limite_credito;
     private static String tabla;
     private static String idtabla;
     private static String cliente_mostrar = "(idcliente||'-('||nombre||')---TEL:('||telefono||')---RUC:('||ruc||')') as nombre ";
@@ -174,6 +235,20 @@ public class cliente {
      */
     public static String getCliente_concat() {
         return cliente_concat;
+    }
+
+    /**
+     * @return the c1idcliente_global
+     */
+    public static int getC1idcliente_global() {
+        return c1idcliente_global;
+    }
+
+    /**
+     * @param aC1idcliente_global the c1idcliente_global to set
+     */
+    public static void setC1idcliente_global(int aC1idcliente_global) {
+        c1idcliente_global = aC1idcliente_global;
     }
     
 }

@@ -77,7 +77,7 @@ public class JDiaLogin extends javax.swing.JDialog {
         FrmMenuMonchis.btnvale.setEnabled(blo2);
         FrmMenuMonchis.btnventa.setEnabled(blo2);
         FrmMenuMonchis.btncategoria.setEnabled(blo);
-        FrmMenuMonchis.btnbalance.setEnabled(blo);
+        FrmMenuMonchis.btnshopp.setEnabled(blo);
         FrmMenuMonchis.btncambiar_usuario.setEnabled(blo2);
         FrmMenuMonchis.btncomprainsumo.setEnabled(blo2);
         FrmMenuMonchis.btncotizacion.setEnabled(blo2);

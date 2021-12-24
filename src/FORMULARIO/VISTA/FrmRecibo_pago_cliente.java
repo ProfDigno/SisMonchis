@@ -25,31 +25,33 @@ import javax.swing.JOptionPane;
  *
  * @author Digno
  */
-public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
+public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
 
     EvenJFRAME evetbl = new EvenJFRAME();
     EvenJtable evejta = new EvenJtable();
-    private recibo_pago_finanza rpcli = new recibo_pago_finanza();
-    private BO_recibo_pago_finanza rpcli_bo = new BO_recibo_pago_finanza();
-    private DAO_recibo_pago_finanza rpcli_dao = new DAO_recibo_pago_finanza();
-    private BO_financista clBO = new BO_financista();
+    private recibo_pago_cliente rpcli = new recibo_pago_cliente();
+    private BO_recibo_pago_cliente rpcli_bo = new BO_recibo_pago_cliente();
+    private DAO_recibo_pago_cliente rpcli_dao = new DAO_recibo_pago_cliente();
+    private BO_cliente clBO = new BO_cliente();
     EvenJTextField evejtf = new EvenJTextField();
     Connection conn = ConnPostgres.getConnPosgres();
     EvenConexion eveconn = new EvenConexion();
     cla_color_pelete clacolor = new cla_color_pelete();
     EvenFecha evefec = new EvenFecha();
-    private DAO_financista cdao = new DAO_financista();
-    private financista fina = new financista();
-    private credito_finanza ccli = new credito_finanza();
-    private credito_finanza ccli2 = new credito_finanza();
-    private DAO_grupo_credito_finanza gccDAO = new DAO_grupo_credito_finanza();
-    private grupo_credito_finanza gcc = new grupo_credito_finanza();
-     private saldo_credito_finanza sccli = new saldo_credito_finanza();
+    private DAO_cliente cdao = new DAO_cliente();
+    private cliente clie = new cliente();
+    private credito_cliente ccli = new credito_cliente();
+    private credito_cliente ccli2 = new credito_cliente();
+    private DAO_grupo_credito_cliente gccDAO = new DAO_grupo_credito_cliente();
+    private grupo_credito_cliente gcc = new grupo_credito_cliente();
+     private saldo_credito_cliente sccli = new saldo_credito_cliente();
     private  caja_detalle caja = new caja_detalle();
+    caja_detalle_alquilado cdalq = new caja_detalle_alquilado();
+    private DAO_caja_detalle_alquilado cdalq_dao = new DAO_caja_detalle_alquilado();
     private usuario usu = new usuario();
     private EvenNumero_a_Letra nroletra = new EvenNumero_a_Letra();
     private boolean hab_guardar;
-    private int fk_idfinancista;
+    private int fk_idcliente;
     private String estado_EMITIDO = "EMITIDO";
     private String estado_ABIERTO = "ABIERTO";
     private double monto_recibo_pago;
@@ -57,16 +59,16 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
     private String monto_letra;
     private String tabla_origen = caja.getTabla_origen_recibo();
     private int fk_idusuario;
-    private int idrecibo_pago_finanza;
+    private int idrecibo_pago_cliente;
     private double Lmonto_saldo_credito;
 
     private void abrir_formulario() {
-        this.setTitle("RECIBO PAGO FINANZA");
+        this.setTitle("RECIBO PAGO CLIENTE");
         evetbl.centrar_formulario_internalframa(this);
         fk_idusuario=usu.getGlobal_idusuario();
-        cargar_financista();
+        cargar_cliente();
         reestableser();
-        rpcli_dao.actualizar_tabla_recibo_pago_finanza(conn, tblpro_categoria);
+        rpcli_dao.actualizar_tabla_recibo_pago_cliente(conn, tblpro_categoria);
         color_formulario();
         
     }
@@ -83,9 +85,9 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
         if (evejtf.getBoo_JTextField_vacio(txtrec_monto_recibo_pago, "DEBE CARGAR UN MONTO")) {
             return false;
         }
-        if(monto_recibo_pago > (Math.abs(fina.getC7saldo_credito()))){
+        if(monto_recibo_pago > (Math.abs(clie.getC13saldo_credito()))){
             JOptionPane.showMessageDialog(null, "EL MONTO EXEDE EL MONTO MAXIMO DE PAGO","ERROR",JOptionPane.ERROR_MESSAGE);
-            monto_recibo_pago = Math.abs(fina.getC7saldo_credito());
+            monto_recibo_pago = Math.abs(clie.getC13saldo_credito());
             txtrec_monto_recibo_pago.setText(String.valueOf((int)monto_recibo_pago));
             cargar_monto();
             return false;
@@ -99,7 +101,7 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
             monto_recibo_pago = Double.parseDouble(monto_recibo);
             monto_letra = nroletra.Convertir(monto_recibo, true);
             txtrec_monto_letra.setText(monto_letra);
-            Lmonto_saldo_credito = fina.getC7saldo_credito() + monto_recibo_pago ;
+            Lmonto_saldo_credito = clie.getC13saldo_credito() + monto_recibo_pago ;
             jFnuevo_saldo.setValue(Lmonto_saldo_credito);
             monto_saldo_credito = Math.abs(Lmonto_saldo_credito);
             if(Lmonto_saldo_credito >= 0){
@@ -110,77 +112,85 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
         }
     }
 
-    private void cargar_recibo_pago_financista() {
+    private void cargar_recibo_pago_cliente() {
         rpcli.setC3descripcion(txtrec_descripcion.getText());
         rpcli.setC4monto_recibo_pago(monto_recibo_pago);
         rpcli.setC5monto_letra(monto_letra);
         rpcli.setC6estado(estado_EMITIDO);
-        rpcli.setC7fk_idfinancista(fk_idfinancista);
+        rpcli.setC7fk_idcliente(fk_idcliente);
         rpcli.setC8fk_idusuario(fk_idusuario);
     }
 
-    private void cargar_credito_finanza_recibo() {
-        idrecibo_pago_finanza = (eveconn.getInt_ultimoID_mas_uno(conn, rpcli.getTb_recibo_pago_finanza(), rpcli.getId_idrecibo_pago_finanza()));
-        gccDAO.cargar_grupo_credito_finanza_id(conn, gcc, fk_idfinancista);
+    private void cargar_credito_cliente_recibo() {
+        idrecibo_pago_cliente = (eveconn.getInt_ultimoID_mas_uno(conn, rpcli.getTb_recibo_pago_cliente(), rpcli.getId_idrecibo_pago_cliente()));
+        gccDAO.cargar_grupo_credito_cliente_id(conn, gcc, fk_idcliente);
         ccli.setC3descripcion(txtrec_descripcion.getText());
         ccli.setC4estado(estado_EMITIDO);
         ccli.setC5monto_contado(monto_recibo_pago);
         ccli.setC6monto_credito(0);
         ccli.setC7tabla_origen(tabla_origen);
-        ccli.setC8fk_idgrupo_credito_finanza(gcc.getC1idgrupo_credito_finanza());
-        ccli.setC11fk_idcompra(0);
-        ccli.setC10fk_idrecibo_pago_finanza(idrecibo_pago_finanza);
-        ccli.setC9fk_idsaldo_credito_finanza(0);
+        ccli.setC8fk_idgrupo_credito_cliente(gcc.getC1idgrupo_credito_cliente());
+        ccli.setC11fk_idventa_alquiler(0);
+        ccli.setC10fk_idrecibo_pago_cliente(idrecibo_pago_cliente);
+        ccli.setC9fk_idsaldo_credito_cliente(0);
     }
-    private void cargar_credito_finanza_saldo() {
+    private void cargar_credito_cliente_saldo() {
         ccli2.setC3descripcion("SALDO DEL CIERRE ANTERIOR");
         ccli2.setC4estado(estado_EMITIDO);
         ccli2.setC5monto_contado(0);
         ccli2.setC6monto_credito(monto_saldo_credito);
         ccli2.setC7tabla_origen(tabla_origen);
-        ccli2.setC11fk_idcompra(0);
-        ccli2.setC10fk_idrecibo_pago_finanza(0);
+        ccli2.setC11fk_idventa_alquiler(0);
+        ccli2.setC10fk_idrecibo_pago_cliente(0);
     }
-    private void cargar_saldo_credito_finanza() {
+    private void cargar_saldo_credito_cliente() {
         sccli.setC3descripcion("SALDO DEL CIERRE ANTERIOR");
         sccli.setC4monto_saldo_credito(monto_saldo_credito);
         String Smonto_saldo_credito=String.valueOf(monto_saldo_credito);
         sccli.setC5monto_letra(nroletra.Convertir(Smonto_saldo_credito, true));
         sccli.setC6estado(estado_EMITIDO);
-        sccli.setC7fk_idfinancista(fk_idfinancista);
+        sccli.setC7fk_idcliente(fk_idcliente);
         sccli.setC8fk_idusuario(fk_idusuario);
     }
-    private void cargar_caja_detalle() {
-        caja.setC3descripcion1(txtrec_descripcion.getText());
-        caja.setC4monto_venta_efectivo(0);
-        caja.setC5monto_venta_tarjeta(0);
-        caja.setC6monto_delivery(0);
-        caja.setC7monto_gasto(0);
-        caja.setC8monto_compra(0);
-        caja.setC9monto_vale(0);
-        caja.setC10monto_caja(0);
-        caja.setC11monto_cierre(0);
-        caja.setC12id_origen(idrecibo_pago_finanza);
-        caja.setC13tabla_origen(tabla_origen);
-//        caja.setC14cierre("A");
-        caja.setC15estado(estado_EMITIDO);
-        caja.setC16fk_idusuario(fk_idusuario);
-        caja.setC17monto_recibo_pago(monto_recibo_pago);
-        caja.setC18monto_compra_credito(0);
+//    private void cargar_caja_detalle() {
+//        caja.setC3descripcion1(txtrec_descripcion.getText());
+//        caja.setC4monto_venta_efectivo(0);
+//        caja.setC5monto_venta_tarjeta(0);
+//        caja.setC6monto_delivery(0);
+//        caja.setC7monto_gasto(0);
+//        caja.setC8monto_compra(0);
+//        caja.setC9monto_vale(0);
+//        caja.setC10monto_caja(0);
+//        caja.setC11monto_cierre(0);
+//        caja.setC12id_origen(idrecibo_pago_cliente);
+//        caja.setC13tabla_origen(tabla_origen);
+////        caja.setC14cierre("A");
+//        caja.setC15estado(estado_EMITIDO);
+//        caja.setC16fk_idusuario(fk_idusuario);
+//        caja.setC17monto_recibo_pago(monto_recibo_pago);
+//        caja.setC18monto_compra_credito(0);
+//    }
+    void cargar_dato_caja_alquilado() {
+        cdalq_dao.limpiar_caja_detalle_alquilado(cdalq);
+        cdalq.setC3descripcion("(RECIBO CLIENTE) ID:" +idrecibo_pago_cliente + " DESCRIP:"+ txtrec_descripcion.getText());
+        cdalq.setC4tabla_origen(tabla_origen);
+        cdalq.setC5estado(estado_EMITIDO);
+        cdalq.setC10monto_recibo_pago(monto_recibo_pago);
+        cdalq.setC22fk_idrecibo_pago_cliente(idrecibo_pago_cliente);
     }
     private void boton_guardar() {
         if (hab_guardar) {
             if (validar_guardar()) {
-                cargar_recibo_pago_financista();
-                cargar_credito_finanza_recibo();
-                cargar_saldo_credito_finanza();
-                cargar_credito_finanza_saldo();
-                cargar_caja_detalle();
-                fina.setC1idfinancista(fk_idfinancista);
-                if (clBO.getBoolean_insertar_finanza_con_recibo_pago(fina, ccli,ccli2, gcc, rpcli,sccli,caja)) {
+                cargar_recibo_pago_cliente();
+                cargar_credito_cliente_recibo();
+                cargar_saldo_credito_cliente();
+                cargar_credito_cliente_saldo();
+                cargar_dato_caja_alquilado();
+                clie.setC1idcliente(fk_idcliente);
+                if (clBO.getBoolean_insertar_cliente_con_recibo_pago(clie, ccli,ccli2, gcc, rpcli,sccli,cdalq)) {
                     reestableser();
-                    rpcli_dao.actualizar_tabla_recibo_pago_finanza(conn, tblpro_categoria);
-//                    cdao.actualizar_tabla_financista(conn, FrmCliente.tblpro_financista);
+                    rpcli_dao.actualizar_tabla_recibo_pago_cliente(conn, tblpro_categoria);
+//                    cdao.actualizar_tabla_cliente(conn, FrmCliente.tblpro_cliente);
                 }
             }
         }
@@ -188,15 +198,16 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
 
     private void boton_editar() {
         if (validar_guardar()) {
-            rpcli.setC1idrecibo_pago_finanza(Integer.parseInt(txtid.getText()));
+            rpcli.setC1idrecibo_pago_cliente(Integer.parseInt(txtid.getText()));
             rpcli.setC3descripcion(txtrec_descripcion.getText());
+//            rpcli_bo.update_recibo_pago_finanza(rpcli, tblpro_categoria);
         }
     }
 
     private void seleccionar_tabla() {
         int id = evejta.getInt_select_id(tblpro_categoria);
-        rpcli_dao.cargar_recibo_pago_finanza(conn, rpcli, id);
-        txtid.setText(String.valueOf(rpcli.getC1idrecibo_pago_finanza()));
+        rpcli_dao.cargar_recibo_pago_cliente(conn, rpcli, id);
+        txtid.setText(String.valueOf(rpcli.getC1idrecibo_pago_cliente()));
         txtrec_descripcion.setText(rpcli.getC3descripcion());
         btnguardar.setEnabled(false);
         hab_guardar = false;
@@ -206,7 +217,7 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
     private void reestableser() {
         txtid.setText(null);
         txtrec_fecha_emision.setText(evefec.getString_formato_fecha_hora());
-        txtrec_descripcion.setText("RECIBO DE PAGO PARA: "+fina.getC2nombre());
+        txtrec_descripcion.setText("RECIBO DE PAGO PARA: "+clie.getC3nombre());
         txtrec_monto_recibo_pago.setText(null);
         txtrec_monto_letra.setText(null);
         btnguardar.setEnabled(true);
@@ -216,8 +227,8 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
         txtrec_descripcion.grabFocus();
     }
 
-    private void limpiar_financista_local() {
-        fk_idfinancista = 0;
+    private void limpiar_cliente_local() {
+        fk_idcliente = 0;
         txtcli_nombre.setText(null);
         txtcli_ruc.setText(null);
         txtcli_direccion.setText(null);
@@ -227,18 +238,18 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
         txtcli_nombre.grabFocus();
     }
 
-    private void cargar_financista() {
-        cdao.cargar_financista(conn, fina, fina.getC1idfinancista_global());
-        cargar_financista_local(fina);
+    private void cargar_cliente() {
+        cdao.cargar_cliente(conn, clie, clie.getC1idcliente_global());
+        cargar_cliente_local(clie);
     }
 
-    private void cargar_financista_local(financista cli) {
-        fk_idfinancista = cli.getC1idfinancista();
-        txtcli_nombre.setText(cli.getC2nombre());
-//        txtcli_ruc.setText(cli.getC);
-        txtcli_direccion.setText(cli.getC3direccion());
-        txtcli_telefono.setText(cli.getC4telefono());
-        jFcli_saldo_credito.setValue(cli.getC7saldo_credito());
+    private void cargar_cliente_local(cliente cli) {
+        fk_idcliente = cli.getC1idcliente();
+        txtcli_nombre.setText(cli.getC3nombre());
+        txtcli_ruc.setText(cli.getC6ruc());
+        txtcli_direccion.setText(cli.getC4direccion());
+        txtcli_telefono.setText(cli.getC5telefono());
+        jFcli_saldo_credito.setValue(cli.getC13saldo_credito());
 //        txtcli_fec_limite.setText(cli.getC);
     }
 
@@ -246,7 +257,7 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
         reestableser();
     }
 
-    public FrmRecibo_pago_finanza() {
+    public FrmRecibo_pago_cliente() {
         initComponents();
         abrir_formulario();
     }
@@ -670,7 +681,7 @@ public class FrmRecibo_pago_finanza extends javax.swing.JInternalFrame {
 
     private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
         // TODO add your handling code here:
-        rpcli_dao.ancho_tabla_recibo_pago_finanza(tblpro_categoria);
+        rpcli_dao.ancho_tabla_recibo_pago_cliente(tblpro_categoria);
     }//GEN-LAST:event_formInternalFrameOpened
 
     private void tblpro_categoriaMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblpro_categoriaMouseReleased

@@ -22,6 +22,7 @@ public class EvenFecha {
     String formato_fecha = "yyyy-MM-dd";
     String fecha_dia1 = "yyyy-MM-01";
     String formato_fechaHora = "yyyy-MM-dd HH:mm";
+    String formato_fechaHoraZona = "yyyy-MM-dd HH:mm:ss.00";
     private String formato_hora = "HH:mm:ss";
 
     public String getString_validar_fecha(String fechaStr) {
@@ -71,7 +72,7 @@ public class EvenFecha {
         java.sql.Timestamp dateSql = null;
         java.util.Date dateUtil = new java.util.Date();
         try {
-            SimpleDateFormat formato = new SimpleDateFormat(formato_fechaHora);
+            SimpleDateFormat formato = new SimpleDateFormat(formato_fechaHoraZona);
             dateUtil = formato.parse(fechaStr);
             dateSql = new java.sql.Timestamp(dateUtil.getTime());
         } catch (Exception e) {

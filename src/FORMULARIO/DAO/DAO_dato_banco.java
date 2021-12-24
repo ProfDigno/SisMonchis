@@ -19,7 +19,10 @@ public class DAO_dato_banco {
 	private String mensaje_update = "DATO_BANCO MODIFICADO CORECTAMENTE";
 	private String sql_insert = "INSERT INTO dato_banco(iddato_banco,titular,documento,nro_cuenta,mibanco,fk_idbanco) VALUES (?,?,?,?,?,?);";
 	private String sql_update = "UPDATE dato_banco SET titular=?,documento=?,nro_cuenta=?,mibanco=?,fk_idbanco=? WHERE iddato_banco=?;";
-	private String sql_select = "SELECT iddato_banco,titular,documento,nro_cuenta,mibanco,fk_idbanco FROM dato_banco order by 1 desc;";
+	private String sql_select = "SELECT db.iddato_banco as id,db.titular,db.nro_cuenta,b.nombre as banco "
+                + "FROM dato_banco db,banco b "
+                + "where b.idbanco=db.fk_idbanco "
+                + "order by 1 desc;";
 	private String sql_cargar = "SELECT iddato_banco,titular,documento,nro_cuenta,mibanco,fk_idbanco FROM dato_banco WHERE iddato_banco=";
 	public void insertar_dato_banco(Connection conn, dato_banco dban){
 		dban.setC1iddato_banco(eveconn.getInt_ultimoID_mas_uno(conn, dban.getTb_dato_banco(), dban.getId_iddato_banco()));
@@ -82,7 +85,7 @@ public class DAO_dato_banco {
 		ancho_tabla_dato_banco(tbltabla);
 	}
 	public void ancho_tabla_dato_banco(JTable tbltabla){
-		int Ancho[]={16,16,16,16,16,16};
+		int Ancho[]={10,40,25,25};
 		evejt.setAnchoColumnaJtable(tbltabla, Ancho);
 	}
 }
