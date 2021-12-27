@@ -27,7 +27,26 @@ public class DAO_item_venta_alquiler {
     private String sql_update = "UPDATE item_venta_alquiler SET descripcion=?,precio_venta=?,precio_compra=?,cantidad_total=?,cantidad_pagado=?,fk_idventa_alquiler=?,fk_idproducto=? WHERE iditem_venta_alquiler=?;";
     private String sql_select = "SELECT iditem_venta_alquiler,descripcion,precio_venta,precio_compra,cantidad_total,cantidad_pagado,fk_idventa_alquiler,fk_idproducto FROM item_venta_alquiler order by 1 desc;";
     private String sql_cargar = "SELECT iditem_venta_alquiler,descripcion,precio_venta,precio_compra,cantidad_total,cantidad_pagado,fk_idventa_alquiler,fk_idproducto FROM item_venta_alquiler WHERE iditem_venta_alquiler=";
-
+    private String sql_cant_reser = "select iditem_venta_alquiler as iditem\n"
+            + ",descripcion\n"
+            + ",trim(to_char(precio_venta,'999G999G999')) as pventa\n"
+            + ",(cantidad_total-cantidad_pagado) as cant\n"
+            + ",trim(to_char(((cantidad_total-cantidad_pagado)*precio_venta),'999G999G999')) as total\n"
+            + "from item_venta_alquiler\n"
+            + "where (cantidad_total-cantidad_pagado)>0 and fk_idventa_alquiler="
+            ;
+    private String sql_cant_reser_int = "select fk_idproducto as idp\n"
+            + ",descripcion\n"
+            + ",precio_venta as pventa\n"
+            + ",(cantidad_total-cantidad_pagado) as cant\n"
+            + ",((cantidad_total-cantidad_pagado)*precio_venta) as total\n"
+            + "from item_venta_alquiler\n"
+            + "where (cantidad_total-cantidad_pagado)>0 and fk_idventa_alquiler="
+            ;
+    private String sql_cant_total = "select (descripcion||' ====>  '||cantidad_total) as descrip "
+            + "from item_venta_alquiler\n"
+            + "where fk_idventa_alquiler="
+            ;
     public void insertar_item_venta_alquiler(Connection conn, item_venta_alquiler ivealq) {
         ivealq.setC1iditem_venta_alquiler(eveconn.getInt_ultimoID_mas_uno(conn, ivealq.getTb_item_venta_alquiler(), ivealq.getId_iditem_venta_alquiler()));
         String titulo = "insertar_item_venta_alquiler";
@@ -92,15 +111,16 @@ public class DAO_item_venta_alquiler {
             evemen.mensaje_error(e, sql_cargar + "\n" + ivealq.toString(), titulo);
         }
     }
-    public void insertar_item_venta_alquiler_de_tabla(Connection conn, JTable tblitem_producto,  venta_alquiler ven) {
+
+    public void insertar_item_venta_alquiler_de_tabla(Connection conn, JTable tblitem_producto, venta_alquiler ven) {
         for (int row = 0; row < tblitem_producto.getRowCount(); row++) {
             String idproducto = ((tblitem_producto.getModel().getValueAt(row, 0).toString()));
             String descripcion = ((tblitem_producto.getModel().getValueAt(row, 1).toString()));
             String precio_venta = ((tblitem_producto.getModel().getValueAt(row, 2).toString()));
             String cantidad_pagado = ((tblitem_producto.getModel().getValueAt(row, 3).toString()));
             String cantidad_reservado = ((tblitem_producto.getModel().getValueAt(row, 4).toString()));
-            double Dcant_pagado =Double.parseDouble(cantidad_pagado);
-            double Dcant_reservado =Double.parseDouble(cantidad_reservado);
+            double Dcant_pagado = Double.parseDouble(cantidad_pagado);
+            double Dcant_reservado = Double.parseDouble(cantidad_reservado);
             try {
                 producto prod = new producto();
                 item_venta_alquiler item = new item_venta_alquiler();
@@ -108,20 +128,34 @@ public class DAO_item_venta_alquiler {
                 item.setC2descripcion(descripcion);
                 item.setC3precio_venta(Double.parseDouble(precio_venta));
                 item.setC4precio_compra(prod.getC7precio_compra());
-                item.setC5cantidad_total(Dcant_pagado+Dcant_reservado);
+                item.setC5cantidad_total(Dcant_pagado + Dcant_reservado);
                 item.setC6cantidad_pagado(Dcant_pagado);
                 item.setC7fk_idventa_alquiler(ven.getC1idventa_alquiler());
                 item.setC8fk_idproducto(Integer.parseInt(idproducto));
                 insertar_item_venta_alquiler(conn, item);
-//                prod.setC21_aux_cantidad(Integer.parseInt(cantidad));
-//                prod.setC1idproducto(Integer.parseInt(idproducto));
-//                pdao.update_producto_stock_descontar(conn, prod);
             } catch (Exception e) {
                 evemen.mensaje_error(e, "insertar_item_venta_alquiler_de_tabla");
                 break;
             }
 
         }
+    }
+    public String getString_cargar_item_venta_alquiler_cantidad_total(Connection conn, int id) {
+        String suma_item="";
+        String titulo = "getString_cargar_item_venta_alquiler_cantidad_total";
+        String sql=sql_cant_total + id;
+        try {
+            ResultSet rs = eveconn.getResulsetSQL(conn,sql , titulo);
+            while (rs.next()) {
+                String descripcion=(rs.getString(1));
+                suma_item=suma_item+descripcion +"\n";
+            }
+            evemen.Imprimir_serial_sql(sql , titulo);
+        } catch (Exception e) {
+            suma_item="error";
+            evemen.mensaje_error(e, sql , titulo);
+        }
+        return suma_item;
     }
     public void actualizar_tabla_item_venta_alquiler(Connection conn, JTable tbltabla) {
         eveconn.Select_cargar_jtable(conn, sql_select, tbltabla);
@@ -130,6 +164,18 @@ public class DAO_item_venta_alquiler {
 
     public void ancho_tabla_item_venta_alquiler(JTable tbltabla) {
         int Ancho[] = {12, 12, 12, 12, 12, 12, 12, 12};
+        evejt.setAnchoColumnaJtable(tbltabla, Ancho);
+    }
+    public void actualizar_tabla_item_venta_alquiler_cant_reser(Connection conn, JTable tbltabla,int idventa_alquiler) {
+        eveconn.Select_cargar_jtable(conn, sql_cant_reser+idventa_alquiler+" order by 4 desc;", tbltabla);
+        ancho_tabla_item_venta_alquiler_cant_reser(tbltabla);
+    }
+    public void actualizar_tabla_item_venta_alquiler_cant_reser_int(Connection conn, JTable tbltabla,int idventa_alquiler) {
+        eveconn.Select_cargar_jtable(conn, sql_cant_reser_int+idventa_alquiler+" order by 4 desc;", tbltabla);
+        ancho_tabla_item_venta_alquiler_cant_reser(tbltabla);
+    }
+    public void ancho_tabla_item_venta_alquiler_cant_reser(JTable tbltabla) {
+        int Ancho[] = {10,50,15,10,15};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 }

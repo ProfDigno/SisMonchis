@@ -31,6 +31,8 @@ public class DAO_credito_cliente {
             + "TRIM(to_char(cc.monto_contado,'999G999G999')) as contado\n"
             + " from credito_cliente cc\n"
             + " where  cc.fk_idgrupo_credito_cliente=";
+        private String sql_anular = "UPDATE credito_cliente SET estado=? WHERE fk_idventa_alquiler=?;";
+ 
     public void insertar_credito_cliente(Connection conn, credito_cliente crcl) {
         crcl.setC1idcredito_cliente(eveconn.getInt_ultimoID_mas_uno(conn, crcl.getTb_credito_cliente(), crcl.getId_idcredito_cliente()));
         String titulo = "insertar_credito_cliente";
@@ -123,5 +125,20 @@ public class DAO_credito_cliente {
     public void ancho_tabla_credito_cliente_por_grupo(JTable tbltabla) {
         int Ancho[] = {5, 10, 40, 10, 15, 10, 10};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
+    }
+    public void update_credito_cliente_anular(Connection conn, credito_cliente crcl) {
+        String titulo = "update_credito_cliente";
+        PreparedStatement pst = null;
+        try {
+            pst = conn.prepareStatement(sql_anular);
+            pst.setString(1, crcl.getC4estado());
+            pst.setInt(2, crcl.getC11fk_idventa_alquiler());
+            pst.execute();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql_anular + "\n" + crcl.toString(), titulo);
+            evemen.modificado_correcto(mensaje_update, false);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql_anular + "\n" + crcl.toString(), titulo);
+        }
     }
 }

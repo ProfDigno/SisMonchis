@@ -6,6 +6,7 @@ import Evento.JasperReport.EvenJasperReport;
 import Evento.Jtable.EvenJtable;
 import Evento.Mensaje.EvenMensajeJoptionpane;
 import Evento.Fecha.EvenFecha;
+import FORMULARIO.ENTIDAD.venta_alquiler;
 import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -81,7 +82,14 @@ public class DAO_producto {
             + "and p.stock_min>0\n"
             + "and p.activar=true\n"
             + "order by 4 desc";
-
+    private String sql_stock_retirar = "update producto set stock=(stock-(item_venta_alquiler.cantidad_total)) \n"
+            + "from item_venta_alquiler \n"
+            + "where producto.idproducto=item_venta_alquiler.fk_idproducto\n"
+            + "and item_venta_alquiler.fk_idventa_alquiler=";
+    private String sql_stock_devolucion = "update producto set stock=(stock+(item_venta_alquiler.cantidad_total)) \n"
+            + "from item_venta_alquiler \n"
+            + "where producto.idproducto=item_venta_alquiler.fk_idproducto\n"
+            + "and item_venta_alquiler.fk_idventa_alquiler=";
     public void insertar_producto(Connection conn, producto pro) {
         pro.setC1idproducto(eveconn.getInt_ultimoID_mas_uno(conn, pro.getTb_producto(), pro.getId_idproducto()));
         String titulo = "insertar_producto";
@@ -421,14 +429,39 @@ public class DAO_producto {
         }
         return total;
     }
-
+    public void update_producto_stock_retirar_alquiler(Connection conn,venta_alquiler vealq) {
+        String titulo = "update_producto_stock_retirar_alquiler";
+        PreparedStatement pst = null;
+        String sql=sql_stock_retirar+vealq.getC1idventa_alquiler();
+        try {
+            pst = conn.prepareStatement(sql);
+            pst.executeUpdate();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql , titulo);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql , titulo);
+        }
+    }
+    public void update_producto_stock_finalizar_alquiler(Connection conn,venta_alquiler vealq) {
+        String titulo = "update_producto_stock_finalizar_alquiler";
+        PreparedStatement pst = null;
+        String sql=sql_stock_devolucion+vealq.getC1idventa_alquiler();
+        try {
+            pst = conn.prepareStatement(sql);
+            pst.executeUpdate();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql , titulo);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql , titulo);
+        }
+    }
     public void actualizar_tabla_producto_stock_minimo(Connection conn, JTable tbltabla) {
         eveconn.Select_cargar_jtable(conn, sql_stock_minimo, tbltabla);
         ancho_tabla_producto_stock_minimo(tbltabla);
     }
 
     public void ancho_tabla_producto_stock_minimo(JTable tbltabla) {
-        int Ancho[] = {10, 60, 10,10, 10};
+        int Ancho[] = {10, 60, 10, 10, 10};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 }

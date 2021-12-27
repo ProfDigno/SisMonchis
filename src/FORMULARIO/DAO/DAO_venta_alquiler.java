@@ -22,16 +22,23 @@ public class DAO_venta_alquiler {
     private String mensaje_update = "VENTA_ALQUILER MODIFICADO CORECTAMENTE";
     private String sql_insert = "INSERT INTO venta_alquiler(idventa_alquiler,fecha_creado,fecha_retirado_previsto,fecha_retirado_real,fecha_devolusion_previsto,fecha_devolusion_real,monto_total,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_delivery,forma_pago,condicion,alquiler_retirado,alquiler_devolusion,direccion_alquiler,observacion,estado,fk_idcliente,fk_identregador,monto_alquilado_credito) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     private String sql_update = "UPDATE venta_alquiler SET fecha_creado=?,fecha_retirado_previsto=?,fecha_retirado_real=?,fecha_devolusion_previsto=?,fecha_devolusion_real=?,monto_total=?,monto_alquilado_efectivo=?,monto_alquilado_tarjeta=?,monto_alquilado_transferencia=?,monto_delivery=?,forma_pago=?,condicion=?,alquiler_retirado=?,alquiler_devolusion=?,direccion_alquiler=?,observacion=?,estado=?,fk_idcliente=?,fk_identregador=? WHERE idventa_alquiler=?;";
-    private String sql_select = "select va.idventa_alquiler as idva,va.fecha_retirado_real as retirado,va.fecha_devolusion_real as devolusion,\n"
-            + "cl.nombre,va.direccion_alquiler as direccion, \n"
+    private String sql_select = "select va.idventa_alquiler as idva,"
+            + "TRIM(to_char(va.fecha_retirado_real,'yyyy-MM-dd HH24:MI')) as retirado,"
+            + "TRIM(to_char(va.fecha_devolusion_real,'yyyy-MM-dd HH24:MI')) as devolusion,\n"
+            + "cl.idcliente as idc,cl.nombre,va.direccion_alquiler as direccion, \n"
             + "TRIM(to_char((va.monto_alquilado_efectivo+va.monto_alquilado_tarjeta+va.monto_alquilado_transferencia+va.monto_alquilado_credito),'999G999G999')) as monto_total,\n"
             + "TRIM(to_char((va.monto_total-(va.monto_alquilado_efectivo+va.monto_alquilado_tarjeta+va.monto_alquilado_transferencia+va.monto_alquilado_credito)),'999G999G999')) as reservado,\n"
             + "va.forma_pago,va.condicion,va.estado\n"
             + "from venta_alquiler va,cliente cl\n"
             + "where va.fk_idcliente=cl.idcliente\n"
             + "order by 1 desc";
-    private String sql_cargar = "SELECT idventa_alquiler,fecha_creado,fecha_retirado_previsto,fecha_retirado_real,fecha_devolusion_previsto,fecha_devolusion_real,monto_total,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_delivery,forma_pago,condicion,alquiler_retirado,alquiler_devolusion,direccion_alquiler,observacion,estado,fk_idcliente,fk_identregador FROM venta_alquiler WHERE idventa_alquiler=";
-
+    private String sql_cargar = "SELECT idventa_alquiler,fecha_creado,fecha_retirado_previsto,fecha_retirado_real,fecha_devolusion_previsto,fecha_devolusion_real,"
+            + "monto_total,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_delivery,"
+            + "forma_pago,condicion,alquiler_retirado,alquiler_devolusion,direccion_alquiler,observacion,estado,"
+            + "fk_idcliente,fk_identregador FROM venta_alquiler WHERE idventa_alquiler=";
+    private String sql_anular_venta="update venta_alquiler set estado=? where idventa_alquiler=?;";
+    private String sql_retirar_alq="update venta_alquiler set fecha_retirado_real=?,alquiler_retirado=?,estado=? where idventa_alquiler=?;";
+    private String sql_devolusion_alq="update venta_alquiler set fecha_devolusion_real=?,alquiler_devolusion=?,estado=? where idventa_alquiler=?;";
     public void insertar_venta_alquiler(Connection conn, venta_alquiler vealq) {
         vealq.setC1idventa_alquiler(eveconn.getInt_ultimoID_mas_uno(conn, vealq.getTb_venta_alquiler(), vealq.getId_idventa_alquiler()));
         String titulo = "insertar_venta_alquiler";
@@ -133,14 +140,62 @@ public class DAO_venta_alquiler {
             evemen.mensaje_error(e, sql_cargar + "\n" + vealq.toString(), titulo);
         }
     }
-
+    public void update_venta_alquiler_anular(Connection conn, venta_alquiler vealq) {
+        String titulo = "update_venta_alquiler_anular";
+        PreparedStatement pst = null;
+        try {
+            pst = conn.prepareStatement(sql_anular_venta);
+            pst.setString(1, vealq.getC18estado());
+            pst.setInt(2, vealq.getC1idventa_alquiler());
+            pst.execute();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql_anular_venta + "\n" + vealq.toString(), titulo);
+            evemen.modificado_correcto(mensaje_update, true);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql_anular_venta + "\n" + vealq.toString(), titulo);
+        }
+    }
+    public void update_venta_alquiler_retirar(Connection conn, venta_alquiler vealq) {
+        String titulo = "update_venta_alquiler_retirar";
+        PreparedStatement pst = null;
+        try {
+            pst = conn.prepareStatement(sql_retirar_alq);
+            pst.setTimestamp(1, evefec.getTimestamp_sistema());
+            pst.setBoolean(2, true);
+            pst.setString(3, vealq.getC18estado());
+            pst.setInt(4, vealq.getC1idventa_alquiler());
+            pst.execute();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql_retirar_alq + "\n" + vealq.toString(), titulo);
+            evemen.modificado_correcto(mensaje_update, true);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql_retirar_alq + "\n" + vealq.toString(), titulo);
+        }
+    }
+    public void update_venta_alquiler_finalizar(Connection conn, venta_alquiler vealq) {
+        String titulo = "update_venta_alquiler_finalizar";
+        PreparedStatement pst = null;
+        try {
+            pst = conn.prepareStatement(sql_devolusion_alq);
+            pst.setTimestamp(1, evefec.getTimestamp_sistema());
+            pst.setBoolean(2, true);
+            pst.setString(3, vealq.getC18estado());
+            pst.setInt(4, vealq.getC1idventa_alquiler());
+            pst.execute();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql_devolusion_alq + "\n" + vealq.toString(), titulo);
+            evemen.modificado_correcto(mensaje_update, true);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql_devolusion_alq + "\n" + vealq.toString(), titulo);
+        }
+    }
     public void actualizar_tabla_venta_alquiler(Connection conn, JTable tbltabla) {
         eveconn.Select_cargar_jtable(conn, sql_select, tbltabla);
         ancho_tabla_venta_alquiler(tbltabla);
     }
 
     public void ancho_tabla_venta_alquiler(JTable tbltabla) {
-        int Ancho[] = {6,11,11,18,18,7,7,9,7,7};
+        int Ancho[] = {6,11,11,2,17,17,7,7,9,7,7};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 }

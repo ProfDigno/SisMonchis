@@ -26,7 +26,8 @@ public class DAO_caja_detalle_alquilado {
     private String sql_update = "UPDATE caja_detalle_alquilado SET fecha_emision=?,descripcion=?,tabla_origen=?,estado=?,cierre=?,monto_alquilado_efectivo=?,monto_alquilado_tarjeta=?,monto_alquilado_transferencia=?,monto_recibo_pago=?,monto_delivery=?,monto_gasto=?,monto_vale=?,monto_compra_contado=?,monto_compra_credito=?,monto_apertura_caja=?,monto_cierre_caja=?,fk_idgasto=?,fk_idcompra=?,fk_idventa_alquiler=?,fk_idvale=?,fk_idrecibo_pago_cliente=?,fk_idusuario=? WHERE idcaja_detalle_alquilado=?;";
     private String sql_select = "SELECT idcaja_detalle_alquilado,fecha_emision,descripcion,tabla_origen,estado,cierre,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_recibo_pago,monto_delivery,monto_gasto,monto_vale,monto_compra_contado,monto_compra_credito,monto_apertura_caja,monto_cierre_caja,fk_idgasto,fk_idcompra,fk_idventa_alquiler,fk_idvale,fk_idrecibo_pago_cliente,fk_idusuario FROM caja_detalle_alquilado order by 1 desc;";
     private String sql_cargar = "SELECT idcaja_detalle_alquilado,fecha_emision,descripcion,tabla_origen,estado,cierre,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_recibo_pago,monto_delivery,monto_gasto,monto_vale,monto_compra_contado,monto_compra_credito,monto_apertura_caja,monto_cierre_caja,fk_idgasto,fk_idcompra,fk_idventa_alquiler,fk_idvale,fk_idrecibo_pago_cliente,fk_idusuario FROM caja_detalle_alquilado WHERE idcaja_detalle_alquilado=";
-
+    private String sql_estado_venta_alquiler = "UPDATE caja_detalle_alquilado SET estado=? WHERE fk_idventa_alquiler=?;";
+ 
     public void insertar_caja_detalle_alquilado(Connection conn, caja_detalle_alquilado cdalq) {
         cdalq.setC1idcaja_detalle_alquilado(eveconn.getInt_ultimoID_mas_uno(conn, cdalq.getTb_caja_detalle_alquilado(), cdalq.getId_idcaja_detalle_alquilado()));
         String titulo = "insertar_caja_detalle_alquilado";
@@ -169,5 +170,20 @@ public class DAO_caja_detalle_alquilado {
     public void ancho_tabla_caja_detalle_alquilado(JTable tbltabla) {
         int Ancho[] = {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
+    }
+    public void update_caja_detalle_alquilado_estado_venta_alquiler(Connection conn, caja_detalle_alquilado cdalq) {
+        String titulo = "update_caja_detalle_alquilado_estado_venta_alquiler";
+        PreparedStatement pst = null;
+        try {
+            pst = conn.prepareStatement(sql_estado_venta_alquiler);
+            pst.setString(1, cdalq.getC5estado());
+            pst.setInt(2, cdalq.getC20fk_idventa_alquiler());
+            pst.execute();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql_estado_venta_alquiler + "\n" + cdalq.toString(), titulo);
+            evemen.modificado_correcto(mensaje_update, false);
+        } catch (Exception e) {
+            evemen.mensaje_error(e, sql_estado_venta_alquiler + "\n" + cdalq.toString(), titulo);
+        }
     }
 }

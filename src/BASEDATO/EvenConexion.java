@@ -29,12 +29,15 @@ public class EvenConexion {
     
     public int getInt_ultimoID_mas_uno(Connection conn,String tabla,String id){
         String titulo="getInt_ultimoID";
-        int getid=0;
+        int getid=1;
         String sql="select max("+id+"+1) as getid from "+tabla+" ";
         try {
             ResultSet rs=getResulsetSQL(conn, sql, titulo);
             if(rs.next()){
                 getid=rs.getInt("getid");
+                if(getid==0){
+                    getid=1;
+                }
             }
         } catch (Exception e) {
             evmen.mensaje_error(e, sql, titulo);

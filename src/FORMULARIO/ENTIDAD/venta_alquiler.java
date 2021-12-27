@@ -2,6 +2,34 @@
 public class venta_alquiler {
 
     /**
+     * @return the C1idventa_alquiler_global
+     */
+    public static int getC1idventa_alquiler_global() {
+        return C1idventa_alquiler_global;
+    }
+
+    /**
+     * @param aC1idventa_alquiler_global the C1idventa_alquiler_global to set
+     */
+    public static void setC1idventa_alquiler_global(int aC1idventa_alquiler_global) {
+        C1idventa_alquiler_global = aC1idventa_alquiler_global;
+    }
+
+    /**
+     * @return the compotexte
+     */
+    public static String getCompotexte() {
+        return compotexte;
+    }
+
+    /**
+     * @param aCompotexte the compotexte to set
+     */
+    public static void setCompotexte(String aCompotexte) {
+        compotexte = aCompotexte;
+    }
+
+    /**
      * @return the C21monto_alquilado_credito
      */
     public double getC21monto_alquilado_credito() {
@@ -17,6 +45,7 @@ public class venta_alquiler {
 
 //---------------DECLARAR VARIABLES---------------
 private int C1idventa_alquiler;
+private static int C1idventa_alquiler_global;
 private String C2fecha_creado;
 private String C3fecha_retirado_previsto;
 private String C4fecha_retirado_real;
@@ -39,6 +68,7 @@ private int C20fk_identregador;
 private double C21monto_alquilado_credito;
 private static String nom_tabla;
 private static String nom_idtabla;
+private static String compotexte;
 //---------------TABLA-ID---------------
 	public venta_alquiler() {
 		setTb_venta_alquiler("venta_alquiler");

@@ -320,20 +320,6 @@ public class FrmCliente extends javax.swing.JInternalFrame {
 
     private void seleccionar_tabla() {
         int idcliente = evejt.getInt_select_id(tblcliente_credito_resumen);
-//        fina.setC1idfinancista_global(idfinancista);
-//        finaDAO.cargar_financista(conn, fina, idfinancista);
-//        txtid.setText(String.valueOf(fina.getC1idfinancista()));
-//        txtnombre.setText(fina.getC2nombre());
-//        txtdireccion.setText(fina.getC3direccion());
-//        txttelefono.setText(fina.getC4telefono());
-//        txtdescripcion.setText(fina.getC5descripcion());
-//        jCescredito.setSelected(fina.getC6escredito());
-//        txtsaldo_credito.setText(evejtf.getString_format_nro_entero(fina.getC7saldo_credito()));
-//        txtfec_inicio_credito.setText(fina.getC8fecha_inicio_credito());
-//        txtdia_limite_credito.setText(evejtf.getString_format_nro_entero(fina.getC9dia_limite_credito()));
-//        btnguardar.setEnabled(false);
-//        hab_guardar = false;
-//        btneditar.setEnabled(true);
         clie.setC1idcliente_global(idcliente);
         gcfina_dao.actualizar_tabla_grupo_credito_cliente_idc(conn, tblgrupo_credito_cliente, idcliente);
         gcfina_dao.cargar_grupo_credito_cliente_id(conn, gcfina, idcliente);
