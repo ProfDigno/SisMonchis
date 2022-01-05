@@ -31,7 +31,7 @@ public class BO_venta_alquiler {
 
     public boolean getBoolean_insertar_venta_alquiler(venta_alquiler vealq, caja_detalle_alquilado cdalq, credito_cliente ccli, cliente clie, boolean escredito, JTable tbltabla) {
         boolean insertado = false;
-        String titulo = "insertar_venta_alquiler";
+        String titulo = "getBoolean_insertar_venta_alquiler";
         Connection conn = ConnPostgres.getConnPosgres();
         try {
             if (conn.getAutoCommit()) {
@@ -39,11 +39,10 @@ public class BO_venta_alquiler {
             }
             vealq_dao.insertar_venta_alquiler(conn, vealq);
             ivealq_dao.insertar_item_venta_alquiler_de_tabla(conn, tbltabla, vealq);
+            cdalq_dao.insertar_caja_detalle_alquilado(conn, cdalq);
             if (escredito) {
                 ccli_dao.insertar_credito_cliente(conn, ccli);
                 cli_dao.update_cliente_saldo_credito(conn, clie);
-            } else {
-                cdalq_dao.insertar_caja_detalle_alquilado(conn, cdalq);
             }
             conn.commit();
             insertado = true;
@@ -106,17 +105,18 @@ public class BO_venta_alquiler {
         }
         return anulado;
     }
-    public boolean getBoolean_update_venta_alquiler_reirar(String lista_producto,venta_alquiler vealq, caja_detalle_alquilado cdalq) {
+
+    public boolean getBoolean_update_venta_alquiler_alquilado(String lista_producto, venta_alquiler vealq, caja_detalle_alquilado cdalq) {
         boolean retirar = false;
-        if (evmen.MensajeGeneral_warning("ESTAS SEGURO DE RETIRAR VENTA_ALQUILER\nLISTA DE PRODUCTO A RETIRAR:\n"+lista_producto+"\nSALE DEL STOCK", "RETIRAR", "ACEPTAR", "CANCELAR")) {
-            String titulo = "getBoolean_update_venta_alquiler_reirar";
+        if (evmen.MensajeGeneral_warning("ESTAS SEGURO DE ALQUILAR VENTA_ALQUILER\nLISTA DE PRODUCTO A RETIRAR:\n" + lista_producto + "\nSALE DEL STOCK", "ALQUILAR", "ACEPTAR", "CANCELAR")) {
+            String titulo = "getBoolean_update_venta_alquiler_alquilado";
             Connection conn = ConnPostgres.getConnPosgres();
             try {
                 if (conn.getAutoCommit()) {
                     conn.setAutoCommit(false);
                 }
-                vealq_dao.update_venta_alquiler_retirar(conn, vealq);
-                pro_dao.update_producto_stock_retirar_alquiler(conn, vealq);
+                vealq_dao.update_venta_alquiler_alquilado(conn, vealq);
+                pro_dao.update_producto_stock_Alquilado(conn, vealq);
                 cdalq_dao.update_caja_detalle_alquilado_estado_venta_alquiler(conn, cdalq);
                 conn.commit();
                 retirar = true;
@@ -131,17 +131,18 @@ public class BO_venta_alquiler {
         }
         return retirar;
     }
-    public boolean getBoolean_update_venta_alquiler_finalizar(String lista_producto,venta_alquiler vealq, caja_detalle_alquilado cdalq) {
+
+    public boolean getBoolean_update_venta_alquiler_Devolucion(String lista_producto, venta_alquiler vealq, caja_detalle_alquilado cdalq) {
         boolean devolusion = false;
-        if (evmen.MensajeGeneral_warning("ESTAS SEGURO DE PRECESAR FINALIZAR VENTA_ALQUILER\nLISTA DE PRODUCTO A FINALIZAR:\n"+lista_producto+"\n(+INGRESA A STOCK+)", "FINALIZAR", "ACEPTAR", "CANCELAR")) {
-            String titulo = "getBoolean_update_venta_alquiler_finalizar";
+        if (evmen.MensajeGeneral_warning("ESTAS SEGURO DE PRECESAR DEVOLUCION VENTA_ALQUILER\nLISTA DE PRODUCTO A FINALIZAR:\n" + lista_producto + "\n(+INGRESA A STOCK+)", "DEVOLUCION", "ACEPTAR", "CANCELAR")) {
+            String titulo = "getBoolean_update_venta_alquiler_Devolucion";
             Connection conn = ConnPostgres.getConnPosgres();
             try {
                 if (conn.getAutoCommit()) {
                     conn.setAutoCommit(false);
                 }
-                vealq_dao.update_venta_alquiler_finalizar(conn, vealq);
-                pro_dao.update_producto_stock_finalizar_alquiler(conn, vealq);
+                vealq_dao.update_venta_alquiler_Devolucion(conn, vealq);
+                pro_dao.update_producto_stock_Devolucion(conn, vealq);
                 cdalq_dao.update_caja_detalle_alquilado_estado_venta_alquiler(conn, cdalq);
                 conn.commit();
                 devolusion = true;
@@ -155,5 +156,30 @@ public class BO_venta_alquiler {
             }
         }
         return devolusion;
+    }
+
+    public boolean getBoolean_update_venta_alquiler_Finalizar( venta_alquiler vealq, caja_detalle_alquilado cdalq) {
+        boolean finalizar = false;
+//        if (evmen.MensajeGeneral_warning("ESTAS SEGURO DE PRECESAR DEVOLUCION VENTA_ALQUILER\nLISTA DE PRODUCTO A FINALIZAR:\n" + lista_producto + "\n(+INGRESA A STOCK+)", "DEVOLUCION", "ACEPTAR", "CANCELAR")) {
+            String titulo = "getBoolean_update_venta_alquiler_Finalizar";
+            Connection conn = ConnPostgres.getConnPosgres();
+            try {
+                if (conn.getAutoCommit()) {
+                    conn.setAutoCommit(false);
+                }
+                vealq_dao.update_venta_alquiler_Finalizar(conn, vealq);
+                cdalq_dao.update_caja_detalle_alquilado_estado_venta_alquiler(conn, cdalq);
+                conn.commit();
+                finalizar = true;
+            } catch (SQLException e) {
+                evmen.mensaje_error(e, vealq.toString(), titulo);
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    evmen.Imprimir_serial_sql_error(e1, vealq.toString(), titulo);
+                }
+            }
+//        }
+        return finalizar;
     }
 }

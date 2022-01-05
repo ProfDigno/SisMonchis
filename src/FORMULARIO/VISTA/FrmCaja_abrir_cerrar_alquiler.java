@@ -17,14 +17,17 @@ import Evento.Jtable.EvenJtable;
 import Evento.Jtable.EvenRender;
 import Evento.Mensaje.EvenMensajeJoptionpane;
 import FORMULARIO.DAO.DAO_caja_cierre;
+import FORMULARIO.DAO.DAO_caja_cierre_alquilado;
 import FORMULARIO.DAO.DAO_caja_detalle;
-import FORMULARIO.ENTIDAD.caja_detalle;
+import FORMULARIO.DAO.DAO_caja_detalle_alquilado;
+import FORMULARIO.ENTIDAD.caja_detalle_alquilado;
 import IMPRESORA_POS.PosImprimir_Compra;
 import IMPRESORA_POS.PosImprimir_Gasto;
 import IMPRESORA_POS.PosImprimir_Vale;
 import IMPRESORA_POS.PosImprimir_Venta;
 import IMPRESORA_POS.PosImprimir_caja_cierre;
 import IMPRESORA_POS.PosImprimir_caja_cierre_vgrupo;
+import IMPRESORA_POS.PosImprimir_venta_alquiler;
 import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
 import java.awt.Color;
@@ -47,7 +50,7 @@ import javax.swing.JTextField;
  *
  * @author Digno
  */
-public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
+public class FrmCaja_abrir_cerrar_alquiler extends javax.swing.JInternalFrame {
 
     /**
      * Creates new form FrmCajaDetalle
@@ -64,24 +67,25 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     EvenJTextField evejtf = new EvenJTextField();
 //    ConnPostgres_SER conPsSER = new ConnPostgres_SER();
     EvenMensajeJoptionpane evemen = new EvenMensajeJoptionpane();
-    DAO_caja_detalle cdao = new DAO_caja_detalle();
-    DAO_caja_cierre ccdao = new DAO_caja_cierre();
-    PosImprimir_Venta posven = new PosImprimir_Venta();
-    PosImprimir_Compra poscomp = new PosImprimir_Compra();
-    PosImprimir_Gasto posgas = new PosImprimir_Gasto();
-    PosImprimir_Vale posval = new PosImprimir_Vale();
-    PosImprimir_caja_cierre poscc = new PosImprimir_caja_cierre();
-    PosImprimir_caja_cierre_vgrupo posccvg = new PosImprimir_caja_cierre_vgrupo();
+    DAO_caja_detalle_alquilado cdao = new DAO_caja_detalle_alquilado();
+    DAO_caja_cierre_alquilado ccdao = new DAO_caja_cierre_alquilado();
+    PosImprimir_venta_alquiler posven = new PosImprimir_venta_alquiler();
+//    PosImprimir_Compra poscomp = new PosImprimir_Compra();
+//    PosImprimir_Gasto posgas = new PosImprimir_Gasto();
+//    PosImprimir_Vale posval = new PosImprimir_Vale();
+//    PosImprimir_caja_cierre poscc = new PosImprimir_caja_cierre();
+//    PosImprimir_caja_cierre_vgrupo posccvg = new PosImprimir_caja_cierre_vgrupo();
     ConnPostgres cpt = new ConnPostgres();
     cla_color_pelete clacolor = new cla_color_pelete();
-    caja_detalle caja = new caja_detalle();
+    caja_detalle_alquilado caja = new caja_detalle_alquilado();
     private String nom_grupo_0;
     private String nom_grupo_1;
+    private String tabla_origen_ALQUILER="ALQUILER";
 
     void abrir() {
         conn = cpt.getConnPosgres();
-        this.setTitle("CAJA ABRIR-CIERRE ");
-        ccdao.actualizar_tabla_caja_cierre(conn, tblcaja_resumen);
+        this.setTitle("CAJA ABRIR-CIERRE ALQUILER");
+        ccdao.actualizar_tabla_caja_cierre_alquilado(conn, tblcaja_resumen);
         color_formulario();
         evetbl.centrar_formulario_internalframa(this);
     }
@@ -97,46 +101,50 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
 
     void seleccionar_caja_detalle() {
         if (!evejt.getBoolean_validar_select(tblcaja_resumen)) {
-            String fk_idcaja_cierre = evejt.getString_select(tblcaja_resumen, 0);
-            actualizar_caja_detalle_venta(fk_idcaja_cierre, tblcaja_venta_efectivo, txtcantidad_venta_efectivo, jFtotal_venta_efectivo);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre, caja.getTabla_origen_vale(), "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre, caja.getTabla_origen_gasto(), "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre, caja.getTabla_origen_compra_contado(), "c.monto_compra", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre, caja.getTabla_origen_compra_credito(), "c.monto_compra_credito", tblcaja_compra_credito, txtcantidad_compra_credito, jFtotal_compra_credito);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre, caja.getTabla_origen_recibo(), "c.monto_recibo_pago", tblcaja_recibo, txtcantidad_recibo, jFtotal_recibo);
-            caja_detalle_saldo(fk_idcaja_cierre);
+            String fk_idcaja_cierre_alquilado = evejt.getString_select(tblcaja_resumen, 0);
+            actualizar_caja_detalle_venta(fk_idcaja_cierre_alquilado, tabla_origen_ALQUILER,tblcaja_venta_efectivo, txtcantidad_venta_efectivo, jFtotal_alquiler_contado,jFtotal_alquiler_credito);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_vale(), "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_gasto(), "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_compra_contado(), "c.monto_compra_contado", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_compra_credito(), "c.monto_compra_credito", tblcaja_compra_credito, txtcantidad_compra_credito, jFtotal_compra_credito);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_recibo(), "c.monto_recibo_pago", tblcaja_recibo, txtcantidad_recibo, jFtotal_recibo);
+            caja_detalle_saldo(fk_idcaja_cierre_alquilado);
         }
     }
     
-    void actualizar_caja_detalle_otros(String fk_idcaja_cierre, String origen_tabla, String campo_total, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
-        String sql = "select c.id_origen,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
+    void actualizar_caja_detalle_otros(String fk_idcaja_cierre_alquilado, String origen_tabla, String campo_total, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
+        String sql = "select c.idcaja_detalle_alquilado,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
                 + "TRIM(to_char(" + campo_total + ",'999G999G999')) as monto,c.estado \n"
-                + " from caja_detalle c,item_caja_cierre icc \n"
-                + "where c.idcaja_detalle=icc.fk_idcaja_detalle\n"
-                + "and icc.fk_idcaja_cierre=" + fk_idcaja_cierre + "\n"
+                + " from caja_detalle_alquilado c,item_caja_cierre_alquilado icc \n"
+                + "where c.idcaja_detalle_alquilado=icc.fk_idcaja_detalle_alquilado\n"
+                + "and icc.fk_idcaja_cierre_alquilado=" + fk_idcaja_cierre_alquilado + "\n"
                 + "and c.tabla_origen='" + origen_tabla + "'\n"
                 + "order by 1 desc";
         eveconn.Select_cargar_jtable(conn, sql, tabla);
-        caja_detalle_cantidad_total(fk_idcaja_cierre, origen_tabla, campo_total, txtcantidad, jftotal);
+        caja_detalle_cantidad_total(fk_idcaja_cierre_alquilado, origen_tabla, campo_total, txtcantidad, jftotal);
         anchotabla_caja_detalle_otros(tabla);
     }
-        void actualizar_caja_detalle_venta(String fk_idcaja_cierre, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal) {
-        String sql = "select c.id_origen,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
-                + "TRIM(to_char(c.monto_venta_efectivo,'999G999G999')) as v_efectivo,"
-                + "TRIM(to_char(c.monto_venta_tarjeta,'999G999G999')) as v_tarjeta,"
+        void actualizar_caja_detalle_venta(String fk_idcaja_cierre_alquilado, String origen_tabla, JTable tabla, JTextField txtcantidad, JFormattedTextField jftotal, JFormattedTextField jftotalcredito) {
+        String sql = "select c.fk_idventa_alquiler as idalq,to_char(c.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha_emision,c.descripcion,"
+                + "TRIM(to_char(c.monto_alquilado_efectivo,'999G999G999')) as v_efectivo,"
+                + "TRIM(to_char(c.monto_alquilado_tarjeta,'999G999G999')) as v_tarjeta,"
+                + "TRIM(to_char(c.monto_alquilado_transferencia,'999G999G999')) as v_transfe,"
+                + "TRIM(to_char(c.monto_alquilado_credio,'999G999G999')) as v_credito,"
                 + "c.tabla_origen as origen,"
-                + "estado \n"
-                + " from caja_detalle c,item_caja_cierre icc \n"
-                + "where c.idcaja_detalle=icc.fk_idcaja_detalle\n"
-                + "and icc.fk_idcaja_cierre=" + fk_idcaja_cierre + "\n"
-                + "and c.tabla_origen ilike'%VENTA%'\n"
+                + "c.estado \n"
+                + " from caja_detalle_alquilado c,item_caja_cierre_alquilado icc \n" 
+                + "where c.idcaja_detalle_alquilado=icc.fk_idcaja_detalle_alquilado\n"
+                + "and icc.fk_idcaja_cierre_alquilado=" + fk_idcaja_cierre_alquilado + "\n"
+                + "and c.tabla_origen='"+origen_tabla+"'\n"
                 + "order by 1 desc";
         eveconn.Select_cargar_jtable(conn, sql, tabla);
         anchotabla_caja_detalle_venta(tabla);
-        
+        String campo_total="c.monto_alquilado_efectivo+c.monto_alquilado_tarjeta+c.monto_alquilado_transferencia";
+        caja_detalle_cantidad_total(fk_idcaja_cierre_alquilado, origen_tabla, campo_total, txtcantidad, jftotal);
+        caja_detalle_cantidad_total(fk_idcaja_cierre_alquilado, origen_tabla, "c.monto_alquilado_transferencia", txtcantidad, jftotalcredito);
     }
         void anchotabla_caja_detalle_venta(JTable tabla) {
-        int Ancho[] = {7, 15, 38, 9,9,14,8};
+        int Ancho[] = {7, 10, 35, 8,8,8,8,8,8};
         evejt.setAnchoColumnaJtable(tabla, Ancho);
     }
 
@@ -150,15 +158,16 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         evejt.setAnchoColumnaJtable(tabla, Ancho);
     }
 
-    void caja_detalle_saldo(String fk_idcaja_cierre) {
+    void caja_detalle_saldo(String fk_idcaja_cierre_alquilado) {
         String titulo = "caja_detalle_saldo";
-        String sql = "select sum(c.monto_venta_efectivo+c.monto_venta_tarjeta+c.monto_caja) as ingreso,"
-                + "sum(c.monto_compra+c.monto_gasto+c.monto_vale+c.monto_recibo_pago) as egreso, \n"
-                + "sum((c.monto_venta_efectivo+c.monto_venta_tarjeta+c.monto_caja)-"
-                + "(c.monto_compra+c.monto_gasto+c.monto_vale+c.monto_recibo_pago)) as saldo\n"
-                + "from caja_detalle c,item_caja_cierre icc "
-                + "where c.idcaja_detalle=icc.fk_idcaja_detalle\n"
-                + "and icc.fk_idcaja_cierre=" + fk_idcaja_cierre + "\n";
+        String sql = "select "
+                + " sum(c.monto_alquilado_efectivo+c.monto_alquilado_tarjeta+c.monto_alquilado_transferencia+c.monto_apertura_caja+c.monto_recibo_pago) as ingreso,"
+                + "sum(c.monto_compra_contado+c.monto_gasto+c.monto_vale) as egreso, \n"
+                + "sum((c.monto_alquilado_efectivo+c.monto_alquilado_tarjeta+c.monto_alquilado_transferencia+c.monto_apertura_caja+c.monto_recibo_pago)-"
+                   + "(c.monto_compra_contado+c.monto_gasto+c.monto_vale)) as saldo\n"
+                + "from caja_detalle_alquilado c,item_caja_cierre_alquilado icc "
+                + "where c.idcaja_detalle_alquilado=icc.fk_idcaja_detalle_alquilado\n"
+                + "and icc.fk_idcaja_cierre_alquilado=" + fk_idcaja_cierre_alquilado + "\n";
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
             if (rs.next()) {
@@ -179,12 +188,13 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         }
     }
 
-    void caja_detalle_cantidad_total(String fk_idcaja_cierre, String origen_tabla, String campo_total, JTextField txtcantidad, JFormattedTextField jftotal) {
+    void caja_detalle_cantidad_total(String fk_idcaja_cierre_alquilado, String origen_tabla, String campo_total, JTextField txtcantidad, JFormattedTextField jftotal) {
         String titulo = "caja_detalle_cantidad_total";
         String sql = "select count(*) as cantidad,sum(" + campo_total + ") as total\n"
-                + " from caja_detalle c,item_caja_cierre icc \n"
-                + "where c.idcaja_detalle=icc.fk_idcaja_detalle\n"
-                + "and icc.fk_idcaja_cierre=" + fk_idcaja_cierre + "\n"
+                + " from caja_detalle_alquilado c,item_caja_cierre_alquilado icc \n"
+                + "where c.idcaja_detalle_alquilado=icc.fk_idcaja_detalle_alquilado\n"
+                + "and icc.fk_idcaja_cierre_alquilado=" + fk_idcaja_cierre_alquilado + "\n"
+                + "and c.estado!='ANULADO'\n"
                 + "and c.tabla_origen='" + origen_tabla + "'\n";
         try {
             ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
@@ -202,10 +212,10 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     void boton_imprimir_pos_compra() {
         if (!evejt.getBoolean_validar_select(tblcaja_compra)) {
             int idcompra_insumo = evejt.getInt_select_id(tblcaja_compra);
-            poscomp.boton_imprimir_pos_compra(conn, idcompra_insumo);
+//            poscomp.boton_imprimir_pos_compra(conn, idcompra_insumo);
         }
     }
-    public FrmCaja_abrir_cerrar() {
+    public FrmCaja_abrir_cerrar_alquiler() {
         initComponents();
         abrir();
     }
@@ -237,8 +247,10 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         txtcantidad_venta_efectivo = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jFtotal_venta_efectivo = new javax.swing.JFormattedTextField();
+        jFtotal_alquiler_contado = new javax.swing.JFormattedTextField();
         btnimprimir_venta = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        jFtotal_alquiler_credito = new javax.swing.JFormattedTextField();
         panel_delivery = new javax.swing.JPanel();
         panel_venta3 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
@@ -432,17 +444,17 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         jScrollPane2.setViewportView(tblcaja_venta_efectivo);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel1.setText("CANTIDAD:");
+        jLabel1.setText("CANT:");
 
         txtcantidad_venta_efectivo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel2.setText("TOTAL:");
+        jLabel2.setText("TOTAL CONTADO:");
 
-        jFtotal_venta_efectivo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
-        jFtotal_venta_efectivo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jFtotal_venta_efectivo.setText("0");
-        jFtotal_venta_efectivo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jFtotal_alquiler_contado.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
+        jFtotal_alquiler_contado.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFtotal_alquiler_contado.setText("0");
+        jFtotal_alquiler_contado.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
         btnimprimir_venta.setText("IMPRIMIR TICKET VENTA");
         btnimprimir_venta.addActionListener(new java.awt.event.ActionListener() {
@@ -451,6 +463,14 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
             }
         });
 
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel5.setText("TOTAL CREDITO:");
+
+        jFtotal_alquiler_credito.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
+        jFtotal_alquiler_credito.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFtotal_alquiler_credito.setText("0");
+        jFtotal_alquiler_credito.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+
         javax.swing.GroupLayout panel_ventaLayout = new javax.swing.GroupLayout(panel_venta);
         panel_venta.setLayout(panel_ventaLayout);
         panel_ventaLayout.setHorizontalGroup(
@@ -458,29 +478,37 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
             .addComponent(jScrollPane2)
             .addGroup(panel_ventaLayout.createSequentialGroup()
                 .addComponent(btnimprimir_venta, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 507, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtcantidad_venta_efectivo, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jFtotal_venta_efectivo, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jFtotal_alquiler_contado, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jFtotal_alquiler_credito, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 94, Short.MAX_VALUE))
         );
         panel_ventaLayout.setVerticalGroup(
             panel_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_ventaLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel1)
                     .addComponent(txtcantidad_venta_efectivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
-                    .addComponent(jFtotal_venta_efectivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnimprimir_venta, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jFtotal_alquiler_contado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnimprimir_venta, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addGroup(panel_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                        .addComponent(jLabel5)
+                        .addComponent(jFtotal_alquiler_credito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
 
-        jTabbedPane1.addTab("VENTA", panel_venta);
+        jTabbedPane1.addTab("ALQUILER", panel_venta);
 
         panel_venta3.setBackground(new java.awt.Color(204, 204, 255));
         panel_venta3.setBorder(javax.swing.BorderFactory.createTitledBorder("CAJA VENTA"));
@@ -926,7 +954,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         panel_compra2Layout.setVerticalGroup(
             panel_compra2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_compra2Layout.createSequentialGroup()
-                .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
+                .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_compra2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel20)
@@ -947,7 +975,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
             .addComponent(panel_compra2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("RECIBO PAGO COMPRA", jPanel2);
+        jTabbedPane1.addTab("RECIBO PAGO CLIENTE", jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -965,7 +993,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
 
     private void btnactualizar_tablaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnactualizar_tablaActionPerformed
         // TODO add your handling code here:
-        ccdao.actualizar_tabla_caja_cierre(conn, tblcaja_resumen);
+        ccdao.actualizar_tabla_caja_cierre_alquilado(conn, tblcaja_resumen);
     }//GEN-LAST:event_btnactualizar_tablaActionPerformed
 
     private void tblcaja_resumenMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblcaja_resumenMouseReleased
@@ -985,7 +1013,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         if (!evejt.getBoolean_validar_select(tblcaja_vale)) {
             int idvale = evejt.getInt_select_id(tblcaja_vale);
-            posval.boton_imprimir_pos_VALE(conn, idvale);
+//            posval.boton_imprimir_pos_VALE(conn, idvale);
         }
     }//GEN-LAST:event_btnimprimir_valeActionPerformed
 
@@ -993,7 +1021,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         if (!evejt.getBoolean_validar_select(tblcaja_gasto)) {
             int idgasto = evejt.getInt_select_id(tblcaja_gasto);
-            posgas.boton_imprimir_pos_GASTO(conn, idgasto);
+//            posgas.boton_imprimir_pos_GASTO(conn, idgasto);
         }
     }//GEN-LAST:event_btnimprimir_GASTOActionPerformed
 
@@ -1004,14 +1032,14 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
 
     private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
         // TODO add your handling code here:
-        ccdao.ancho_tabla_caja_cierre(tblcaja_resumen);
+//        ccdao.ancho_tabla_caja_cierre_alquilado(tblcaja_resumen);
     }//GEN-LAST:event_formInternalFrameOpened
 
     private void btnimprimir_ccierreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimir_ccierreActionPerformed
         // TODO add your handling code here:
         if (!evejt.getBoolean_validar_select(tblcaja_resumen)) {
             int idcaja_cierre = evejt.getInt_select_id(tblcaja_resumen);
-            poscc.boton_imprimir_pos_caja_cierre(conn, idcaja_cierre);
+//            poscc.boton_imprimir_pos_caja_cierre(conn, idcaja_cierre);
         }
     }//GEN-LAST:event_btnimprimir_ccierreActionPerformed
 
@@ -1036,13 +1064,14 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField jFcaja_egreso;
     private javax.swing.JFormattedTextField jFcaja_ingreso;
     private javax.swing.JFormattedTextField jFcaja_saldo;
+    private javax.swing.JFormattedTextField jFtotal_alquiler_contado;
+    private javax.swing.JFormattedTextField jFtotal_alquiler_credito;
     private javax.swing.JFormattedTextField jFtotal_compra;
     private javax.swing.JFormattedTextField jFtotal_compra_credito;
     private javax.swing.JFormattedTextField jFtotal_gasto;
     private javax.swing.JFormattedTextField jFtotal_recibo;
     private javax.swing.JFormattedTextField jFtotal_vale;
     private javax.swing.JFormattedTextField jFtotal_venta_delivery;
-    private javax.swing.JFormattedTextField jFtotal_venta_efectivo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -1057,6 +1086,7 @@ public class FrmCaja_abrir_cerrar extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;

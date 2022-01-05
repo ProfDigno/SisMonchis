@@ -82,7 +82,7 @@ public class DAO_producto {
             + "and p.stock_min>0\n"
             + "and p.activar=true\n"
             + "order by 4 desc";
-    private String sql_stock_retirar = "update producto set stock=(stock-(item_venta_alquiler.cantidad_total)) \n"
+    private String sql_stock_alquilado = "update producto set stock=(stock-(item_venta_alquiler.cantidad_total)) \n"
             + "from item_venta_alquiler \n"
             + "where producto.idproducto=item_venta_alquiler.fk_idproducto\n"
             + "and item_venta_alquiler.fk_idventa_alquiler=";
@@ -429,10 +429,10 @@ public class DAO_producto {
         }
         return total;
     }
-    public void update_producto_stock_retirar_alquiler(Connection conn,venta_alquiler vealq) {
-        String titulo = "update_producto_stock_retirar_alquiler";
+    public void update_producto_stock_Alquilado(Connection conn,venta_alquiler vealq) {
+        String titulo = "update_producto_stock_Alquilado";
         PreparedStatement pst = null;
-        String sql=sql_stock_retirar+vealq.getC1idventa_alquiler();
+        String sql=sql_stock_alquilado+vealq.getC1idventa_alquiler();
         try {
             pst = conn.prepareStatement(sql);
             pst.executeUpdate();
@@ -442,8 +442,8 @@ public class DAO_producto {
             evemen.mensaje_error(e, sql , titulo);
         }
     }
-    public void update_producto_stock_finalizar_alquiler(Connection conn,venta_alquiler vealq) {
-        String titulo = "update_producto_stock_finalizar_alquiler";
+    public void update_producto_stock_Devolucion(Connection conn,venta_alquiler vealq) {
+        String titulo = "update_producto_stock_Devolucion";
         PreparedStatement pst = null;
         String sql=sql_stock_devolucion+vealq.getC1idventa_alquiler();
         try {

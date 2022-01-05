@@ -2,6 +2,104 @@
 public class venta_alquiler {
 
     /**
+     * @return the C22fecha_retirado
+     */
+    public String getC22fecha_retirado() {
+        return C22fecha_retirado;
+    }
+
+    /**
+     * @param C22fecha_retirado the C22fecha_retirado to set
+     */
+    public void setC22fecha_retirado(String C22fecha_retirado) {
+        this.C22fecha_retirado = C22fecha_retirado;
+    }
+
+    /**
+     * @return the C23hora_retirado
+     */
+    public String getC23hora_retirado() {
+        return C23hora_retirado;
+    }
+
+    /**
+     * @param C23hora_retirado the C23hora_retirado to set
+     */
+    public void setC23hora_retirado(String C23hora_retirado) {
+        this.C23hora_retirado = C23hora_retirado;
+    }
+
+    /**
+     * @return the C24min_retirado
+     */
+    public String getC24min_retirado() {
+        return C24min_retirado;
+    }
+
+    /**
+     * @param C24min_retirado the C24min_retirado to set
+     */
+    public void setC24min_retirado(String C24min_retirado) {
+        this.C24min_retirado = C24min_retirado;
+    }
+
+    /**
+     * @return the C25fecha_devolusion
+     */
+    public String getC25fecha_devolusion() {
+        return C25fecha_devolusion;
+    }
+
+    /**
+     * @param C25fecha_devolusion the C25fecha_devolusion to set
+     */
+    public void setC25fecha_devolusion(String C25fecha_devolusion) {
+        this.C25fecha_devolusion = C25fecha_devolusion;
+    }
+
+    /**
+     * @return the C26hora_devolusion
+     */
+    public String getC26hora_devolusion() {
+        return C26hora_devolusion;
+    }
+
+    /**
+     * @param C26hora_devolusion the C26hora_devolusion to set
+     */
+    public void setC26hora_devolusion(String C26hora_devolusion) {
+        this.C26hora_devolusion = C26hora_devolusion;
+    }
+
+    /**
+     * @return the C27min_devolusion
+     */
+    public String getC27min_devolusion() {
+        return C27min_devolusion;
+    }
+
+    /**
+     * @param C27min_devolusion the C27min_devolusion to set
+     */
+    public void setC27min_devolusion(String C27min_devolusion) {
+        this.C27min_devolusion = C27min_devolusion;
+    }
+
+    /**
+     * @return the Confirmado_carga_reserva
+     */
+    public static boolean isConfirmado_carga_reserva() {
+        return Confirmado_carga_reserva;
+    }
+
+    /**
+     * @param aConfirmado_carga_reserva the Confirmado_carga_reserva to set
+     */
+    public static void setConfirmado_carga_reserva(boolean aConfirmado_carga_reserva) {
+        Confirmado_carga_reserva = aConfirmado_carga_reserva;
+    }
+
+    /**
      * @return the C1idventa_alquiler_global
      */
     public static int getC1idventa_alquiler_global() {
@@ -66,9 +164,16 @@ private String C18estado;
 private int C19fk_idcliente;
 private int C20fk_identregador;
 private double C21monto_alquilado_credito;
+private String C22fecha_retirado;
+private String C23hora_retirado;
+private String C24min_retirado;
+private String C25fecha_devolusion;
+private String C26hora_devolusion;
+private String C27min_devolusion;
 private static String nom_tabla;
 private static String nom_idtabla;
 private static String compotexte;
+private static boolean Confirmado_carga_reserva;
 //---------------TABLA-ID---------------
 	public venta_alquiler() {
 		setTb_venta_alquiler("venta_alquiler");

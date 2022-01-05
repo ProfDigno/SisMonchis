@@ -1,0 +1,31 @@
+                                   
+ ======MONCHI'S SHOP BEER======    
+          CIERRE ALQ:3             
+ INICIO:       2022-01-02 19:31    
+ FIN:          2022-01-02 19:31    
+ #=============================#   
+ CAJA ABRIR:              15,000   
+ ALQ. EFECTIVO:          250,000   
+ ALQ. TARJETA:           250,000   
+ ALQ. TRANSFE.:          250,000   
+ RECIBO CRED.:           250,000   
+ ------Detalle Venta-----------    
+ DELIVERY:                60,000   
+ #=============================#   
+ TOTAL GASTO:                  0   
+ TOTAL VALE:                   0   
+ TOTAL COMPRA:                 0   
+                                   
+ #=============================#   
+ SAL.SISTEMA:          1,015,000   
+ CAJA CIERRE:          1,015,000   
+ DIFERENCIA:                   0   
+ #=============================#   
+ TOTAL COMP-CREDITO:           0   
+ ------TOP 20 Mas Vendido-----     
+ 4 X    error                      
+                                   
+ -----COMPRA-PROVEEDOR----         
+                                   
+                                   
+                                   

@@ -300,6 +300,7 @@ public class json_imprimir_pos {
     private static int tt_fila_ccvg;
     private static int tt_fila_cc;
     private static int tt_fila_ven;
+    private static int tt_fila_ven_alq;
     private static int tt_fila_ven_ms;
     private static int tt_fila_com_in;
     private static int tt_fila_gas;
@@ -332,6 +333,7 @@ public class json_imprimir_pos {
             String linea_ven_top_1 = (String) jsonObject.get("linea_ven_top_1");
             String linea_ven_top_2 = (String) jsonObject.get("linea_ven_top_2");
             String cant_top_venta = (String)jsonObject.get("cant_top_venta");
+            String tt_fila_ven_alq = (String)jsonObject.get("tt_fila_ven_alq");
             setLinea_separador(linea_separador);
             setLinea_ven_detalle(linea_ven_detalle);
             setLinea_cabezera(linea_cabezera);
@@ -354,6 +356,7 @@ public class json_imprimir_pos {
             setLinea_ven_top_1(linea_ven_top_1);
             setLinea_ven_top_2(linea_ven_top_2);
             setCant_top_venta(Integer.parseInt(cant_top_venta));
+            setTt_fila_ven_alq(Integer.parseInt(tt_fila_ven_alq));
             System.out.println("json imprimir pos:"+jsonObject);
         } catch (Exception ex) {
             System.err.println("Error json_imprimir_pos: " + ex.toString());
@@ -403,6 +406,20 @@ public class json_imprimir_pos {
      */
     public static void setTt_text_descrip(int aTt_text_descrip) {
         tt_text_descrip = aTt_text_descrip;
+    }
+
+    /**
+     * @return the tt_fila_ven_alq
+     */
+    public static int getTt_fila_ven_alq() {
+        return tt_fila_ven_alq;
+    }
+
+    /**
+     * @param aTt_fila_ven_alq the tt_fila_ven_alq to set
+     */
+    public static void setTt_fila_ven_alq(int aTt_fila_ven_alq) {
+        tt_fila_ven_alq = aTt_fila_ven_alq;
     }
 
 

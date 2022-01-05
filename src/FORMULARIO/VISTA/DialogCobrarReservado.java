@@ -7,11 +7,13 @@ package FORMULARIO.VISTA;
 
 import BASEDATO.EvenConexion;
 import BASEDATO.LOCAL.ConnPostgres;
+import Evento.Color.cla_color_pelete;
 import Evento.JTextField.EvenJTextField;
 import Evento.Jtable.EvenJtable;
 import Evento.Mensaje.EvenMensajeJoptionpane;
 import FORMULARIO.DAO.DAO_item_venta_alquiler;
 import FORMULARIO.ENTIDAD.venta_alquiler;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -38,14 +40,18 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
     DefaultTableModel model_itemf_reser = new DefaultTableModel();
     EvenConexion eveconn = new EvenConexion();
     EvenMensajeJoptionpane evemen = new EvenMensajeJoptionpane();
-
+    cla_color_pelete clacolor = new cla_color_pelete();
     private void abrir_formulario() {
         this.setTitle("COBRAR RESERVADOS");
         crear_item_producto_utilizado();
         crear_item_producto_reservado();
+        color_formulario();
         boton_reset();
     }
-
+    void color_formulario() {
+        panel_principal.setBackground(clacolor.getColor_insertar_primario());
+        panel_cantidad.setBackground(clacolor.getColor_insertar_secundario());
+    }
     private void cargar_tabla_reservado() {
         String titulo = "cargar_tabla_reservado";
         String sql_cant_reser_int = "select fk_idproducto as idp\n"
@@ -71,11 +77,11 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
         } catch (Exception e) {
             evemen.mensaje_error(e, sql_cant_reser_int, titulo);
         }
-        sumar_item_reservado(jFtotal_reservado, tblitem_reservado);
+        sumar_item_reservado(jFtotal_reservado, tblitem_reservado,4);
     }
 
-    private void sumar_item_reservado(JFormattedTextField JFtotal, JTable tblitem) {
-        double total_reservado = evejt.getDouble_sumar_tabla(tblitem, 4);
+    private void sumar_item_reservado(JFormattedTextField JFtotal, JTable tblitem,int columna) {
+        double total_reservado = evejt.getDouble_sumar_tabla(tblitem, columna);
         JFtotal.setValue(total_reservado);
     }
 
@@ -110,7 +116,10 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             String Ssubtotal = String.valueOf(Isubtotal);
             String dato[] = {idproducto, descripcion, Sprecio_venta, Scant_reserva, Ssubtotal};
             evejt.cargar_tabla_datos(tblitem_reservado_utilizado, model_itemf, dato);
-            sumar_item_reservado(jFtotal_reservado_utilizado, tblitem_reservado_utilizado);
+            sumar_item_reservado(jFtotal_reservado_utilizado, tblitem_reservado_utilizado,4);
+            String dato2[] = {idproducto, descripcion, Sprecio_venta, Scant_reserva, "0", Ssubtotal, "0"};
+            evejt.cargar_tabla_datos(FrmVenta_alquiler.tblitem_producto, FrmVenta_alquiler.model_itemf, dato2);
+            sumar_item_reservado(FrmVenta_alquiler.jFtotal_pagado, FrmVenta_alquiler.tblitem_producto,5);
             boton_eliminar_item_reservado();
         }
     }
@@ -118,7 +127,7 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
     private void boton_eliminar_item_utilizado() {
         if (!evejt.getBoolean_validar_select(tblitem_reservado_utilizado)) {
             if (evejt.getBoolean_Eliminar_Fila(tblitem_reservado_utilizado, model_itemf)) {
-                sumar_item_reservado(jFtotal_reservado_utilizado, tblitem_reservado_utilizado);
+                sumar_item_reservado(jFtotal_reservado_utilizado, tblitem_reservado_utilizado,4);
             }
         }
     }
@@ -126,7 +135,7 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
     private void boton_eliminar_item_reservado() {
         if (!evejt.getBoolean_validar_select(tblitem_reservado)) {
             if (evejt.getBoolean_Eliminar_Fila(tblitem_reservado, model_itemf_reser)) {
-                sumar_item_reservado(jFtotal_reservado, tblitem_reservado);
+                sumar_item_reservado(jFtotal_reservado, tblitem_reservado,4);
             }
         }
     }
@@ -134,10 +143,12 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
     private void boton_reset() {
         txtcantidad.setEnabled(false);
         ocultar_boton_cant(false, false, false, false, false);
+        evejt.limpiar_tabla_datos(FrmVenta_alquiler.model_itemf);
         evejt.limpiar_tabla_datos(model_itemf);
         evejt.limpiar_tabla_datos(model_itemf_reser);
         cargar_tabla_reservado();
-        sumar_item_reservado(jFtotal_reservado_utilizado, tblitem_reservado_utilizado);
+        sumar_item_reservado(jFtotal_reservado_utilizado, tblitem_reservado_utilizado,4);
+        sumar_item_reservado(FrmVenta_alquiler.jFtotal_pagado, FrmVenta_alquiler.tblitem_producto,5);
     }
 
     private void ocultar_boton_cant(boolean btn1, boolean btn2, boolean btn3, boolean btn4, boolean btn5) {
@@ -188,7 +199,15 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             }
         }
     }
-
+    private void confirmar_carga(){
+        ven_alq.setConfirmado_carga_reserva(true);
+        this.dispose();
+    }
+    private void cancelar_carga(){
+        ven_alq.setConfirmado_carga_reserva(false);
+        boton_reset();
+        this.dispose();
+    }
     public DialogCobrarReservado(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -204,7 +223,7 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        panel_principal = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblitem_reservado = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -213,9 +232,8 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
         jFtotal_reservado = new javax.swing.JFormattedTextField();
         jLabel8 = new javax.swing.JLabel();
         jFtotal_reservado_utilizado = new javax.swing.JFormattedTextField();
-        btneliminar_item = new javax.swing.JButton();
         btnreset = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        panel_cantidad = new javax.swing.JPanel();
         btncan_1 = new javax.swing.JButton();
         btncan_2 = new javax.swing.JButton();
         btncan_3 = new javax.swing.JButton();
@@ -223,15 +241,16 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
         btncan_5 = new javax.swing.JButton();
         txtcantidad = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
+        btncancelar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("TABLA ITEM RESERVADO"));
+        panel_principal.setBorder(javax.swing.BorderFactory.createTitledBorder("TABLA ITEM RESERVADO"));
 
         tblitem_reservado.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -282,13 +301,6 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
         jFtotal_reservado_utilizado.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jFtotal_reservado_utilizado.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
 
-        btneliminar_item.setText("ELIMINAR ITEM");
-        btneliminar_item.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btneliminar_itemActionPerformed(evt);
-            }
-        });
-
         btnreset.setText("RESET");
         btnreset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -296,8 +308,9 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             }
         });
 
-        jPanel2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        panel_cantidad.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
+        btncan_1.setBackground(new java.awt.Color(255, 255, 153));
         btncan_1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btncan_1.setText("1");
         btncan_1.addActionListener(new java.awt.event.ActionListener() {
@@ -306,6 +319,7 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             }
         });
 
+        btncan_2.setBackground(new java.awt.Color(255, 255, 153));
         btncan_2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btncan_2.setText("2");
         btncan_2.addActionListener(new java.awt.event.ActionListener() {
@@ -314,6 +328,7 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             }
         });
 
+        btncan_3.setBackground(new java.awt.Color(255, 255, 153));
         btncan_3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btncan_3.setText("3");
         btncan_3.addActionListener(new java.awt.event.ActionListener() {
@@ -322,6 +337,7 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             }
         });
 
+        btncan_4.setBackground(new java.awt.Color(255, 255, 153));
         btncan_4.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btncan_4.setText("4");
         btncan_4.addActionListener(new java.awt.event.ActionListener() {
@@ -330,6 +346,7 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             }
         });
 
+        btncan_5.setBackground(new java.awt.Color(255, 255, 153));
         btncan_5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         btncan_5.setText("5");
         btncan_5.addActionListener(new java.awt.event.ActionListener() {
@@ -348,27 +365,27 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout panel_cantidadLayout = new javax.swing.GroupLayout(panel_cantidad);
+        panel_cantidad.setLayout(panel_cantidadLayout);
+        panel_cantidadLayout.setHorizontalGroup(
+            panel_cantidadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_cantidadLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panel_cantidadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btncan_1)
                     .addComponent(btncan_2)
                     .addComponent(btncan_3)
                     .addComponent(btncan_4)
                     .addComponent(btncan_5))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_cantidadLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(txtcantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        panel_cantidadLayout.setVerticalGroup(
+            panel_cantidadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_cantidadLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btncan_1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -384,72 +401,86 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout panel_principalLayout = new javax.swing.GroupLayout(panel_principal);
+        panel_principal.setLayout(panel_principalLayout);
+        panel_principalLayout.setHorizontalGroup(
+            panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_principalLayout.createSequentialGroup()
+                .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(panel_principalLayout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jFtotal_reservado, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnreset, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panel_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_principalLayout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jFtotal_reservado_utilizado, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btneliminar_item, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        panel_principalLayout.setVerticalGroup(
+            panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_principalLayout.createSequentialGroup()
+                .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(panel_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panel_principalLayout.createSequentialGroup()
+                        .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jFtotal_reservado, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(jLabel7))
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addGroup(panel_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jFtotal_reservado_utilizado, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(jLabel8)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btneliminar_item)
-                            .addComponent(btnreset))))
+                        .addComponent(btnreset)))
                 .addGap(15, 15, 15))
         );
 
+        jButton2.setBackground(new java.awt.Color(102, 255, 102));
         jButton2.setText("CONFIRMAR RESERVAS UTILIZADO");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        btncancelar.setBackground(new java.awt.Color(255, 0, 0));
+        btncancelar.setText("CANCELAR");
+        btncancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btncancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panel_principal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btncancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panel_principal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                    .addComponent(btncancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
@@ -466,11 +497,6 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
         // TODO add your handling code here:
         cargar_item(1);
     }//GEN-LAST:event_btncan_1ActionPerformed
-
-    private void btneliminar_itemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminar_itemActionPerformed
-        // TODO add your handling code here:
-        boton_eliminar_item_utilizado();
-    }//GEN-LAST:event_btneliminar_itemActionPerformed
 
     private void btnresetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnresetActionPerformed
         // TODO add your handling code here:
@@ -513,6 +539,16 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
         // TODO add your handling code here:
         evejtf.soloNumero(evt);
     }//GEN-LAST:event_txtcantidadKeyTyped
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        confirmar_carga();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void btncancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btncancelarActionPerformed
+        // TODO add your handling code here:
+        cancelar_carga();
+    }//GEN-LAST:event_btncancelarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -563,17 +599,17 @@ public class DialogCobrarReservado extends javax.swing.JDialog {
     private javax.swing.JButton btncan_3;
     private javax.swing.JButton btncan_4;
     private javax.swing.JButton btncan_5;
-    private javax.swing.JButton btneliminar_item;
+    private javax.swing.JButton btncancelar;
     private javax.swing.JButton btnreset;
     private javax.swing.JButton jButton2;
     private javax.swing.JFormattedTextField jFtotal_reservado;
     private javax.swing.JFormattedTextField jFtotal_reservado_utilizado;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPanel panel_cantidad;
+    private javax.swing.JPanel panel_principal;
     private javax.swing.JTable tblitem_reservado;
     private javax.swing.JTable tblitem_reservado_utilizado;
     private javax.swing.JTextField txtcantidad;

@@ -99,7 +99,7 @@ public class caja_detalle {
     }
     private static String tabla_origen_venta_efectivo="VENTA_EFECTIVO";
     private static String tabla_origen_venta_tarjeta="VENTA_TARJETA";
-     private static String tabla_origen_venta_combinado="VENTA_COMBI";
+    private static String tabla_origen_venta_combinado="VENTA_COMBI";
     private static String tabla_origen_compra_contado="COMPRA_CONTADO";
     private static String tabla_origen_compra_credito="COMPRA_CREDITO";
     private static String tabla_origen_vale="VALE";

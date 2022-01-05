@@ -10,7 +10,7 @@
 "sep_fecha":"15",
 "sep_item_cant":"4",
 "sep_item_precio":"8",
-"sep_item_subtotal":"25",
+"sep_item_subtotal":"22",
 "sep_total_gral":"25",
 "total_columna":"35",
 "tt_text_descrip":"150",
@@ -20,5 +20,6 @@
 "tt_fila_ven_ms":"15",
 "tt_fila_com_in":"18",
 "tt_fila_gas":"15",
-"tt_fila_val":"15"
+"tt_fila_val":"15",
+"tt_fila_ven_alq":"32"
 }

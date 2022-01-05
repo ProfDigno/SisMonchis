@@ -13,8 +13,13 @@ import Evento.JTextField.EvenJTextField;
 import Evento.Jframe.EvenJFRAME;
 import Evento.Utilitario.EvenUtil;
 import FORMULARIO.BO.BO_caja_cierre;
+import FORMULARIO.BO.BO_caja_cierre_alquilado;
+import FORMULARIO.DAO.DAO_caja_detalle_alquilado;
+import FORMULARIO.DAO.DAO_grupo_credito_cliente;
 import FORMULARIO.ENTIDAD.caja_cierre;
+import FORMULARIO.ENTIDAD.caja_cierre_alquilado;
 import FORMULARIO.ENTIDAD.caja_detalle;
+import FORMULARIO.ENTIDAD.caja_detalle_alquilado;
 import FORMULARIO.ENTIDAD.usuario;
 import IMPRESORA_POS.PosImprimir_Venta;
 import java.awt.event.KeyEvent;
@@ -24,7 +29,7 @@ import java.sql.Connection;
  *
  * @author Digno
  */
-public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
+public class FrmCaja_Abrir_alquiler extends javax.swing.JInternalFrame {
 
     /**
      * Creates new form FrmCaja_Cierre
@@ -36,55 +41,46 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
     EvenFecha evefec = new EvenFecha();
     EvenDatosPc evepc = new EvenDatosPc();
     EvenUtil eveut = new EvenUtil();
-    caja_cierre cjcie = new caja_cierre();
+    caja_cierre_alquilado cjcie = new caja_cierre_alquilado();
     usuario usu = new usuario();
-    caja_detalle caja = new caja_detalle();
+    private caja_detalle_alquilado cdalq = new caja_detalle_alquilado();
     EvenJFRAME evetbl = new EvenJFRAME();
-    BO_caja_cierre bocjcie=new BO_caja_cierre();
+    BO_caja_cierre_alquilado bocjcie=new BO_caja_cierre_alquilado();
     cla_color_pelete clacolor= new cla_color_pelete();
+    private DAO_caja_detalle_alquilado cdalq_dao = new DAO_caja_detalle_alquilado();
+    private DAO_grupo_credito_cliente gccDAO = new DAO_grupo_credito_cliente();
     private String tabla_origen = "CAJA_ABRIR";
     private String estado_EMITIDO = "EMITIDO";
     private String estado_ABIERTO="Abierto";
     void abrir_formulario(){
-        this.setTitle("CAJA ABRIR");
+        this.setTitle("CAJA ABRIR ALQUILER");
         connLocal = cpt.getConnPosgres();
         color_formulario();
         evetbl.centrar_formulario_internalframa(this);
     }
     void color_formulario(){
-        panel_insert.setBackground(clacolor.getColor_base());
+        panel_insert.setBackground(clacolor.getColor_shopp());
     }
     void cargar_datos_caja_cierre(){
         cjcie.setC4estado(estado_ABIERTO);
         cjcie.setC5fk_idusuario(usu.getGlobal_idusuario());
     }
     void cargar_datos_caja() {
-        caja.setC2fecha_emision(evefec.getString_formato_fecha_hora());
-        caja.setC3descripcion1("(VENTA) CAJA ABRIR:" );
-        caja.setC4monto_venta_efectivo(0);
-        caja.setC5monto_venta_tarjeta(0);
-        caja.setC6monto_delivery(0);
-        caja.setC7monto_gasto(0);
-        caja.setC8monto_compra(0);
-        caja.setC9monto_vale(0);
-        caja.setC10monto_caja(evejtf.getDouble_format_nro_entero(txtmonto_caja_abrir));
-        caja.setC11monto_cierre(0);
-        caja.setC12id_origen(0);
-        caja.setC13tabla_origen(tabla_origen);
-        caja.setC15estado(estado_EMITIDO);
-        caja.setC16fk_idusuario(usu.getGlobal_idusuario());
-        caja.setC17monto_recibo_pago(0);
-        caja.setC18monto_compra_credito(0);
+        cdalq_dao.limpiar_caja_detalle_alquilado(cdalq);
+        cdalq.setC3descripcion("(VENTA-ALQUILER) CAJA ABRIR:");
+        cdalq.setC4tabla_origen(tabla_origen);
+        cdalq.setC5estado(estado_EMITIDO);
+        cdalq.setC16monto_apertura_caja(evejtf.getDouble_format_nro_entero(txtmonto_caja_abrir));
     }
     void boton_caja_cierre(){
         if(txtmonto_caja_abrir.getText().trim().length()>0){
             cargar_datos_caja();
             cargar_datos_caja_cierre();
-            bocjcie.insertar_caja_cierre1(cjcie, caja);
+            bocjcie.insertar_caja_cierre_alquilado(cjcie, cdalq);
             this.dispose();
         }
     }
-    public FrmCaja_Abrir() {
+    public FrmCaja_Abrir_alquiler() {
         initComponents();
         abrir_formulario();
     }
@@ -105,7 +101,7 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("CAJA ABRIR");
+        jLabel1.setText("CAJA ABRIR ALQUILER");
 
         txtmonto_caja_abrir.setFont(new java.awt.Font("Stencil", 0, 36)); // NOI18N
         txtmonto_caja_abrir.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -140,7 +136,7 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
                 .addGroup(panel_insertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btncaja_abrir, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtmonto_caja_abrir, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtmonto_caja_abrir, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_insertLayout.setVerticalGroup(
@@ -151,7 +147,7 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtmonto_caja_abrir, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btncaja_abrir, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                .addComponent(btncaja_abrir, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -159,7 +155,9 @@ public class FrmCaja_Abrir extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel_insert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(panel_insert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

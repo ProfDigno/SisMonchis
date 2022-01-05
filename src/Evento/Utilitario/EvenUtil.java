@@ -26,6 +26,20 @@ public class EvenUtil {
 //         System.out.println(texto_saltado);
         return texto_saltado;
     }
+     public static String getString_completar_caracter(String campo){
+         String nuevocampo="0";
+         int max_char=10;
+         if(campo.trim().length()<max_char){
+             int cant_campo=campo.trim().length();
+             int cant_spacio_add=max_char-cant_campo;
+             nuevocampo=nuevocampo+campo;
+             for (int i = 0; i < cant_spacio_add; i++) {
+                 nuevocampo=nuevocampo+" ";
+             }
+             nuevocampo=nuevocampo+campo;
+         }
+         return nuevocampo;
+     }
      public String getString_crear_senha(int cantidad){
         String senha="";
         char[] caracteres;

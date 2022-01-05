@@ -27,6 +27,7 @@ import FORMULARIO.ENTIDAD.*;
 import static FORMULARIO.VISTA.FrmCliente.txtdelivery;
 import static FORMULARIO.VISTA.FrmCliente.txtzona;
 import IMPRESORA_POS.PosImprimir_Venta;
+import IMPRESORA_POS.PosImprimir_venta_alquiler;
 import IMPRESORA_POS.PosImprimir_venta_mesa;
 import java.awt.Color;
 import java.awt.Font;
@@ -63,7 +64,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     EvenJTextField evejtf = new EvenJTextField();
     EvenCombobox evecmb = new EvenCombobox();
     EvenMensajeJoptionpane evemen = new EvenMensajeJoptionpane();
-//    PosImprimir_Venta posv = new PosImprimir_Venta();
+    PosImprimir_venta_alquiler posv = new PosImprimir_venta_alquiler();
     cliente clie = new cliente();
     item_venta_alquiler item = new item_venta_alquiler();
     DAO_item_venta_alquiler ivdao = new DAO_item_venta_alquiler();
@@ -94,7 +95,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private java.util.List<JButton> botones_categoria;
     private java.util.List<JButton> botones_unidad;
     private java.util.List<JButton> botones_marca;
-    DefaultTableModel model_itemf = new DefaultTableModel();
+    public static DefaultTableModel model_itemf = new DefaultTableModel();
     cla_color_pelete clacolor = new cla_color_pelete();
     ClaAuxFiltroVenta auxvent = new ClaAuxFiltroVenta();
     private int cant_boton_cate;
@@ -115,9 +116,11 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private String estado_ANULADO = "ANULADO";
     private String estado_EMITIDO = "EMITIDO";
     private String estado_RESERVADO = "RESERVADO";
-    private String estado_RETIRADO = "RETIRADO";
+    private String estado_ALQUILADO = "ALQUILADO";
+    private String estado_DEVOLUCION = "DEVOLUCION";
+    private String estado_USO_RESERVA = "USO_RESERVA";
     private String estado_FINALIZAR = "FINALIZADO";
-    private int idventa_ultimo;
+    private int idventa_alquiler_ultimo;
 //    private String indice_venta;
     private int fk_idcliente_local;
 //    private boolean esFuncionario;
@@ -141,6 +144,8 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private boolean hab_carga_entregador;
     private int fk_identregador;
     private String hora_estandar = "12";
+    private String estado_venta_alquiler;
+    private String observacion_inicio = "NINGUNA";
 
     private void abrir_formulario() {
         String servidor = "";
@@ -152,7 +157,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         jList_cliente.setVisible(false);
         jCimprimir_ticket.setSelected(true);
         codao.cargar_cotizacion(coti, 1);
-        color_formulario();
+
         reestableser_venta();
         cargar_boton_categoria();
         crear_item_producto();
@@ -164,16 +169,16 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         hab_carga_entregador = true;
     }
 
-    void color_formulario() {
-        panel_tabla_busca_cli.setBackground(clacolor.getColor_insertar_primario());
-        panel_insertar_pri_item.setBackground(clacolor.getColor_insertar_primario());
-        panel_insertar_pri_producto.setBackground(clacolor.getColor_insertar_primario());
-        panel_referencia_categoria.setBackground(clacolor.getColor_insertar_primario());
-        panel_referencia_unidad.setBackground(clacolor.getColor_insertar_primario());
-        panel_tabla_venta.setBackground(clacolor.getColor_insertar_primario());
-        panel_tabla_item.setBackground(clacolor.getColor_insertar_primario());
-        panel_referencia_venta.setBackground(clacolor.getColor_insertar_primario());
-        panel_base_1.setBackground(clacolor.getColor_insertar_primario());
+    void color_formulario(Color colorpanel) {
+        panel_tabla_busca_cli.setBackground(colorpanel);
+        panel_insertar_pri_item.setBackground(colorpanel);
+        panel_insertar_pri_producto.setBackground(colorpanel);
+        panel_referencia_categoria.setBackground(colorpanel);
+        panel_referencia_unidad.setBackground(colorpanel);
+        panel_tabla_venta.setBackground(colorpanel);
+        panel_tabla_item.setBackground(colorpanel);
+        panel_referencia_venta.setBackground(colorpanel);
+        panel_base_1.setBackground(colorpanel);
     }
 
     void crear_item_producto() {
@@ -629,6 +634,9 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         if (tipo == 3) {
             fk_idcliente_local = evejt.getInt_select_id(tblbuscar_cliente);
         }
+        if (tipo == 4) {
+            fk_idcliente_local = ven_alq.getC19fk_idcliente();
+        }
         evejt.getBoolean_Eliminar_Fila_delivery(tblitem_producto, model_itemf);
         tipo_entrega = entrega_paqueta;
         System.out.println("idclientelocal:" + fk_idcliente_local);
@@ -643,6 +651,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         txtdireccion_alquiler.setText(clie.getC4direccion());
         jFsaldo_credito.setValue(clie.getC13saldo_credito());
         txtmonto_delivery.setText(String.valueOf((int) monto_delivery));
+//        ven_alq.setConfirmado_carga_reserva(false);
     }
 
     void boton_eliminar_item() {
@@ -701,15 +710,18 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         if (cmbentregador.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(cmbentregador, "SELECCIONAR UN ENTREGADOR");
             return false;
+        } else {
+            fk_identregador = evecmb.getInt_seleccionar_COMBOBOX(connLocal, cmbentregador, "identregador", "nombre", "entregador");
         }
 
         return true;
     }
 
     void reestableser_venta() {
-        idventa_ultimo = (eveconn.getInt_ultimoID_mas_uno(connLocal, ven_alq.getTb_venta_alquiler(), ven_alq.getId_idventa_alquiler()));
+        color_formulario(clacolor.getColor_insertar_primario());
+        idventa_alquiler_ultimo = (eveconn.getInt_ultimoID_mas_uno(connLocal, ven_alq.getTb_venta_alquiler(), ven_alq.getId_idventa_alquiler()));
         vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
-        txtidventa.setText(String.valueOf(idventa_ultimo));
+        txtidventa.setText(String.valueOf(idventa_alquiler_ultimo));
         txtbuscar_fecha.setText(evefec.getString_formato_fecha());
         jCestado_emitido.setSelected(true);
         jCestado_terminado.setSelected(false);
@@ -718,13 +730,15 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         actualizar_venta(3);
         actualizar_tabla_producto(1);
         tipo_entrega = entrega_paqueta;
+        estado_venta_alquiler = estado_EMITIDO;
         monto_total = 0;
         monto_delivery = 0;
         txtcantidad_total.setText(null);
-        txtobservacion.setText("Ninguna");
+        txtobservacion.setText(observacion_inicio);
         btnconfirmar_venta_efectivo.setBackground(Color.white);
         jFtotal_pagado.setValue(monto_total);
         jFtotal_reservado.setValue(monto_total);
+        jFsaldo_credito.setValue(monto_total);
         jRcond_contado.setSelected(true);
         select_condicion();
         evejt.limpiar_tabla_datos(model_itemf);
@@ -836,7 +850,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
 
     void cargar_dato_alquiler() {
         String fecha_retirado_previsto = txtfec_retirado_previsto.getText() + " " + txthora_retirado_previsto.getText() + ":" + txtminuto_retirado_previsto.getText() + ":00.00";
-        String fecha_devolusion_previsto = txtfec_devolusion_previsto.getText() + " " + txthora_devolusion_previsto.getText() + ":" + txtminuto_devolusion_previsto.getText() + ":00.00";
+        String fecha_devolusion_previsto = txtfec_devolusion_previsto.getText() + " " + txthora_devolusion_previsto.getText() + ":" + txtminuto_devolusion_previsto.getText() + ":30.00";
         monto_delivery = Double.parseDouble(txtmonto_delivery.getText());
         ven_alq.setC2fecha_creado("now()");
         ven_alq.setC3fecha_retirado_previsto(fecha_retirado_previsto);
@@ -854,24 +868,24 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         ven_alq.setC15alquiler_devolusion(false);
         ven_alq.setC16direccion_alquiler(txtdireccion_alquiler.getText());
         ven_alq.setC17observacion(txtobservacion.getText());
-        ven_alq.setC18estado(estado_EMITIDO);
+        ven_alq.setC18estado(estado_venta_alquiler);
         ven_alq.setC19fk_idcliente(fk_idcliente_local);
         ven_alq.setC20fk_identregador(fk_identregador);
         ven_alq.setC21monto_alquilado_credito(monto_alquilado_credito);
-
-        //
     }
 
     void cargar_dato_caja_alquilado() {
         cdalq_dao.limpiar_caja_detalle_alquilado(cdalq);
-        cdalq.setC3descripcion("(ALQUILER) ID:" + idventa_ultimo + " CLIENTE:" + txtbucarCliente_nombre.getText() + " DIREC:" + txtdireccion_alquiler.getText());
+        cdalq.setC3descripcion("(ALQUILER) ID:" + idventa_alquiler_ultimo + " CLIENTE:" + txtbucarCliente_nombre.getText() + " DIREC:" + txtdireccion_alquiler.getText());
         cdalq.setC4tabla_origen(tabla_origen);
-        cdalq.setC5estado(estado_EMITIDO);
+        cdalq.setC5estado(estado_venta_alquiler);
         cdalq.setC7monto_alquilado_efectivo(monto_alquilado_efectivo);
         cdalq.setC8monto_alquilado_tarjeta(monto_alquilado_tarjeta);
         cdalq.setC9monto_alquilado_transferencia(monto_alquilado_transferencia);
         cdalq.setC11monto_delivery(monto_delivery);
-        cdalq.setC20fk_idventa_alquiler(idventa_ultimo);
+        cdalq.setC20fk_idventa_alquiler(idventa_alquiler_ultimo);
+        cdalq.setC24monto_alquilado_credio(monto_alquilado_credito);
+        cdalq.setC25forma_pago(forma_pago);
     }
 
     private String getDescripcion_item_venta() {
@@ -888,14 +902,14 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             double monto_credito = monto_alquilado_efectivo + monto_alquilado_tarjeta + monto_alquilado_transferencia + monto_alquilado_credito;
             gccDAO.cargar_grupo_credito_cliente_id(connLocal, gcc, fk_idcliente_local);
             cclie.setC3descripcion(getDescripcion_item_venta());
-            cclie.setC4estado(estado_EMITIDO);
+            cclie.setC4estado(estado_venta_alquiler);
             cclie.setC5monto_contado(0);
             cclie.setC6monto_credito(monto_credito);
             cclie.setC7tabla_origen(tabla_origen);
             cclie.setC8fk_idgrupo_credito_cliente(gcc.getC1idgrupo_credito_cliente());
             cclie.setC9fk_idsaldo_credito_cliente(0);
             cclie.setC10fk_idrecibo_pago_cliente(0);
-            cclie.setC11fk_idventa_alquiler(idventa_ultimo);
+            cclie.setC11fk_idventa_alquiler(idventa_alquiler_ultimo);
             clie.setC1idcliente(fk_idcliente_local);
         }
     }
@@ -1025,7 +1039,6 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             cargar_dato_alquiler();
             cargar_dato_caja_alquilado();
             cargar_credito_cliente(escredito);
-
             if (hab_venta_combinado) {
                 JDpago_combinado combi = new JDpago_combinado(null, true);
                 combi.setVisible(true);
@@ -1033,7 +1046,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             if (vBO.getBoolean_insertar_venta_alquiler(ven_alq, cdalq, cclie, clie, escredito, tblitem_producto)) {
                 if (hab_venta_combinado) {
                     if (jCimprimir_ticket.isSelected()) {
-//                        imprimir_venta(idventa_ultimo);
+                        posv.boton_imprimir_pos_VENTA(connLocal, idventa_alquiler_ultimo);
                     } else {
                         JOptionPane.showMessageDialog(null, "VENTA GUARDADO\nSIN TICKET");
                     }
@@ -1043,11 +1056,23 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                         vuel.setVisible(true);
                     } else {
                         if (jCimprimir_ticket.isSelected()) {
-//                            imprimir_venta(idventa_ultimo);
+                            posv.boton_imprimir_pos_VENTA(connLocal, idventa_alquiler_ultimo);
                         } else {
                             JOptionPane.showMessageDialog(null, "VENTA GUARDADO\nSIN TICKET");
                         }
                     }
+                }
+                if (ven_alq.isConfirmado_carga_reserva()) {
+                    int idventa_alquiler = ven_alq.getC1idventa_alquiler_global();
+                    ven_alq.setC18estado(estado_FINALIZAR);
+                    ven_alq.setC1idventa_alquiler(idventa_alquiler);
+                    cdalq.setC5estado(estado_FINALIZAR);
+                    cdalq.setC20fk_idventa_alquiler(idventa_alquiler);
+                    if (vBO.getBoolean_update_venta_alquiler_Finalizar(ven_alq, cdalq)) {
+//                        vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
+                    }
+                    ven_alq.setConfirmado_carga_reserva(false);
+                    ven_alq.setC1idventa_alquiler_global(0);
                 }
                 reestableser_venta();
                 limpiar_buscardor_cliente();
@@ -1072,41 +1097,79 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         }
     }
 
-    private void boton_retirar_venta_alquiler() {
+    private void boton_venta_alquiler_alquilado() {
         if (!evejt.getBoolean_validar_select(tblventa)) {
             int idventa_alquiler = evejt.getInt_select_id(tblventa);
-            ven_alq.setC18estado(estado_RETIRADO);
+            ven_alq.setC18estado(estado_ALQUILADO);
             ven_alq.setC1idventa_alquiler(idventa_alquiler);
-            cdalq.setC5estado(estado_RETIRADO);
+            cdalq.setC5estado(estado_ALQUILADO);
             cdalq.setC20fk_idventa_alquiler(idventa_alquiler);
             String lista_producto = ivdao.getString_cargar_item_venta_alquiler_cantidad_total(connLocal, idventa_alquiler);
-            if (vBO.getBoolean_update_venta_alquiler_reirar(lista_producto, ven_alq, cdalq)) {
+            if (vBO.getBoolean_update_venta_alquiler_alquilado(lista_producto, ven_alq, cdalq)) {
                 vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
             }
         }
     }
 
-    private void boton_devolusion_venta_alquiler() {
+    private void boton_venta_alquiler_devolucion() {
         if (!evejt.getBoolean_validar_select(tblventa)) {
             int idventa_alquiler = evejt.getInt_select_id(tblventa);
-            ven_alq.setC18estado(estado_FINALIZAR);
-            ven_alq.setC1idventa_alquiler(idventa_alquiler);
-            cdalq.setC5estado(estado_FINALIZAR);
-            cdalq.setC20fk_idventa_alquiler(idventa_alquiler);
-            String lista_producto = ivdao.getString_cargar_item_venta_alquiler_cantidad_total(connLocal, idventa_alquiler);
-            if (vBO.getBoolean_update_venta_alquiler_finalizar(lista_producto, ven_alq, cdalq)) {
-                vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
+            String fecha_retirado_previsto = evejt.getString_select(tblventa,1)+ ":00.00";
+            String fecha_devolusion_previsto = evefec.getString_formato_fecha_hora() + ":00.00";
+            if (evefec.getTimestamp_fecha_cargado(fecha_retirado_previsto).equals(evefec.getTimestamp_fecha_cargado(fecha_devolusion_previsto))) {
+                JOptionPane.showMessageDialog(jPanel_fecha, "LA FECHA DE RETIRADO Y DEVOLUSION NO PUEDE SER IGUAL ");
+            } else {
+                ven_alq.setC18estado(estado_DEVOLUCION);
+                ven_alq.setC1idventa_alquiler(idventa_alquiler);
+                cdalq.setC5estado(estado_DEVOLUCION);
+                cdalq.setC20fk_idventa_alquiler(idventa_alquiler);
+                String lista_producto = ivdao.getString_cargar_item_venta_alquiler_cantidad_total(connLocal, idventa_alquiler);
+                if (vBO.getBoolean_update_venta_alquiler_Devolucion(lista_producto, ven_alq, cdalq)) {
+                    vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
+                }
             }
         }
     }
 
+    private void boton_venta_alquiler_imprimir_ticket() {
+        if (!evejt.getBoolean_validar_select(tblventa)) {
+            int idventa_alquiler = evejt.getInt_select_id(tblventa);
+            posv.boton_imprimir_pos_VENTA(connLocal, idventa_alquiler);
+        }
+    }
+
+    //
     private void boton_pagar_reservado() {
         if (!evejt.getBoolean_validar_select(tblventa)) {
+            color_formulario(clacolor.getColor_shopp());
+            evejt.mostrar_JTabbedPane(jTabbedPane_VENTA, 0);
             int idventa_alquiler = evejt.getInt_select_id(tblventa);
-//            vdao.cargar_venta_alquiler(connLocal, ven_alq, idventa_alquiler);
             ven_alq.setC1idventa_alquiler_global(idventa_alquiler);
             DialogCobrarReservado frm = new DialogCobrarReservado(null, true);
             frm.setVisible(true);
+            if (ven_alq.isConfirmado_carga_reserva()) {
+                vdao.cargar_venta_alquiler(connLocal, ven_alq, idventa_alquiler);
+                estado_venta_alquiler = estado_USO_RESERVA;
+                seleccionar_cargar_cliente(4);
+                txtfec_retirado_previsto.setText(ven_alq.getC22fecha_retirado());
+                txthora_retirado_previsto.setText(ven_alq.getC23hora_retirado());
+                txtminuto_retirado_previsto.setText(ven_alq.getC24min_retirado());
+                txtfec_devolusion_previsto.setText(ven_alq.getC25fecha_devolusion());
+                txthora_devolusion_previsto.setText(ven_alq.getC26hora_devolusion());
+                txtminuto_devolusion_previsto.setText(ven_alq.getC27min_devolusion());
+                txtdireccion_alquiler.setText(ven_alq.getC16direccion_alquiler());
+                txtmonto_delivery.setText("0");
+                String observacion = txtobservacion.getText();
+                if (observacion.equals(observacion_inicio)) {
+                    txtobservacion.setText("Alq Nro: " + idventa_alquiler);
+                } else {
+                    txtobservacion.setText(ven_alq.getC17observacion() + " /Alquiler Nro: " + idventa_alquiler);
+                }
+                cmbentregador.setSelectedIndex(1);
+                sumar_item_venta();
+            } else {
+                reestableser_venta();
+            }
         }
     }
 
@@ -1117,26 +1180,38 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             String monto_reserva = evejt.getString_select(tblventa, 7);
             if (estado.equals(estado_EMITIDO)) {
                 btnestado_anulado.setEnabled(true);
-                btnestado_retirado.setEnabled(true);
-                btnestado_finalizado.setEnabled(false);
+                btnestado_alquilado.setEnabled(true);
+                btnestado_devolucion.setEnabled(false);
                 btnestado_cobrar_reservado.setEnabled(false);
             }
             if (estado.equals(estado_ANULADO)) {
                 btnestado_anulado.setEnabled(false);
-                btnestado_retirado.setEnabled(false);
-                btnestado_finalizado.setEnabled(false);
+                btnestado_alquilado.setEnabled(false);
+                btnestado_devolucion.setEnabled(false);
                 btnestado_cobrar_reservado.setEnabled(false);
             }
-            if (estado.equals(estado_RETIRADO)) {
+            if (estado.equals(estado_ALQUILADO)) {
                 btnestado_anulado.setEnabled(false);
-                btnestado_retirado.setEnabled(false);
-                btnestado_finalizado.setEnabled(true);
+                btnestado_alquilado.setEnabled(false);
+                btnestado_devolucion.setEnabled(true);
+                btnestado_cobrar_reservado.setEnabled(false);
+            }
+            if (estado.equals(estado_USO_RESERVA)) {
+                btnestado_anulado.setEnabled(false);
+                btnestado_alquilado.setEnabled(false);
+                btnestado_devolucion.setEnabled(false);
                 btnestado_cobrar_reservado.setEnabled(false);
             }
             if (estado.equals(estado_FINALIZAR)) {
                 btnestado_anulado.setEnabled(false);
-                btnestado_retirado.setEnabled(false);
-                btnestado_finalizado.setEnabled(false);
+                btnestado_alquilado.setEnabled(false);
+                btnestado_devolucion.setEnabled(false);
+                btnestado_cobrar_reservado.setEnabled(false);
+            }
+            if (estado.equals(estado_DEVOLUCION)) {
+                btnestado_anulado.setEnabled(false);
+                btnestado_alquilado.setEnabled(false);
+                btnestado_devolucion.setEnabled(false);
                 if (monto_reserva.trim().length() > 1) {
                     btnestado_cobrar_reservado.setEnabled(true);
                 } else {
@@ -1277,8 +1352,8 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         jCfecha_todos = new javax.swing.JCheckBox();
         btnpasar_venta_efectivo = new javax.swing.JButton();
         btnpasar_venta_tarjeta = new javax.swing.JButton();
-        btnestado_retirado = new javax.swing.JButton();
-        btnestado_finalizado = new javax.swing.JButton();
+        btnestado_alquilado = new javax.swing.JButton();
+        btnestado_devolucion = new javax.swing.JButton();
         btnestado_cobrar_reservado = new javax.swing.JButton();
         jPanel11 = new javax.swing.JPanel();
         panel_tabla_busca_cli = new javax.swing.JPanel();
@@ -2398,25 +2473,25 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             }
         });
 
-        btnestado_retirado.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        btnestado_retirado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/venta/flecha-salir.png"))); // NOI18N
-        btnestado_retirado.setText("RETIRADO");
-        btnestado_retirado.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
-        btnestado_retirado.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        btnestado_retirado.addActionListener(new java.awt.event.ActionListener() {
+        btnestado_alquilado.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        btnestado_alquilado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/venta/flecha-salir.png"))); // NOI18N
+        btnestado_alquilado.setText("ALQUILADO");
+        btnestado_alquilado.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        btnestado_alquilado.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnestado_alquilado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnestado_retiradoActionPerformed(evt);
+                btnestado_alquiladoActionPerformed(evt);
             }
         });
 
-        btnestado_finalizado.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        btnestado_finalizado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/venta/flecha-retornar.png"))); // NOI18N
-        btnestado_finalizado.setText("FINALIZAR");
-        btnestado_finalizado.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
-        btnestado_finalizado.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        btnestado_finalizado.addActionListener(new java.awt.event.ActionListener() {
+        btnestado_devolucion.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        btnestado_devolucion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/venta/flecha-retornar.png"))); // NOI18N
+        btnestado_devolucion.setText("DEVOLUCION");
+        btnestado_devolucion.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        btnestado_devolucion.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnestado_devolucion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnestado_finalizadoActionPerformed(evt);
+                btnestado_devolucionActionPerformed(evt);
             }
         });
 
@@ -2472,11 +2547,11 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                                     .addComponent(btnpasar_venta_tarjeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnestado_retirado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnestado_alquilado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnestado_cobrar_reservado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnestado_finalizado)
-                        .addContainerGap(156, Short.MAX_VALUE))))
+                        .addComponent(btnestado_devolucion)
+                        .addContainerGap(140, Short.MAX_VALUE))))
         );
         panel_referencia_ventaLayout.setVerticalGroup(
             panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2502,8 +2577,8 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                             .addComponent(jCfecha_todos)))
                     .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
                         .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnestado_retirado, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnestado_finalizado, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnestado_alquilado, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnestado_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnestado_cobrar_reservado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2799,6 +2874,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private void btnimprimirNotaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnimprimirNotaActionPerformed
         // TODO add your handling code here:
 //        boton_imprimirPos_venta();
+        boton_venta_alquiler_imprimir_ticket();
     }//GEN-LAST:event_btnimprimirNotaActionPerformed
 
     private void jCestado_emitidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_emitidoActionPerformed
@@ -3180,15 +3256,15 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         select_condicion();
     }//GEN-LAST:event_jRcond_pagoparcialActionPerformed
 
-    private void btnestado_retiradoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnestado_retiradoActionPerformed
+    private void btnestado_alquiladoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnestado_alquiladoActionPerformed
         // TODO add your handling code here:
-        boton_retirar_venta_alquiler();
-    }//GEN-LAST:event_btnestado_retiradoActionPerformed
+        boton_venta_alquiler_alquilado();
+    }//GEN-LAST:event_btnestado_alquiladoActionPerformed
 
-    private void btnestado_finalizadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnestado_finalizadoActionPerformed
+    private void btnestado_devolucionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnestado_devolucionActionPerformed
         // TODO add your handling code here:
-        boton_devolusion_venta_alquiler();
-    }//GEN-LAST:event_btnestado_finalizadoActionPerformed
+        boton_venta_alquiler_devolucion();
+    }//GEN-LAST:event_btnestado_devolucionActionPerformed
 
     private void btnestado_cobrar_reservadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnestado_cobrar_reservadoActionPerformed
         // TODO add your handling code here:
@@ -3204,10 +3280,10 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnconfirmar_venta_tarjeta;
     private javax.swing.JButton btnconfirmar_venta_transferencia;
     private javax.swing.JButton btneliminar_item;
+    private javax.swing.JButton btnestado_alquilado;
     private javax.swing.JButton btnestado_anulado;
     private javax.swing.JButton btnestado_cobrar_reservado;
-    private javax.swing.JButton btnestado_finalizado;
-    private javax.swing.JButton btnestado_retirado;
+    private javax.swing.JButton btnestado_devolucion;
     private javax.swing.JButton btnfacturar;
     private javax.swing.JButton btnimprimirNota;
     private javax.swing.JButton btnlimpiar_cliente;
@@ -3229,7 +3305,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox jCimprimir_ticket;
     private javax.swing.JCheckBox jCvuelto;
     private javax.swing.JFormattedTextField jFsaldo_credito;
-    private javax.swing.JFormattedTextField jFtotal_pagado;
+    public static javax.swing.JFormattedTextField jFtotal_pagado;
     private javax.swing.JFormattedTextField jFtotal_reservado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -3296,7 +3372,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panel_tabla_item;
     private javax.swing.JPanel panel_tabla_venta;
     private javax.swing.JTable tblbuscar_cliente;
-    private javax.swing.JTable tblitem_producto;
+    public static javax.swing.JTable tblitem_producto;
     private javax.swing.JTable tblitem_venta_filtro;
     private javax.swing.JTable tblproducto;
     private javax.swing.JTable tblventa;

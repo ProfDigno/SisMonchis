@@ -14,9 +14,12 @@ import Evento.Jframe.EvenJFRAME;
 import FORMULARIO.BO.BO_usuario;
 import FORMULARIO.DAO.DAO_backup;
 import FORMULARIO.DAO.DAO_caja_cierre;
+import FORMULARIO.DAO.DAO_caja_cierre_alquilado;
 import FORMULARIO.DAO.DAO_usuario;
 import FORMULARIO.DAO.DAO_venta;
 import FORMULARIO.ENTIDAD.caja_cierre;
+import FORMULARIO.ENTIDAD.caja_cierre_alquilado;
+import FORMULARIO.ENTIDAD.caja_detalle_alquilado;
 import FORMULARIO.ENTIDAD.financista;
 import FORMULARIO.ENTIDAD.usuario;
 import java.awt.event.KeyEvent;
@@ -44,9 +47,14 @@ public class JDiaLogin extends javax.swing.JDialog {
 //    Connection connser = conPsSER.getConnPosgres();
     EvenConexion eveconn = new EvenConexion();
     caja_cierre cjcie = new caja_cierre();
+    caja_cierre_alquilado ccal = new caja_cierre_alquilado();
+    caja_detalle_alquilado cdalq = new caja_detalle_alquilado();
+    
     DAO_caja_cierre cjcie_dao = new DAO_caja_cierre();
+    private DAO_caja_cierre_alquilado ccal_dao = new DAO_caja_cierre_alquilado();
     cla_color_pelete clacolor= new cla_color_pelete();
     private financista fina = new financista();
+    private Object estado_CERRADO="CERRADO";
     /**
      * Creates new form FrmZonaDelivery
      */
@@ -109,9 +117,10 @@ public class JDiaLogin extends javax.swing.JDialog {
             }
             this.dispose();
             if (bdao.getBoolean_backup_creado_hoy(conn)) {
-                evetbl.abrir_TablaJinternal(new FrmCrearBackup());
+                
+//                evetbl.abrir_TablaJinternal(new FrmCrearBackup());
             }
-            primer_finanza();
+//            primer_finanza();
             int idcaja_cierre = (eveconn.getInt_ultimoID_max(conn, cjcie.getTb_caja_cierre(), cjcie.getId_idcaja_cierre()));
             if (idcaja_cierre == 0) {
                 JOptionPane.showMessageDialog(null, "NO HAY NINGUNA CAJA");
@@ -119,9 +128,21 @@ public class JDiaLogin extends javax.swing.JDialog {
             } else {
                 cjcie.setC1idcaja_cierre(idcaja_cierre);
                 cjcie_dao.cargar_caja_cierre(cjcie);
-                if (cjcie.getC4estado().equals("CERRADO")) {
+                if (cjcie.getC4estado().equals(estado_CERRADO)) {
                     JOptionPane.showMessageDialog(null, "NO HAY CAJA ABIERTA SE DEBE ABRIR UNO NUEVO");
                     evetbl.abrir_TablaJinternal(new FrmCaja_Abrir());
+                }
+            }
+            int idcaja_cierre_alquiler = (eveconn.getInt_ultimoID_max(conn, ccal.getTb_caja_cierre_alquilado(), ccal.getId_idcaja_cierre_alquilado()));
+            if (idcaja_cierre_alquiler == 0) {
+                JOptionPane.showMessageDialog(null, "NO HAY NINGUNA CAJA ALQUILER");
+                evetbl.abrir_TablaJinternal(new FrmCaja_Abrir_alquiler());
+            } else {
+                ccal.setC1idcaja_cierre_alquilado(idcaja_cierre_alquiler);
+                ccal_dao.cargar_caja_cierre_alquilado(conn, ccal, idcaja_cierre_alquiler);
+                if (ccal.getC4estado().equals(estado_CERRADO)) {
+                    JOptionPane.showMessageDialog(null, "NO HAY CAJA ALQUILER ABIERTA SE DEBE ABRIR UNO NUEVO");
+                    evetbl.abrir_TablaJinternal(new FrmCaja_Abrir_alquiler());
                 }
             }
         } else {
@@ -130,12 +151,12 @@ public class JDiaLogin extends javax.swing.JDialog {
             txtusuario.grabFocus();
         }
     }
-    void primer_finanza(){
-        int idfinancista = (eveconn.getInt_ultimoID_mas_uno(conn, fina.getTb_financista(), fina.getId_idfinancista()));
-        if(idfinancista==0){
-            evetbl.abrir_TablaJinternal(new FrmFinancista());
-        }
-    }
+//    void primer_finanza(){
+//        int idfinancista = (eveconn.getInt_ultimoID_mas_uno(conn, fina.getTb_financista(), fina.getId_idfinancista()));
+//        if(idfinancista==0){
+//            evetbl.abrir_TablaJinternal(new FrmFinancista());
+//        }
+//    }
     void boton_entrar() {
         if (validar_ingreso()) {
             usu.setU3usuario(txtusuario.getText());

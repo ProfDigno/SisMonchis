@@ -1000,7 +1000,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
             clie.setC6ruc(txtcli_ruc.getText());
             clie.setC7fecha_cumple(txtcli_fecha_nacimiento.getText());
             clie.setC8tipo(tipo_cliente());
-            cBO.update_cliente(clie, tblpro_cliente);
+            cBO.update_cliente(clie);
         }
     }
 

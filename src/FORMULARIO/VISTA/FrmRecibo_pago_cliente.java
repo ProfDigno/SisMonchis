@@ -54,6 +54,7 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
     private int fk_idcliente;
     private String estado_EMITIDO = "EMITIDO";
     private String estado_ABIERTO = "ABIERTO";
+    private String forma_pago_EFECTIVO="EFECTIVO";
     private double monto_recibo_pago;
     private double monto_saldo_credito;
     private String monto_letra;
@@ -152,24 +153,7 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
         sccli.setC7fk_idcliente(fk_idcliente);
         sccli.setC8fk_idusuario(fk_idusuario);
     }
-//    private void cargar_caja_detalle() {
-//        caja.setC3descripcion1(txtrec_descripcion.getText());
-//        caja.setC4monto_venta_efectivo(0);
-//        caja.setC5monto_venta_tarjeta(0);
-//        caja.setC6monto_delivery(0);
-//        caja.setC7monto_gasto(0);
-//        caja.setC8monto_compra(0);
-//        caja.setC9monto_vale(0);
-//        caja.setC10monto_caja(0);
-//        caja.setC11monto_cierre(0);
-//        caja.setC12id_origen(idrecibo_pago_cliente);
-//        caja.setC13tabla_origen(tabla_origen);
-////        caja.setC14cierre("A");
-//        caja.setC15estado(estado_EMITIDO);
-//        caja.setC16fk_idusuario(fk_idusuario);
-//        caja.setC17monto_recibo_pago(monto_recibo_pago);
-//        caja.setC18monto_compra_credito(0);
-//    }
+
     void cargar_dato_caja_alquilado() {
         cdalq_dao.limpiar_caja_detalle_alquilado(cdalq);
         cdalq.setC3descripcion("(RECIBO CLIENTE) ID:" +idrecibo_pago_cliente + " DESCRIP:"+ txtrec_descripcion.getText());
@@ -177,6 +161,7 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
         cdalq.setC5estado(estado_EMITIDO);
         cdalq.setC10monto_recibo_pago(monto_recibo_pago);
         cdalq.setC22fk_idrecibo_pago_cliente(idrecibo_pago_cliente);
+        cdalq.setC25forma_pago(forma_pago_EFECTIVO);
     }
     private void boton_guardar() {
         if (hab_guardar) {

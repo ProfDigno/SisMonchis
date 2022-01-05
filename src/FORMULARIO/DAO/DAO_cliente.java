@@ -61,7 +61,7 @@ public class DAO_cliente {
             + "from grupo_credito_cliente gcc,credito_cliente cc\n"
             + "where gcc.idgrupo_credito_cliente=cc.fk_idgrupo_credito_cliente\n"
             + "and gcc.estado='ABIERTO'\n"
-            + "and cc.estado='EMITIDO'\n"
+            + "and (cc.estado='EMITIDO' or cc.estado='USO_RESERVA')\n"
             + "and gcc.fk_idcliente=cliente.idcliente) where cliente.idcliente=?;";
     public void cargar_cliente(Connection conn,cliente clie, int idcliente) {
         String titulo = "cargar_cliente";

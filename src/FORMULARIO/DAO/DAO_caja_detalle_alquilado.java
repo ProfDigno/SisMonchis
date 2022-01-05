@@ -10,6 +10,7 @@ import FORMULARIO.ENTIDAD.usuario;
 import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javax.swing.JTable;
 
 public class DAO_caja_detalle_alquilado {
@@ -22,12 +23,36 @@ public class DAO_caja_detalle_alquilado {
      usuario usu = new usuario();
     private String mensaje_insert = "CAJA_DETALLE_ALQUILADO GUARDADO CORRECTAMENTE";
     private String mensaje_update = "CAJA_DETALLE_ALQUILADO MODIFICADO CORECTAMENTE";
-    private String sql_insert = "INSERT INTO caja_detalle_alquilado(idcaja_detalle_alquilado,fecha_emision,descripcion,tabla_origen,estado,cierre,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_recibo_pago,monto_delivery,monto_gasto,monto_vale,monto_compra_contado,monto_compra_credito,monto_apertura_caja,monto_cierre_caja,fk_idgasto,fk_idcompra,fk_idventa_alquiler,fk_idvale,fk_idrecibo_pago_cliente,fk_idusuario) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-    private String sql_update = "UPDATE caja_detalle_alquilado SET fecha_emision=?,descripcion=?,tabla_origen=?,estado=?,cierre=?,monto_alquilado_efectivo=?,monto_alquilado_tarjeta=?,monto_alquilado_transferencia=?,monto_recibo_pago=?,monto_delivery=?,monto_gasto=?,monto_vale=?,monto_compra_contado=?,monto_compra_credito=?,monto_apertura_caja=?,monto_cierre_caja=?,fk_idgasto=?,fk_idcompra=?,fk_idventa_alquiler=?,fk_idvale=?,fk_idrecibo_pago_cliente=?,fk_idusuario=? WHERE idcaja_detalle_alquilado=?;";
-    private String sql_select = "SELECT idcaja_detalle_alquilado,fecha_emision,descripcion,tabla_origen,estado,cierre,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_recibo_pago,monto_delivery,monto_gasto,monto_vale,monto_compra_contado,monto_compra_credito,monto_apertura_caja,monto_cierre_caja,fk_idgasto,fk_idcompra,fk_idventa_alquiler,fk_idvale,fk_idrecibo_pago_cliente,fk_idusuario FROM caja_detalle_alquilado order by 1 desc;";
+    private String sql_insert = "INSERT INTO caja_detalle_alquilado(idcaja_detalle_alquilado,fecha_emision,descripcion,tabla_origen,estado,cierre,"
+            + "monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_recibo_pago,monto_delivery,"
+            + "monto_gasto,monto_vale,monto_compra_contado,monto_compra_credito,monto_apertura_caja,monto_cierre_caja,"
+            + "fk_idgasto,fk_idcompra,fk_idventa_alquiler,fk_idvale,fk_idrecibo_pago_cliente,fk_idusuario,"
+            + "monto_alquilado_credio,forma_pago) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+    private String sql_update = "UPDATE caja_detalle_alquilado SET fecha_emision=?,descripcion=?,tabla_origen=?,estado=?,cierre=?,"
+            + "monto_alquilado_efectivo=?,monto_alquilado_tarjeta=?,monto_alquilado_transferencia=?,monto_recibo_pago=?,monto_delivery=?,"
+            + "monto_gasto=?,monto_vale=?,monto_compra_contado=?,monto_compra_credito=?,monto_apertura_caja=?,monto_cierre_caja=?,"
+            + "fk_idgasto=?,fk_idcompra=?,fk_idventa_alquiler=?,fk_idvale=?,fk_idrecibo_pago_cliente=?,fk_idusuario=?,"
+            + "monto_alquilado_credio=?,forma_pago=? WHERE idcaja_detalle_alquilado=?;";
+//    private String sql_select = "SELECT idcaja_detalle_alquilado,fecha_emision,descripcion,tabla_origen,estado,cierre,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_recibo_pago,monto_delivery,monto_gasto,monto_vale,monto_compra_contado,monto_compra_credito,monto_apertura_caja,monto_cierre_caja,fk_idgasto,fk_idcompra,fk_idventa_alquiler,fk_idvale,fk_idrecibo_pago_cliente,fk_idusuario FROM caja_detalle_alquilado order by 1 desc;";
     private String sql_cargar = "SELECT idcaja_detalle_alquilado,fecha_emision,descripcion,tabla_origen,estado,cierre,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_recibo_pago,monto_delivery,monto_gasto,monto_vale,monto_compra_contado,monto_compra_credito,monto_apertura_caja,monto_cierre_caja,fk_idgasto,fk_idcompra,fk_idventa_alquiler,fk_idvale,fk_idrecibo_pago_cliente,fk_idusuario FROM caja_detalle_alquilado WHERE idcaja_detalle_alquilado=";
     private String sql_estado_venta_alquiler = "UPDATE caja_detalle_alquilado SET estado=? WHERE fk_idventa_alquiler=?;";
- 
+     private String sql_update_cerrartodo="update caja_detalle_alquilado set cierre='C' "
+                + "where cierre='A' ";
+      private String sql_select="select date(fecha_emision) as fecha,"//monto_apertura_caja
+                + "TRIM(to_char(sum(monto_apertura_caja),'999G999G999')) as caja_abrir,"
+                + "TRIM(to_char(sum(monto_alquilado_efectivo),'999G999G999')) as v_efectivo,"
+                + "TRIM(to_char(sum(monto_alquilado_tarjeta),'999G999G999')) as v_tarjeta,"
+                + "TRIM(to_char(sum(monto_alquilado_transferencia),'999G999G999')) as v_transfe,"
+                + "TRIM(to_char(sum(monto_recibo_pago),'999G999G999')) as rec_pag_clientte, "
+                + "TRIM(to_char(sum(monto_delivery),'999G999G999')) as delivery,"
+                + "TRIM(to_char(sum(monto_compra_contado),'999G999G999')) as comp_contado,\n" 
+                + "TRIM(to_char(sum(monto_gasto),'999G999G999')) as gasto,"
+                + "TRIM(to_char(sum(monto_vale),'999G999G999')) as vale, "
+                + "TRIM(to_char(sum(monto_compra_credito),'999G999G999')) as com_credito,\n" 
+                + "TRIM(to_char(sum(monto_alquilado_credio),'999G999G999')) as ven_credito "
+                + "from caja_detalle_alquilado "
+                + "where estado!='ANULADO' "
+                + "group by 1 order by 1 desc";
     public void insertar_caja_detalle_alquilado(Connection conn, caja_detalle_alquilado cdalq) {
         cdalq.setC1idcaja_detalle_alquilado(eveconn.getInt_ultimoID_mas_uno(conn, cdalq.getTb_caja_detalle_alquilado(), cdalq.getId_idcaja_detalle_alquilado()));
         String titulo = "insertar_caja_detalle_alquilado";
@@ -57,6 +82,8 @@ public class DAO_caja_detalle_alquilado {
             pst.setInt(21, cdalq.getC21fk_idvale());
             pst.setInt(22, cdalq.getC22fk_idrecibo_pago_cliente());
             pst.setInt(23, cdalq.getC23fk_idusuario());
+            pst.setDouble(24, cdalq.getC24monto_alquilado_credio());
+            pst.setString(25, cdalq.getC25forma_pago());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + cdalq.toString(), titulo);
@@ -88,6 +115,8 @@ public class DAO_caja_detalle_alquilado {
         cdalq.setC21fk_idvale(0);
         cdalq.setC22fk_idrecibo_pago_cliente(0);
         cdalq.setC23fk_idusuario(usu.getGlobal_idusuario());
+        cdalq.setC24monto_alquilado_credio(0);
+        cdalq.setC25forma_pago("nulo");
     }
 
     public void update_caja_detalle_alquilado(Connection conn, caja_detalle_alquilado cdalq) {
@@ -164,7 +193,7 @@ public class DAO_caja_detalle_alquilado {
 
     public void actualizar_tabla_caja_detalle_alquilado(Connection conn, JTable tbltabla) {
         eveconn.Select_cargar_jtable(conn, sql_select, tbltabla);
-        ancho_tabla_caja_detalle_alquilado(tbltabla);
+//        ancho_tabla_caja_detalle_alquilado(tbltabla);
     }
 
     public void ancho_tabla_caja_detalle_alquilado(JTable tbltabla) {
@@ -184,6 +213,18 @@ public class DAO_caja_detalle_alquilado {
             evemen.modificado_correcto(mensaje_update, false);
         } catch (Exception e) {
             evemen.mensaje_error(e, sql_estado_venta_alquiler + "\n" + cdalq.toString(), titulo);
+        }
+    }
+    public void update_caja_detalle_CERRARTODO(Connection conn){
+        String titulo = "anular_caja_detalle";
+        PreparedStatement pst = null;
+        try {
+            pst = conn.prepareStatement(sql_update_cerrartodo);
+            pst.execute();
+            pst.close();
+            evemen.Imprimir_serial_sql(sql_update_cerrartodo + "\n", titulo);
+        } catch (SQLException e) {
+            evemen.mensaje_error(e, sql_update_cerrartodo + "\n", titulo);
         }
     }
 }

@@ -53,7 +53,7 @@ public class BO_cliente {
         }
     }
 
-    public void update_cliente(cliente ingre, JTable tbltabla) {
+    public void update_cliente(cliente ingre) {
         if (evmen.MensajeGeneral_warning("ESTAS SEGURO DE MODIFICAR ESTE CLIENTE", "MODIFICAR", "ACEPTAR", "CANCELAR")) {
             String titulo = "update_cliente";
             Connection conn = ConnPostgres.getConnPosgres();
@@ -62,7 +62,7 @@ public class BO_cliente {
                     conn.setAutoCommit(false);
                 }
                 pidao.update_cliente(conn, ingre);
-                pidao.actualizar_tabla_cliente(conn, tbltabla);
+//                pidao.actualizar_tabla_cliente(conn, tbltabla);
                 conn.commit();
             } catch (SQLException e) {
                 evmen.mensaje_error(e, ingre.toString(), titulo);

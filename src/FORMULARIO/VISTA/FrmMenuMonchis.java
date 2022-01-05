@@ -17,6 +17,7 @@ import Evento.Grafico.EvenSQLDataSet;
 import Evento.Grafico.FunFreeChard;
 import Evento.Jframe.EvenJFRAME;
 import FORMULARIO.DAO.DAO_caja_cierre;
+import FORMULARIO.DAO.DAO_caja_cierre_alquilado;
 import FORMULARIO.DAO.DAO_cliente;
 import FORMULARIO.DAO.DAO_cotizacion;
 import FORMULARIO.DAO.DAO_factura;
@@ -24,6 +25,7 @@ import FORMULARIO.DAO.DAO_producto;
 import FORMULARIO.DAO.DAO_producto_categoria;
 import FORMULARIO.DAO.DAO_venta;
 import FORMULARIO.ENTIDAD.caja_cierre;
+import FORMULARIO.ENTIDAD.caja_cierre_alquilado;
 import FORMULARIO.ENTIDAD.cotizacion;
 import FORMULARIO.ENTIDAD.factura;
 import FORMULARIO.ENTIDAD.financista;
@@ -64,6 +66,8 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     EvenConexion eveconn = new EvenConexion();
     caja_cierre cjcie = new caja_cierre();
     DAO_caja_cierre cjcie_dao = new DAO_caja_cierre();
+    caja_cierre_alquilado cjciea = new caja_cierre_alquilado();
+    DAO_caja_cierre_alquilado cjciea_dao = new DAO_caja_cierre_alquilado();
     cla_color_pelete clacolor = new cla_color_pelete();
     json_config jsconfig = new json_config();
     json_imprimir_pos jsprint = new json_imprimir_pos();
@@ -73,7 +77,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     private Timer tiempo;
     boolean vergrafico = true;
     int seg_ver_grafico = 0;
-
+    String estado_CERRADO="CERRADO";
     void abrir_formulario() {
         conPs.ConnectDBpostgres(conn, false, false);
         conn = conPs.getConnPosgres();
@@ -90,10 +94,11 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         jFreal.setValue(coti.getReal_guarani());
         grafico_mas_vendidos();
         grafico_venta_semanal();
-        pdao.actualizar_tabla_producto_stock_minimo(conn, tbl_producto_stock_minimo);
+//        pdao.actualizar_tabla_producto_stock_minimo(conn, tbl_producto_stock_minimo);
         pcDAO.update_orden_categoria_mas_vendido_mes();
         iniciar_color();
         actualizacion_version_v1();
+        
 //        primer_finanza();
     }
 
@@ -244,6 +249,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
 //                + "	\"monto_alquilado_efectivo\" NUMERIC(14,0) NOT NULL ,\n"
 //                + "	\"monto_alquilado_tarjeta\" NUMERIC(14,0) NOT NULL ,\n"
 //                + "	\"monto_alquilado_transferencia\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_alquilado_credio\" NUMERIC(14,0) NOT NULL ,\n" 
 //                + "	\"monto_recibo_pago\" NUMERIC(14,0) NOT NULL ,\n"
 //                + "	\"monto_delivery\" NUMERIC(14,0) NOT NULL ,\n"
 //                + "	\"monto_gasto\" NUMERIC(14,0) NOT NULL ,\n"
@@ -251,7 +257,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
 //                + "	\"monto_compra_contado\" NUMERIC(14,0) NOT NULL ,\n"
 //                + "	\"monto_compra_credito\" NUMERIC(14,0) NOT NULL ,\n"
 //                + "	\"monto_apertura_caja\" NUMERIC(14,0) NOT NULL ,\n"
-//                + "	\"monto_cierre_caja\" NUMERIC(14,0) NOT NULL ,\n"
+//                + "	\"monto_cierre_caja\" NUMERIC(14,0) NOT NULL ,\n" monto_alquilado_credio
 //                + "	\"fk_idgasto\" INTEGER NOT NULL ,\n"
 //                + "	\"fk_idcompra\" INTEGER NOT NULL ,\n"
 //                + "	\"fk_idventa_alquiler\" INTEGER NOT NULL ,\n"
@@ -276,7 +282,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
 
     void ocultar_grafico() {
         panel_mas_vendidos.setVisible(!jCocultar_grafico.isSelected());
-        panel_stock_minimo.setVisible(!jCocultar_grafico.isSelected());
+//        panel_stock_minimo.setVisible(!jCocultar_grafico.isSelected());
         panel_venta_semanal.setVisible(!jCocultar_grafico.isSelected());
     }
 
@@ -365,14 +371,24 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         int idcaja_cierre = (eveconn.getInt_ultimoID_max(conn, cjcie.getTb_caja_cierre(), cjcie.getId_idcaja_cierre()));
         cjcie.setC1idcaja_cierre(idcaja_cierre);
         cjcie_dao.cargar_caja_cierre(cjcie);
-        if (cjcie.getC4estado().equals("CERRADO")) {
+        if (cjcie.getC4estado().equals(estado_CERRADO)) {
             JOptionPane.showMessageDialog(null, "NO HAY CAJA ABIERTA SE DEBE ABRIR UNO NUEVO");
             evetbl.abrir_TablaJinternal(new FrmCaja_Abrir());
         } else {
             evetbl.abrir_TablaJinternal(new FrmCaja_Cierre());
         }
     }
-
+    private void abrir_caja_cierre_alquiler() {
+        int idcaja_cierre = (eveconn.getInt_ultimoID_max(conn, cjciea.getTb_caja_cierre_alquilado(), cjciea.getId_idcaja_cierre_alquilado()));
+        cjciea.setC1idcaja_cierre_alquilado(idcaja_cierre);
+        cjciea_dao.cargar_caja_cierre_alquilado(conn, cjciea, idcaja_cierre);
+        if (cjciea.getC4estado().equals(estado_CERRADO)) {
+            JOptionPane.showMessageDialog(null, "NO HAY CAJA ABIERTA SE DEBE ABRIR UNO NUEVO");
+            evetbl.abrir_TablaJinternal(new FrmCaja_Abrir_alquiler());
+        } else {
+            evetbl.abrir_TablaJinternal(new FrmCaja_Cierre_alquiler());
+        }
+    }
     void grafico_mas_vendidos() {
         int cant_dias = 7;
         int top = 20;
@@ -431,10 +447,8 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         btninventario = new javax.swing.JButton();
         panel_mas_vendidos = new javax.swing.JPanel();
         jCocultar_grafico = new javax.swing.JCheckBox();
-        panel_stock_minimo = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tbl_producto_stock_minimo = new javax.swing.JTable();
         panel_venta_semanal = new javax.swing.JPanel();
+        btncajacerraralquiler = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu_venta = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -487,6 +501,13 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
         jMenuItem26 = new javax.swing.JMenuItem();
         jMenuItem31 = new javax.swing.JMenuItem();
+        jMenu8 = new javax.swing.JMenu();
+        jMenu9 = new javax.swing.JMenu();
+        jMenuItem36 = new javax.swing.JMenuItem();
+        jMenuItem37 = new javax.swing.JMenuItem();
+        jMenuItem38 = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        jMenuItem39 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -717,30 +738,6 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
             }
         });
 
-        tbl_producto_stock_minimo.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(tbl_producto_stock_minimo);
-
-        javax.swing.GroupLayout panel_stock_minimoLayout = new javax.swing.GroupLayout(panel_stock_minimo);
-        panel_stock_minimo.setLayout(panel_stock_minimoLayout);
-        panel_stock_minimoLayout.setHorizontalGroup(
-            panel_stock_minimoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-        );
-        panel_stock_minimoLayout.setVerticalGroup(
-            panel_stock_minimoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
-        );
-
         javax.swing.GroupLayout panel_venta_semanalLayout = new javax.swing.GroupLayout(panel_venta_semanal);
         panel_venta_semanal.setLayout(panel_venta_semanalLayout);
         panel_venta_semanalLayout.setHorizontalGroup(
@@ -751,6 +748,13 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
             panel_venta_semanalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 252, Short.MAX_VALUE)
         );
+
+        btncajacerraralquiler.setText("CAJA CERRAR ALQUILER");
+        btncajacerraralquiler.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btncajacerraralquilerActionPerformed(evt);
+            }
+        });
 
         escritorio.setLayer(btncliente, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(btnproducto, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -773,8 +777,8 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         escritorio.setLayer(btninventario, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(panel_mas_vendidos, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(jCocultar_grafico, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        escritorio.setLayer(panel_stock_minimo, javax.swing.JLayeredPane.DEFAULT_LAYER);
         escritorio.setLayer(panel_venta_semanal, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        escritorio.setLayer(btncajacerraralquiler, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout escritorioLayout = new javax.swing.GroupLayout(escritorio);
         escritorio.setLayout(escritorioLayout);
@@ -809,25 +813,26 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
                                 .addComponent(btnshopp, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btninventario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(14, 14, 14)
                         .addGroup(escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(escritorioLayout.createSequentialGroup()
-                                .addComponent(txtfechahora)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtvercion)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblusuario)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(panel_stock_minimo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(14, 14, 14)
+                                .addGroup(escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(escritorioLayout.createSequentialGroup()
+                                        .addComponent(txtfechahora)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtvercion)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblusuario))
+                                    .addComponent(jCocultar_grafico)))
                             .addGroup(escritorioLayout.createSequentialGroup()
-                                .addComponent(jCocultar_grafico)
-                                .addGap(204, 204, 204)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btncotizacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btncajacerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btncambiar_usuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(btncajacerraralquiler, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
+                                    .addComponent(btncajacerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btncotizacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btncambiar_usuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(escritorioLayout.createSequentialGroup()
                         .addComponent(panel_mas_vendidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -863,20 +868,16 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
                                     .addComponent(txtfechahora)
                                     .addComponent(txtvercion)
                                     .addComponent(lblusuario))
-                                .addGroup(escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(escritorioLayout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(panel_stock_minimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jCocultar_grafico))
-                                    .addGroup(escritorioLayout.createSequentialGroup()
-                                        .addGap(69, 69, 69)
-                                        .addComponent(btncotizacion)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btncajacerrar)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btncambiar_usuario)
-                                        .addGap(0, 0, Short.MAX_VALUE)))))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btncajacerrar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btncajacerraralquiler)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btncotizacion)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btncambiar_usuario)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jCocultar_grafico)))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panel_venta_semanal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1100,7 +1101,12 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
 
         jMenu_caja.setText("CAJA");
 
-        jMenuItem11.setText("CAJA DETALLE");
+        jMenuItem11.setText("CAJA DIARIO");
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
         jMenu_caja.add(jMenuItem11);
 
         jMenuItem28.setText("CAJA ABRIR");
@@ -1213,6 +1219,50 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu4);
 
+        jMenu8.setText("ALQUILER");
+
+        jMenu9.setText("CAJA");
+
+        jMenuItem36.setText("CAJA ABRIR-CERRAR");
+        jMenuItem36.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem36ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItem36);
+
+        jMenuItem37.setText("CAJA DIARIO");
+        jMenuItem37.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem37ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItem37);
+
+        jMenuItem38.setText("CAJA CIERRE");
+        jMenuItem38.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem38ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItem38);
+
+        jMenu8.add(jMenu9);
+
+        jMenu5.setText("REPORTE");
+
+        jMenuItem39.setText("VENTA ALQUILER TODOS");
+        jMenuItem39.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem39ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem39);
+
+        jMenu8.add(jMenu5);
+
+        jMenuBar1.add(jMenu8);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1311,7 +1361,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
             JDiaLogin log = new JDiaLogin(this, true);
             log.setVisible(true);
         }
-        pdao.ancho_tabla_producto_stock_minimo(tbl_producto_stock_minimo);
+//        pdao.ancho_tabla_producto_stock_minimo(tbl_producto_stock_minimo);
     }//GEN-LAST:event_formWindowOpened
 
     private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
@@ -1483,6 +1533,36 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
         evetbl.abrir_TablaJinternal(new FrmDato_Banco());
     }//GEN-LAST:event_jMenuItem31ActionPerformed
 
+    private void btncajacerraralquilerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btncajacerraralquilerActionPerformed
+        // TODO add your handling code here:
+        abrir_caja_cierre_alquiler();
+    }//GEN-LAST:event_btncajacerraralquilerActionPerformed
+
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+        // TODO add your handling code here:
+         evetbl.abrir_TablaJinternal(new FrmCajaDetalle());
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
+    private void jMenuItem36ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem36ActionPerformed
+        // TODO add your handling code here:
+        evetbl.abrir_TablaJinternal(new FrmCaja_abrir_cerrar_alquiler());
+    }//GEN-LAST:event_jMenuItem36ActionPerformed
+
+    private void jMenuItem38ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem38ActionPerformed
+        // TODO add your handling code here:
+        abrir_caja_cierre_alquiler();
+    }//GEN-LAST:event_jMenuItem38ActionPerformed
+
+    private void jMenuItem37ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem37ActionPerformed
+        // TODO add your handling code here:
+        evetbl.abrir_TablaJinternal(new FrmCajaDetalle_alquiler());
+    }//GEN-LAST:event_jMenuItem37ActionPerformed
+
+    private void jMenuItem39ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem39ActionPerformed
+        // TODO add your handling code here:
+        evetbl.abrir_TablaJinternal(new FrmRepVenta_alquiler());
+    }//GEN-LAST:event_jMenuItem39ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1529,6 +1609,7 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     public static javax.swing.JButton btncaja_cierre;
     public static javax.swing.JButton btncaja_detalle;
     public static javax.swing.JButton btncajacerrar;
+    public static javax.swing.JButton btncajacerraralquiler;
     public static javax.swing.JButton btncambiar_usuario;
     public static javax.swing.JButton btncategoria;
     public static javax.swing.JButton btncliente;
@@ -1551,8 +1632,11 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
+    private javax.swing.JMenu jMenu8;
+    private javax.swing.JMenu jMenu9;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
@@ -1583,6 +1667,10 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem33;
     private javax.swing.JMenuItem jMenuItem34;
     private javax.swing.JMenuItem jMenuItem35;
+    private javax.swing.JMenuItem jMenuItem36;
+    private javax.swing.JMenuItem jMenuItem37;
+    private javax.swing.JMenuItem jMenuItem38;
+    private javax.swing.JMenuItem jMenuItem39;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
@@ -1600,12 +1688,9 @@ public class FrmMenuMonchis extends javax.swing.JFrame {
     public static javax.swing.JMenu jMenu_producto;
     public static javax.swing.JMenu jMenu_venta;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     public static javax.swing.JLabel lblusuario;
     private javax.swing.JPanel panel_mas_vendidos;
-    private javax.swing.JPanel panel_stock_minimo;
     private javax.swing.JPanel panel_venta_semanal;
-    private javax.swing.JTable tbl_producto_stock_minimo;
     private javax.swing.JLabel txtfechahora;
     private javax.swing.JLabel txtvercion;
     // End of variables declaration//GEN-END:variables

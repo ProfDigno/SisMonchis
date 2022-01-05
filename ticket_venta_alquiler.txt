@@ -1,0 +1,38 @@
+                                   
+ ======MONCHI'S SHOP BEER======    
+ 0974505297/0972511654             
+ Avd Capitan del Puerto, Esq. Picui
+ #=============================#   
+ ALQ:4         CONDI:CREDITO       
+ ALQUILADO: 2021-12-29 01:21       
+ DEVOLUCION:2021-12-29 01:22       
+ CLI: 6-Arnaldo Benitez            
+ TEL: 0973676250                   
+ DIR: Barrio San Jose	             
+ #=============================#   
+ #####--ITEM-PAGADO--#####         
+ PILSEN-50LTS-barril               
+    1 X 450,000 =        450,000   
+ PILSEN-30LTS-barril               
+    1 X 250,000 =        250,000   
+                                   
+ #=============================#   
+ #####--ITEM-RESERVA--#####        
+                                   
+ MONTO RESERVA:                0   
+ #=============================#   
+ ESTADO ALQ: USO_RESERVA           
+ FORMA PAGO: CREDITO               
+ OBSERVACION: Alq Nro: 3           
+ TOTAL PAGO:                700,000
+ DELIVERY :                       0
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   
