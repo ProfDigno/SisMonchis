@@ -207,7 +207,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
             clie.setC7fecha_cumple(txtfecha_nacimiento.getText());
             clie.setC8tipo(tipo_cliente());
             clie.setC12escredito(jCescredito.isSelected());
-            clie.setC13saldo_credito(Double.parseDouble("-" + txtsaldo_credito.getText()));
+            clie.setC13saldo_credito(Double.parseDouble(txtsaldo_credito.getText()));
             clie.setC14fecha_inicio_credito(txtfec_inicio_credito.getText());
             clie.setC15dia_limite_credito(Integer.parseInt(txtdia_limite_credito.getText()));
             cBO.update_cliente(clie);
@@ -301,26 +301,19 @@ public class FrmCliente extends javax.swing.JInternalFrame {
 //        int Ancho[] = {10, 22, 56, 12};
 //        evejt.setAnchoColumnaJtable(tblventa, Ancho);
 //    }
-//    void sumar_monto_venta_cliente(int idcliente) {
-//        String titulo = "sumar_monto_venta_cliente";
-//        String sql = "select (sum(iv.cantidad*iv.precio_venta)) as monto\n"
-//                + "from venta v,item_venta iv\n"
-//                + "where v.fk_idcliente=" + idcliente
-//                + " and v.idventa=iv.fk_idventa\n"
-//                + " " + filtro_fecha()
-//                + " ";
-//        try {
-//            PreparedStatement pst = conn.prepareStatement(sql);
-//            ResultSet rs = pst.executeQuery();
-//            evemen.Imprimir_serial_sql(sql, titulo);
-//            if (rs.next()) {
-//                double monto = rs.getDouble("monto");
-//                jFsuma_monto.setValue(monto);
-//            }
-//        } catch (SQLException e) {
-//            evemen.Imprimir_serial_sql_error(e, sql, titulo);
-//        }
-//    }
+    void sumar_monto_credito_cliente() {
+        String titulo = "sumar_monto_credito_cliente";
+        String sql = "select sum(saldo_credito) as monto from cliente; ";
+        try {
+            ResultSet rs = eveconn.getResulsetSQL(conn, sql, titulo);
+            if (rs.next()) {
+                double monto = rs.getDouble("monto");
+                jFsaldo_credito_total.setValue(monto);
+            }
+        } catch (SQLException e) {
+            evemen.Imprimir_serial_sql_error(e, sql, titulo);
+        }
+    }
 //    private void seleccionar_tabla() {
 //        int idcliente = evejt.getInt_select_id(tblcliente_credito_resumen);
 //        clie.setC1idcliente_global(idcliente);
@@ -330,6 +323,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
 //    }
     private void actualizar_todo() {
         cdao.actualizar_tabla_cliente2(conn, tblcliente_credito_resumen);
+        sumar_monto_credito_cliente();
     }
 
     private void cargar_credito_cliente() {
@@ -433,6 +427,8 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         btnpagar_credito = new javax.swing.JButton();
         btnactualizar_tabla = new javax.swing.JButton();
         btncrearcredito_inicio = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jFsaldo_credito_total = new javax.swing.JFormattedTextField();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         panel_tabla_cliente1 = new javax.swing.JPanel();
@@ -1172,6 +1168,13 @@ public class FrmCliente extends javax.swing.JInternalFrame {
             }
         });
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel6.setText("SALDO CREDITO TOTAL:");
+
+        jFsaldo_credito_total.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0 Gs"))));
+        jFsaldo_credito_total.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFsaldo_credito_total.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -1184,17 +1187,23 @@ public class FrmCliente extends javax.swing.JInternalFrame {
                 .addComponent(btnactualizar_tabla, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btncrearcredito_inicio)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jFsaldo_credito_total)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(panel_tabla_cliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(btnpagar_credito, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                     .addComponent(btnactualizar_tabla, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btncrearcredito_inicio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btncrearcredito_inicio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel6)
+                    .addComponent(jFsaldo_credito_total, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
 
@@ -1212,7 +1221,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 15, Short.MAX_VALUE)))
+                    .addGap(0, 23, Short.MAX_VALUE)))
         );
 
         jTabbedPane1.addTab("TABLA CREDITO", jPanel1);
@@ -1560,6 +1569,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnpagar_credito;
     private javax.swing.ButtonGroup gru_tipo;
     private javax.swing.JCheckBox jCescredito;
+    private javax.swing.JFormattedTextField jFsaldo_credito_total;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -1581,6 +1591,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLayeredPane jLayeredPane1;

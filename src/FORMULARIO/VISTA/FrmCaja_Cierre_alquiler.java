@@ -55,6 +55,7 @@ public class FrmCaja_Cierre_alquiler extends javax.swing.JInternalFrame {
     PosImprimir_caja_cierre_alquiler poscc = new PosImprimir_caja_cierre_alquiler();
     ArrayList<Integer> array_caja_detalle_abierto = new ArrayList<Integer>();
     cla_color_pelete clacolor = new cla_color_pelete();
+    claNombreEstatico nom_sta=new claNombreEstatico();
     double caja_detalle_SALDO = 0;
     double caja_detalle_DIFERENCIA = 0;
     double caja_detalle_CIERRE;
@@ -68,14 +69,14 @@ public class FrmCaja_Cierre_alquiler extends javax.swing.JInternalFrame {
         this.setTitle("CAJA CIERRE ALQUILADO");
         connLocal = cpt.getConnPosgres();
         evetbl.centrar_formulario_internalframa(this);
-        caja_detalle_cantidad_total(caja.getTabla_origen_caja_abrir(), "monto_apertura_caja", txtcant_caja, jFabrir_caja);
-        caja_detalle_cantidad_total(caja.getTabla_origen_venta_alquiler() ,"monto_alquilado_efectivo", txtcant_venta_efectivo, jFtotal_venta_efectivo);
-        caja_detalle_cantidad_total(caja.getTabla_origen_venta_alquiler() ,"monto_alquilado_tarjeta", txtcant_venta_tarjeta, jFtotal_venta_tarjeta);
-        caja_detalle_cantidad_total(caja.getTabla_origen_venta_alquiler() ,"monto_alquilado_transferencia", txtcant_venta_transferencia, jFtotal_venta_transferencia);
-        caja_detalle_cantidad_total(caja.getTabla_origen_recibo() ,"monto_recibo_pago", txtcant_recibo_credito_cliente, jFtotal_recibo_credito_cliente);
-        caja_detalle_cantidad_total(caja.getTabla_origen_gasto(), "monto_gasto", txtcant_gasto, jFtotal_gasto);
-        caja_detalle_cantidad_total(caja.getTabla_origen_compra_contado(), "monto_compra_contado", txtcant_compra, jFtotal_compra);
-        caja_detalle_cantidad_total(caja.getTabla_origen_vale(), "monto_vale", txtcant_vale, jFtotal_vale);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_caja_abrir(), "monto_apertura_caja", txtcant_caja, jFabrir_caja);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_venta_alquiler() ,"monto_alquilado_efectivo", txtcant_venta_efectivo, jFtotal_venta_efectivo);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_venta_alquiler() ,"monto_alquilado_tarjeta", txtcant_venta_tarjeta, jFtotal_venta_tarjeta);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_venta_alquiler() ,"monto_alquilado_transferencia", txtcant_venta_transferencia, jFtotal_venta_transferencia);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_recibo() ,"monto_recibo_pago", txtcant_recibo_credito_cliente, jFtotal_recibo_credito_cliente);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_gasto(), "monto_gasto", txtcant_gasto, jFtotal_gasto);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_compra_contado(), "monto_compra_contado", txtcant_compra, jFtotal_compra);
+        caja_detalle_cantidad_total(nom_sta.getTabla_origen_vale(), "monto_vale", txtcant_vale, jFtotal_vale);
 //        caja_detalle_cantidad_total(caja.getTabla_origen_recibo(), "monto_recibo_pago", txtcant_recibo, jFtotal_recibo);
         caja_detalle_SALDO();
         color_formulario();
@@ -123,7 +124,7 @@ public class FrmCaja_Cierre_alquiler extends javax.swing.JInternalFrame {
     void cargar_datos_caja_detalle(double saldo_cierre) {
         cdao.limpiar_caja_detalle_alquilado(caja);
         caja.setC3descripcion("(VENTA-ALQUILER) CAJA CERRAR:");
-        caja.setC4tabla_origen(caja.getTabla_origen_caja_cerrar());
+        caja.setC4tabla_origen(nom_sta.getTabla_origen_caja_cerrar());
         caja.setC5estado(estado_EMITIDO);
         caja.setC17monto_cierre_caja(saldo_cierre);
         cdao.insertar_caja_detalle_alquilado(connLocal, caja);

@@ -3,17 +3,17 @@
  0974505297/0972511654             
  Avd Capitan del Puerto, Esq. Picui
  #=============================#   
- ALQ:4         CONDI:CREDITO       
- ALQUILADO: 2021-12-29 01:21       
- DEVOLUCION:2021-12-29 01:22       
- CLI: 6-Arnaldo Benitez            
- TEL: 0973676250                   
- DIR: Barrio San Jose	             
+ ALQ:29        CONDI:CREDITO       
+ ALQUILADO: 2022-01-06 12:00       
+ DEVOLUCION:2022-01-07 12:00       
+ CLI: 2-DIGNO ALFREDO TALAVERA     
+ TEL: 0986799285                   
+ DIR: Calle boqueron M43 L18 - Area
  #=============================#   
  #####--ITEM-PAGADO--#####         
- PILSEN-50LTS-barril               
-    1 X 450,000 =        450,000   
  PILSEN-30LTS-barril               
+    1 X 250,000 =        250,000   
+ MONCHIS-UNIDAD-MAQUINA 1          
     1 X 250,000 =        250,000   
                                    
  #=============================#   
@@ -21,11 +21,11 @@
                                    
  MONTO RESERVA:                0   
  #=============================#   
- ESTADO ALQ: USO_RESERVA           
+ ESTADO ALQ: EMITIDO               
  FORMA PAGO: CREDITO               
- OBSERVACION: Alq Nro: 3           
- TOTAL PAGO:                700,000
- DELIVERY :                       0
+ OBSERVACION: NINGUNA              
+ TOTAL PAGO:                500,000
+ DELIVERY :                  10,000
                                    
                                    
                                    

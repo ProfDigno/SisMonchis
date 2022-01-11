@@ -66,7 +66,7 @@ public class BO_venta_alquiler {
                     conn.setAutoCommit(false);
                 }
                 vealq_dao.update_venta_alquiler(conn, vealq);
-                vealq_dao.actualizar_tabla_venta_alquiler(conn, tbltabla);
+//                vealq_dao.actualizar_tabla_venta_alquiler(conn, tbltabla);
                 conn.commit();
             } catch (SQLException e) {
                 evmen.mensaje_error(e, vealq.toString(), titulo);

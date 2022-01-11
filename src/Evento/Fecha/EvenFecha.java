@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.sql.Date;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 /**
@@ -166,5 +167,58 @@ public class EvenFecha {
         java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
         return ts;
     }
-
+    public void cargar_combobox_directo(JComboBox combo){
+        String fechas[]={"HOY","AYER",
+            "ESTA SEMANA","SEMANA  ANTERIOR",
+            "ESTE MES","MES ANTERIOR",
+            "PRIMER TRIMESTRE","SEGUNDO TRIMESTRE","TERCER TRIMESTRE","CUARTO TRIMESTRE"};
+        for (int i = 0; i < fechas.length; i++) {
+            String fecha = fechas[i];
+            combo.addItem(fecha);
+        }
+    }
+    public String getFechaDirecto_combobox(JComboBox combo,String campofecha){
+        //date_part('year',(current_date - interval '1 year')) un ano menos
+        
+        String fecha="";
+        if(combo.getSelectedIndex()==0){//HOY
+            fecha="\n and date("+campofecha+")=date(current_date) ";
+        }
+        if(combo.getSelectedIndex()==1){//AYER
+            fecha="\n and date("+campofecha+")=date(current_date-1) ";
+        }
+        if(combo.getSelectedIndex()==2){//ESTA SEMANA
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('week',"+campofecha+")=date_part('week',current_date) ";
+        }
+        if(combo.getSelectedIndex()==3){//SEMANA  ANTERIOR
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('week',"+campofecha+")=date_part('week',(current_date - interval '1 week')) ";
+        }
+        if(combo.getSelectedIndex()==4){//ESTE MES
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('month',"+campofecha+")=date_part('month',current_date) ";
+        }
+        if(combo.getSelectedIndex()==5){//MES ANTERIOR
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('month',"+campofecha+")=date_part('month',(current_date - interval '1 month')) ";
+        }
+        if(combo.getSelectedIndex()==6){//PRIMER TRIMESTRE
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('quarter',"+campofecha+")=1 ";
+        }
+        if(combo.getSelectedIndex()==7){//SEGUNDO TRIMESTRE
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('quarter',"+campofecha+")=2 ";
+        }
+        if(combo.getSelectedIndex()==8){//TERCER TRIMESTRE
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('quarter',"+campofecha+")=3 ";
+        }
+        if(combo.getSelectedIndex()==9){//CUARTO TRIMESTRE
+            fecha="\n and date_part('year',"+campofecha+")=date_part('year',current_date)"
+                + "\n and date_part('quarter',"+campofecha+")=4 ";
+        }
+        return fecha;
+    }
 }

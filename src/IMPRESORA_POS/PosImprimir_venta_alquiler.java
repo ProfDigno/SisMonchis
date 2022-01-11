@@ -148,7 +148,8 @@ public class PosImprimir_venta_alquiler {
                 mensaje_impresora = mensaje_impresora + item;
             }
         }
-        mensaje_impresora = mensaje_impresora + "==========================================" + saltolinea;
+//        mensaje_impresora = mensaje_impresora + "==========================================" + saltolinea;
+        mensaje_impresora = mensaje_impresora + "========RESERVAS=======" + saltolinea;
         for (int i = 0; i < tk_iv_fila; i++) {
             if (iv1_cant_rese_int[i] > 0) {
                 mensaje_impresora = mensaje_impresora + iv4_descripcion[i] + saltolinea;

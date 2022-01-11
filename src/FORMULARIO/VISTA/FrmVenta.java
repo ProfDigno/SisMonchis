@@ -140,6 +140,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         reestableser_venta();
         cargar_boton_categoria();
         crear_item_producto();
+        
     }
 
     void color_formulario() {

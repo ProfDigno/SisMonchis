@@ -21,6 +21,7 @@ import FORMULARIO.DAO.DAO_caja_cierre_alquilado;
 import FORMULARIO.DAO.DAO_caja_detalle;
 import FORMULARIO.DAO.DAO_caja_detalle_alquilado;
 import FORMULARIO.ENTIDAD.caja_detalle_alquilado;
+import FORMULARIO.ENTIDAD.claNombreEstatico;
 import IMPRESORA_POS.PosImprimir_Compra;
 import IMPRESORA_POS.PosImprimir_Gasto;
 import IMPRESORA_POS.PosImprimir_Vale;
@@ -75,6 +76,7 @@ public class FrmCaja_abrir_cerrar_alquiler extends javax.swing.JInternalFrame {
 //    PosImprimir_Vale posval = new PosImprimir_Vale();
 //    PosImprimir_caja_cierre poscc = new PosImprimir_caja_cierre();
 //    PosImprimir_caja_cierre_vgrupo posccvg = new PosImprimir_caja_cierre_vgrupo();
+    claNombreEstatico nom_sta=new claNombreEstatico();
     ConnPostgres cpt = new ConnPostgres();
     cla_color_pelete clacolor = new cla_color_pelete();
     caja_detalle_alquilado caja = new caja_detalle_alquilado();
@@ -103,11 +105,11 @@ public class FrmCaja_abrir_cerrar_alquiler extends javax.swing.JInternalFrame {
         if (!evejt.getBoolean_validar_select(tblcaja_resumen)) {
             String fk_idcaja_cierre_alquilado = evejt.getString_select(tblcaja_resumen, 0);
             actualizar_caja_detalle_venta(fk_idcaja_cierre_alquilado, tabla_origen_ALQUILER,tblcaja_venta_efectivo, txtcantidad_venta_efectivo, jFtotal_alquiler_contado,jFtotal_alquiler_credito);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_vale(), "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_gasto(), "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_compra_contado(), "c.monto_compra_contado", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_compra_credito(), "c.monto_compra_credito", tblcaja_compra_credito, txtcantidad_compra_credito, jFtotal_compra_credito);
-            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, caja.getTabla_origen_recibo(), "c.monto_recibo_pago", tblcaja_recibo, txtcantidad_recibo, jFtotal_recibo);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, nom_sta.getTabla_origen_vale(), "c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, nom_sta.getTabla_origen_gasto(), "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, nom_sta.getTabla_origen_compra_contado(), "c.monto_compra_contado", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, nom_sta.getTabla_origen_compra_credito(), "c.monto_compra_credito", tblcaja_compra_credito, txtcantidad_compra_credito, jFtotal_compra_credito);
+            actualizar_caja_detalle_otros(fk_idcaja_cierre_alquilado, nom_sta.getTabla_origen_recibo(), "c.monto_recibo_pago", tblcaja_recibo, txtcantidad_recibo, jFtotal_recibo);
             caja_detalle_saldo(fk_idcaja_cierre_alquilado);
         }
     }

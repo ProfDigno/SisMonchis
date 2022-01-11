@@ -12,6 +12,7 @@ import Evento.Fecha.EvenFecha;
 import Evento.JTextField.EvenJTextField;
 import Evento.Jframe.EvenJFRAME;
 import Evento.Jtable.EvenJtable;
+import Evento.Mensaje.EvenMensajeJoptionpane;
 import Evento.Utilitario.EvenNumero_a_Letra;
 import FORMULARIO.BO.*;
 import FORMULARIO.DAO.*;
@@ -38,6 +39,7 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
     EvenConexion eveconn = new EvenConexion();
     cla_color_pelete clacolor = new cla_color_pelete();
     EvenFecha evefec = new EvenFecha();
+    EvenMensajeJoptionpane evemen=new EvenMensajeJoptionpane();
     private DAO_cliente cdao = new DAO_cliente();
     private cliente clie = new cliente();
     private credito_cliente ccli = new credito_cliente();
@@ -175,7 +177,10 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
                 if (clBO.getBoolean_insertar_cliente_con_recibo_pago(clie, ccli,ccli2, gcc, rpcli,sccli,cdalq)) {
                     reestableser();
                     rpcli_dao.actualizar_tabla_recibo_pago_cliente(conn, tblpro_categoria);
-//                    cdao.actualizar_tabla_cliente(conn, FrmCliente.tblpro_cliente);
+                    cdao.actualizar_tabla_cliente2(conn, FrmCliente.tblcliente_credito_resumen);
+                    if(evemen.MensajeGeneral_question("DESEA CERRAR EL RECIBO","RECIBO","CERRAR","CANCELAR")){
+                        this.dispose();
+                    }
                 }
             }
         }

@@ -39,11 +39,14 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
     cliente clie = new cliente();
     private int fk_idcliente_local;
     cla_color_pelete clacolor = new cla_color_pelete();
+    private boolean esfiltro_por_fecha;
     void abrir_formulario() {
         this.setTitle("REPORTE VENTA ALQUILER TODOS");
         evetbl.centrar_formulario_internalframa(this);
         color_formulario();
         reestableser();
+        evefec.cargar_combobox_directo(jCfiltro_direco);
+        esfiltro_por_fecha=true;
     }
     void color_formulario() {
         panel_reporte_venta.setBackground(clacolor.getColor_insertar_primario());
@@ -63,10 +66,18 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
             String filtro_formapago=auxvent.forma_pago_alquilado(jCpago_efectivo, jCpago_tarjeta, jCpago_transferencia, jCpago_credito, jCpago_combinado);
             String filtro_fecha = " and date(v.fecha_creado) >= '" + fecdesde + "' and date(v.fecha_creado) <= '" + fechasta + "' \n";
             String filtro_cliente = "";
+            
             if (fk_idcliente_local >= 0) {
                 filtro_cliente = " and v.fk_idcliente=" + fk_idcliente_local + "\n";
             }
+            String filtro_fecha_direc=evefec.getFechaDirecto_combobox(jCfiltro_direco, "v.fecha_creado");
+            if(esfiltro_por_fecha){
+                filtro_fecha_direc="";
+            }else{
+                filtro_fecha="";
+            }
             filtro = filtro + filtro_fecha;
+            filtro = filtro + filtro_fecha_direc;
             filtro = filtro + filtro_estado;
             filtro = filtro + filtro_formapago;
             filtro = filtro + filtro_cliente;
@@ -74,7 +85,7 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
         return filtro;
     }
 
-    void seleccionar_check() {
+    private void seleccionar_cargar_filtro() {
         double sumaventa_efectivo = vdao.getDouble_suma_venta(conn,"sumaventa_efectivo", filtro_venta_todos());
         jFtotal_venta_efectivo.setValue(sumaventa_efectivo);
         double sumaventa_tarjeta = vdao.getDouble_suma_venta(conn,"sumaventa_tarjeta", filtro_venta_todos());
@@ -100,16 +111,23 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
         txtfecha_hasta.setText(evefec.getString_formato_fecha());
         jCestado_emitido.setSelected(true);
         jCestado_finalizado.setSelected(true);
+        jCestado_alquilado.setSelected(true);
+        jCestado_devolucion.setSelected(true);  
+        jCestado_usoreserva.setSelected(true);        
         jCestado_anulado.setSelected(false);
+        jCpago_efectivo.setSelected(true);
+        jCpago_tarjeta.setSelected(true);
+        jCpago_transferencia.setSelected(true);
         txtbucarCliente_nombre.setText(null);
         fk_idcliente_local = -1;
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }
 
     void seleccionar_cargar_cliente() {
         fk_idcliente_local = eveconn.getInt_Solo_seleccionar_JLista(conn, jList_cliente, "cliente", clie.getCliente_concat(), "idcliente");
         cdao.cargar_cliente(conn, clie, fk_idcliente_local);
         txtbucarCliente_nombre.setText(clie.getC3nombre());
+        seleccionar_cargar_filtro();
     }
 
     public FrmRepVenta_alquiler() {
@@ -133,6 +151,8 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
         jLabel6 = new javax.swing.JLabel();
         txtfecha_hasta = new javax.swing.JTextField();
         btnbuscar_fecha = new javax.swing.JButton();
+        jCfiltro_direco = new javax.swing.JComboBox<>();
+        jLabel10 = new javax.swing.JLabel();
         panel_estado = new javax.swing.JPanel();
         jCestado_emitido = new javax.swing.JCheckBox();
         jCestado_finalizado = new javax.swing.JCheckBox();
@@ -199,33 +219,53 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
             }
         });
 
+        jCfiltro_direco.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCfiltro_direcoActionPerformed(evt);
+            }
+        });
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel10.setText("Filtro Directo:");
+
         javax.swing.GroupLayout panel_fechaLayout = new javax.swing.GroupLayout(panel_fecha);
         panel_fecha.setLayout(panel_fechaLayout);
         panel_fechaLayout.setHorizontalGroup(
             panel_fechaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_fechaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5)
+                .addGroup(panel_fechaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtfecha_desde, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtfecha_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnbuscar_fecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panel_fechaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_fechaLayout.createSequentialGroup()
+                        .addComponent(txtfecha_desde, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtfecha_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnbuscar_fecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panel_fechaLayout.createSequentialGroup()
+                        .addComponent(jCfiltro_direco, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         panel_fechaLayout.setVerticalGroup(
             panel_fechaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_fechaLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_fechaLayout.createSequentialGroup()
+                .addGroup(panel_fechaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCfiltro_direco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(panel_fechaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtfecha_desde, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
                     .addComponent(txtfecha_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnbuscar_fecha))
-                .addGap(0, 7, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         panel_estado.setBorder(javax.swing.BorderFactory.createTitledBorder("ESTADO VENTA"));
@@ -282,15 +322,15 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
                     .addGroup(panel_estadoLayout.createSequentialGroup()
                         .addComponent(jCestado_emitido)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCestado_finalizado)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jCestado_devolucion)
+                        .addComponent(jCestado_alquilado)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCestado_devolucion)
+                        .addGap(6, 6, 6)
                         .addComponent(jCestado_usoreserva)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jCestado_alquilado))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCestado_finalizado))
                     .addComponent(jCestado_anulado))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_estadoLayout.setVerticalGroup(
             panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -298,10 +338,10 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCestado_emitido)
-                    .addComponent(jCestado_finalizado)
-                    .addComponent(jCestado_devolucion)
                     .addComponent(jCestado_usoreserva)
-                    .addComponent(jCestado_alquilado))
+                    .addComponent(jCestado_alquilado)
+                    .addComponent(jCestado_devolucion)
+                    .addComponent(jCestado_finalizado))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCestado_anulado))
         );
@@ -436,14 +476,13 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
         panel_reporte_ventaLayout.setVerticalGroup(
             panel_reporte_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_reporte_ventaLayout.createSequentialGroup()
-                .addComponent(panel_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(3, 3, 3)
+                .addComponent(panel_fecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panel_estado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panel_formapago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(panel_cliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         btnimprimir.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -605,7 +644,7 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             seleccionar_cargar_cliente();
-            seleccionar_check();
+            seleccionar_cargar_filtro();
         }
     }//GEN-LAST:event_jList_clienteKeyPressed
 
@@ -624,17 +663,17 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
 
     private void jCestado_emitidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_emitidoActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCestado_emitidoActionPerformed
 
     private void jCestado_finalizadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_finalizadoActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCestado_finalizadoActionPerformed
 
     private void jCestado_anuladoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_anuladoActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCestado_anuladoActionPerformed
 
     private void btnresetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnresetActionPerformed
@@ -644,48 +683,55 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
 
     private void btnbuscar_fechaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnbuscar_fechaActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        esfiltro_por_fecha=true;
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_btnbuscar_fechaActionPerformed
 
     private void jCpago_efectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_efectivoActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCpago_efectivoActionPerformed
 
     private void jCpago_tarjetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_tarjetaActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCpago_tarjetaActionPerformed
 
     private void jCpago_combinadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_combinadoActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCpago_combinadoActionPerformed
 
     private void jCestado_devolucionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_devolucionActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCestado_devolucionActionPerformed
 
     private void jCestado_usoreservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_usoreservaActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCestado_usoreservaActionPerformed
 
     private void jCestado_alquiladoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_alquiladoActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCestado_alquiladoActionPerformed
 
     private void jCpago_transferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_transferenciaActionPerformed
         // TODO add your handling code here:
-        seleccionar_check();
+        seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCpago_transferenciaActionPerformed
 
     private void jCpago_creditoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCpago_creditoActionPerformed
         // TODO add your handling code here:
-         seleccionar_check();
+         seleccionar_cargar_filtro();
     }//GEN-LAST:event_jCpago_creditoActionPerformed
+
+    private void jCfiltro_direcoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCfiltro_direcoActionPerformed
+        // TODO add your handling code here:
+        esfiltro_por_fecha=false;
+        seleccionar_cargar_filtro();
+    }//GEN-LAST:event_jCfiltro_direcoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -698,6 +744,7 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox jCestado_emitido;
     private javax.swing.JCheckBox jCestado_finalizado;
     private javax.swing.JCheckBox jCestado_usoreserva;
+    private javax.swing.JComboBox<String> jCfiltro_direco;
     private javax.swing.JCheckBox jCpago_combinado;
     private javax.swing.JCheckBox jCpago_credito;
     private javax.swing.JCheckBox jCpago_efectivo;
@@ -710,6 +757,7 @@ public class FrmRepVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField jFtotal_venta_total;
     private javax.swing.JFormattedTextField jFtotal_venta_transferencia;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

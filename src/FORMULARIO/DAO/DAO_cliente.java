@@ -48,7 +48,7 @@ public class DAO_cliente {
             + "from cliente c,zona_delivery z "
             + "where c.fk_idzona_delivery=z.idzona_delivery "
             + "and c.idcliente=";
-  private String sql_select2 = "SELECT idcliente as idc,nombre,ruc,telefono,\n"
+  private String sql_select2 = "SELECT idcliente as idc,fecha_inicio,nombre,ruc,telefono,\n"
             + "direccion,"
             + "TRIM(to_char(saldo_credito,'999G999G999')) as saldo,\n"
             + "case \n"
@@ -256,7 +256,7 @@ public class DAO_cliente {
     }
 
     public void ancho_tabla_cliente2(JTable tbltabla) {
-        int Ancho[] = {10, 25, 25, 10, 20, 10, 10};
+        int Ancho[] = {10,10, 25, 10, 10, 25, 10, 10};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
     public void update_cliente_saldo_credito(Connection conn, cliente cli) {

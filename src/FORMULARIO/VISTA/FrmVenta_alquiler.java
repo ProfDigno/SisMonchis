@@ -179,6 +179,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         panel_tabla_item.setBackground(colorpanel);
         panel_referencia_venta.setBackground(colorpanel);
         panel_base_1.setBackground(colorpanel);
+        panel_estado.setBackground(colorpanel);
     }
 
     void crear_item_producto() {
@@ -720,13 +721,15 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     void reestableser_venta() {
         color_formulario(clacolor.getColor_insertar_primario());
         idventa_alquiler_ultimo = (eveconn.getInt_ultimoID_mas_uno(connLocal, ven_alq.getTb_venta_alquiler(), ven_alq.getId_idventa_alquiler()));
-        vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
+        vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa,"");
         txtidventa.setText(String.valueOf(idventa_alquiler_ultimo));
         txtbuscar_fecha.setText(evefec.getString_formato_fecha());
         jCestado_emitido.setSelected(true);
-        jCestado_terminado.setSelected(false);
+        jCestado_finalizado.setSelected(true);
+        jCestado_alquilado.setSelected(true);
+        jCestado_devolucion.setSelected(true);  
+        jCestado_usoreserva.setSelected(true);        
         jCestado_anulado.setSelected(false);
-        jCfecha_todos.setSelected(false);
         actualizar_venta(3);
         actualizar_tabla_producto(1);
         tipo_entrega = entrega_paqueta;
@@ -761,25 +764,23 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     void actualizar_venta(int tipo) {
         String filtro = "";
         String campo_filtro = "";
-        String filtro_estado = auxvent.filtro_estado(jCestado_emitido, jCestado_terminado, jCestado_anulado);
+//        String filtro_estado = auxvent.filtro_estado(jCestado_emitido, jCestado_terminado, jCestado_anulado);
+        String filtro_estado = auxvent.filtro_estado_alquiler(jCestado_emitido, jCestado_finalizado, jCestado_usoreserva, jCestado_alquilado, jCestado_devolucion, jCestado_anulado);
         campo_filtro = "(c.idcliente||'-'||c.nombre) as cliente";
         if (tipo == 1) {
             filtro = filtro_estado;
         }
         if (tipo == 2) {
             if (txtbuscar_idventa.getText().trim().length() > 0) {
-                filtro = " and v.idventa=" + txtbuscar_idventa.getText() + " ";
+                filtro = " and v.idventa_alquiler=" + txtbuscar_idventa.getText() + " ";
             }
         }
         if (tipo == 3) {
             if (txtbuscar_fecha.getText().trim().length() > 0) {
-                if (jCfecha_todos.isSelected()) {
-                    filtro = filtro_estado;
-                } else {
-                    filtro = " and date(v.fecha_emision)='" + txtbuscar_fecha.getText() + "' " + filtro_estado;
-                }
+                    filtro = " and date(v.fecha_retirado_real)='" + txtbuscar_fecha.getText() + "' " + filtro_estado;
             }
         }
+         vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa,filtro);
         lblcantidad_filtro.setText("CANT FILTRO: ( " + tblventa.getRowCount() + " )");
     }
 
@@ -1092,7 +1093,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             cdalq.setC5estado(estado_ANULADO);
             cdalq.setC20fk_idventa_alquiler(idventa_alquiler);
             if (vBO.getBoolean_update_venta_alquiler_anular(ven_alq, cdalq, cclie, clie)) {
-                vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
+                vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa,"");
             }
         }
     }
@@ -1106,7 +1107,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             cdalq.setC20fk_idventa_alquiler(idventa_alquiler);
             String lista_producto = ivdao.getString_cargar_item_venta_alquiler_cantidad_total(connLocal, idventa_alquiler);
             if (vBO.getBoolean_update_venta_alquiler_alquilado(lista_producto, ven_alq, cdalq)) {
-                vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
+                vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa,"");
             }
         }
     }
@@ -1117,7 +1118,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             String fecha_retirado_previsto = evejt.getString_select(tblventa,1)+ ":00.00";
             String fecha_devolusion_previsto = evefec.getString_formato_fecha_hora() + ":00.00";
             if (evefec.getTimestamp_fecha_cargado(fecha_retirado_previsto).equals(evefec.getTimestamp_fecha_cargado(fecha_devolusion_previsto))) {
-                JOptionPane.showMessageDialog(jPanel_fecha, "LA FECHA DE RETIRADO Y DEVOLUSION NO PUEDE SER IGUAL ");
+                JOptionPane.showMessageDialog(jPanel_fecha, "LA FECHA DE ALQUILADO Y DEVOLUSION NO PUEDE SER IGUAL ","ERROR DE FECHA",JOptionPane.ERROR_MESSAGE);
             } else {
                 ven_alq.setC18estado(estado_DEVOLUCION);
                 ven_alq.setC1idventa_alquiler(idventa_alquiler);
@@ -1125,7 +1126,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                 cdalq.setC20fk_idventa_alquiler(idventa_alquiler);
                 String lista_producto = ivdao.getString_cargar_item_venta_alquiler_cantidad_total(connLocal, idventa_alquiler);
                 if (vBO.getBoolean_update_venta_alquiler_Devolucion(lista_producto, ven_alq, cdalq)) {
-                    vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa);
+                    vdao.actualizar_tabla_venta_alquiler(connLocal, tblventa,"");
                 }
             }
         }
@@ -1345,16 +1346,18 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         txtbuscar_idventa = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         txtbuscar_fecha = new javax.swing.JTextField();
-        jCestado_emitido = new javax.swing.JCheckBox();
-        jCestado_terminado = new javax.swing.JCheckBox();
-        jCestado_anulado = new javax.swing.JCheckBox();
         lblcantidad_filtro = new javax.swing.JLabel();
-        jCfecha_todos = new javax.swing.JCheckBox();
-        btnpasar_venta_efectivo = new javax.swing.JButton();
-        btnpasar_venta_tarjeta = new javax.swing.JButton();
         btnestado_alquilado = new javax.swing.JButton();
         btnestado_devolucion = new javax.swing.JButton();
         btnestado_cobrar_reservado = new javax.swing.JButton();
+        panel_estado = new javax.swing.JPanel();
+        jCestado_emitido = new javax.swing.JCheckBox();
+        jCestado_finalizado = new javax.swing.JCheckBox();
+        jCestado_anulado = new javax.swing.JCheckBox();
+        jCestado_devolucion = new javax.swing.JCheckBox();
+        jCestado_usoreserva = new javax.swing.JCheckBox();
+        jCestado_alquilado = new javax.swing.JCheckBox();
+        btnalquiler_todos = new javax.swing.JButton();
         jPanel11 = new javax.swing.JPanel();
         panel_tabla_busca_cli = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
@@ -2386,17 +2389,11 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         panel_tabla_item.setLayout(panel_tabla_itemLayout);
         panel_tabla_itemLayout.setHorizontalGroup(
             panel_tabla_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_tabla_itemLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
         );
         panel_tabla_itemLayout.setVerticalGroup(
             panel_tabla_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_tabla_itemLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
         );
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -2422,56 +2419,9 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             }
         });
 
-        jCestado_emitido.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jCestado_emitido.setText("EMITIDO");
-        jCestado_emitido.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCestado_emitidoActionPerformed(evt);
-            }
-        });
-
-        jCestado_terminado.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jCestado_terminado.setText("TERMINADO");
-        jCestado_terminado.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCestado_terminadoActionPerformed(evt);
-            }
-        });
-
-        jCestado_anulado.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jCestado_anulado.setText("ANULADO");
-        jCestado_anulado.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCestado_anuladoActionPerformed(evt);
-            }
-        });
-
         lblcantidad_filtro.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         lblcantidad_filtro.setForeground(new java.awt.Color(0, 0, 204));
         lblcantidad_filtro.setText("jLabel12");
-
-        jCfecha_todos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jCfecha_todos.setText("FACHA TODOS");
-        jCfecha_todos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCfecha_todosActionPerformed(evt);
-            }
-        });
-
-        btnpasar_venta_efectivo.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        btnpasar_venta_efectivo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/venta/efectivo.png"))); // NOI18N
-        btnpasar_venta_efectivo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnpasar_venta_efectivoActionPerformed(evt);
-            }
-        });
-
-        btnpasar_venta_tarjeta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/venta/credito.png"))); // NOI18N
-        btnpasar_venta_tarjeta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnpasar_venta_tarjetaActionPerformed(evt);
-            }
-        });
 
         btnestado_alquilado.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnestado_alquilado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/venta/flecha-salir.png"))); // NOI18N
@@ -2503,6 +2453,92 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             }
         });
 
+        panel_estado.setBorder(javax.swing.BorderFactory.createTitledBorder("ESTADO VENTA"));
+
+        jCestado_emitido.setText("EMITIDO");
+        jCestado_emitido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCestado_emitidoActionPerformed(evt);
+            }
+        });
+
+        jCestado_finalizado.setText("FINALIZADO");
+        jCestado_finalizado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCestado_finalizadoActionPerformed(evt);
+            }
+        });
+
+        jCestado_anulado.setText("ANULADO");
+        jCestado_anulado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCestado_anuladoActionPerformed(evt);
+            }
+        });
+
+        jCestado_devolucion.setText("DEVOLUCION");
+        jCestado_devolucion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCestado_devolucionActionPerformed(evt);
+            }
+        });
+
+        jCestado_usoreserva.setText("USO_RESERVA");
+        jCestado_usoreserva.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCestado_usoreservaActionPerformed(evt);
+            }
+        });
+
+        jCestado_alquilado.setText("ALQUILADO");
+        jCestado_alquilado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCestado_alquiladoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_estadoLayout = new javax.swing.GroupLayout(panel_estado);
+        panel_estado.setLayout(panel_estadoLayout);
+        panel_estadoLayout.setHorizontalGroup(
+            panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_estadoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCestado_devolucion)
+                    .addComponent(jCestado_emitido)
+                    .addComponent(jCestado_finalizado))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCestado_anulado)
+                    .addComponent(jCestado_usoreserva)
+                    .addComponent(jCestado_alquilado))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panel_estadoLayout.setVerticalGroup(
+            panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_estadoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCestado_emitido)
+                    .addComponent(jCestado_alquilado))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCestado_devolucion)
+                    .addComponent(jCestado_usoreserva))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_estadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCestado_finalizado)
+                    .addComponent(jCestado_anulado))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        btnalquiler_todos.setText("TODOS");
+        btnalquiler_todos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnalquiler_todosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panel_referencia_ventaLayout = new javax.swing.GroupLayout(panel_referencia_venta);
         panel_referencia_venta.setLayout(panel_referencia_ventaLayout);
         panel_referencia_ventaLayout.setHorizontalGroup(
@@ -2513,82 +2549,68 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                     .addComponent(panel_tabla_venta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
                         .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_referencia_ventaLayout.createSequentialGroup()
                                 .addComponent(btnestado_anulado, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnimprimirNota, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnfacturar)
-                                .addGap(115, 115, 115)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
-                                        .addComponent(jLabel10)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtbuscar_idventa, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel11)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtbuscar_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lblcantidad_filtro))
-                                    .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
-                                        .addComponent(jCestado_emitido)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jCestado_terminado)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jCestado_anulado)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jCfecha_todos))))
+                                    .addComponent(jLabel10)
+                                    .addComponent(jLabel11))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtbuscar_fecha, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                                    .addComponent(txtbuscar_idventa))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblcantidad_filtro, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
                                 .addComponent(panel_tabla_item, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(btnpasar_venta_efectivo, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
-                                    .addComponent(btnpasar_venta_tarjeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(panel_estado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnalquiler_todos))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnestado_alquilado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnestado_cobrar_reservado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnestado_alquilado, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnestado_devolucion)
-                        .addContainerGap(140, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnestado_cobrar_reservado)
+                        .addContainerGap(79, Short.MAX_VALUE))))
         );
         panel_referencia_ventaLayout.setVerticalGroup(
             panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
                 .addComponent(panel_tabla_venta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnestado_anulado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnimprimirNota, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)
-                    .addComponent(btnfacturar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
-                        .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel10)
-                            .addComponent(txtbuscar_idventa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel11)
-                            .addComponent(txtbuscar_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblcantidad_filtro))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCestado_emitido)
-                            .addComponent(jCestado_terminado)
-                            .addComponent(jCestado_anulado)
-                            .addComponent(jCfecha_todos)))
-                    .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
-                        .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnestado_alquilado, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnestado_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnestado_cobrar_reservado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panel_tabla_item, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
-                        .addComponent(btnpasar_venta_efectivo, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnestado_anulado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnimprimirNota, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)
+                            .addComponent(btnfacturar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
+                                .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel10)
+                                    .addComponent(txtbuscar_idventa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblcantidad_filtro))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtbuscar_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel11)))
+                            .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnestado_alquilado, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnestado_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnpasar_venta_tarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(40, Short.MAX_VALUE))
+                        .addGroup(panel_referencia_ventaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(panel_tabla_item, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panel_referencia_ventaLayout.createSequentialGroup()
+                                .addComponent(panel_estado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnalquiler_todos))))
+                    .addComponent(btnestado_cobrar_reservado, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
 
         jTabbedPane_VENTA.addTab("FILTRO VENTA", panel_referencia_venta);
@@ -2877,21 +2899,6 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         boton_venta_alquiler_imprimir_ticket();
     }//GEN-LAST:event_btnimprimirNotaActionPerformed
 
-    private void jCestado_emitidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_emitidoActionPerformed
-        // TODO add your handling code here:
-        actualizar_venta(3);
-    }//GEN-LAST:event_jCestado_emitidoActionPerformed
-
-    private void jCestado_terminadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_terminadoActionPerformed
-        // TODO add your handling code here:
-        actualizar_venta(3);
-    }//GEN-LAST:event_jCestado_terminadoActionPerformed
-
-    private void jCestado_anuladoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_anuladoActionPerformed
-        // TODO add your handling code here:
-        actualizar_venta(3);
-    }//GEN-LAST:event_jCestado_anuladoActionPerformed
-
     private void txtbuscar_idventaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtbuscar_idventaKeyPressed
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -2911,11 +2918,6 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             actualizar_venta(3);
         }
     }//GEN-LAST:event_txtbuscar_fechaKeyPressed
-
-    private void jCfecha_todosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCfecha_todosActionPerformed
-        // TODO add your handling code here:
-        actualizar_venta(3);
-    }//GEN-LAST:event_jCfecha_todosActionPerformed
 
     private void btnnuevo_clienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnnuevo_clienteActionPerformed
         // TODO add your handling code here:
@@ -3091,16 +3093,6 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txtprecio_ventaKeyPressed
 
-    private void btnpasar_venta_efectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnpasar_venta_efectivoActionPerformed
-        // TODO add your handling code here:
-        boton_forma_pago_EFECTIVO();
-    }//GEN-LAST:event_btnpasar_venta_efectivoActionPerformed
-
-    private void btnpasar_venta_tarjetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnpasar_venta_tarjetaActionPerformed
-        // TODO add your handling code here:
-        boton_forma_pago_TARJETA();
-    }//GEN-LAST:event_btnpasar_venta_tarjetaActionPerformed
-
     private void btnconfirmar_venta_combinarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnconfirmar_venta_combinarActionPerformed
         // TODO add your handling code here:
         boton_venta_combinado();
@@ -3271,9 +3263,51 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         boton_pagar_reservado();
     }//GEN-LAST:event_btnestado_cobrar_reservadoActionPerformed
 
+    private void jCestado_emitidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_emitidoActionPerformed
+        // TODO add your handling code here:
+        actualizar_venta(1);
+//        seleccionar_cargar_filtro();
+    }//GEN-LAST:event_jCestado_emitidoActionPerformed
+
+    private void jCestado_finalizadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_finalizadoActionPerformed
+        // TODO add your handling code here:
+        actualizar_venta(1);
+//        seleccionar_cargar_filtro();
+    }//GEN-LAST:event_jCestado_finalizadoActionPerformed
+
+    private void jCestado_anuladoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_anuladoActionPerformed
+        // TODO add your handling code here:
+        actualizar_venta(1);
+//        seleccionar_cargar_filtro();
+    }//GEN-LAST:event_jCestado_anuladoActionPerformed
+
+    private void jCestado_devolucionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_devolucionActionPerformed
+        // TODO add your handling code here:
+        actualizar_venta(1);
+//        seleccionar_cargar_filtro();
+    }//GEN-LAST:event_jCestado_devolucionActionPerformed
+
+    private void jCestado_usoreservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_usoreservaActionPerformed
+        // TODO add your handling code here:
+        actualizar_venta(1);
+//        seleccionar_cargar_filtro();
+    }//GEN-LAST:event_jCestado_usoreservaActionPerformed
+
+    private void jCestado_alquiladoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCestado_alquiladoActionPerformed
+        // TODO add your handling code here:
+        actualizar_venta(1);
+//        seleccionar_cargar_filtro();
+    }//GEN-LAST:event_jCestado_alquiladoActionPerformed
+
+    private void btnalquiler_todosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnalquiler_todosActionPerformed
+        // TODO add your handling code here:
+        actualizar_venta(0);
+    }//GEN-LAST:event_btnalquiler_todosActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnagregar_cantidad;
+    private javax.swing.JButton btnalquiler_todos;
     private javax.swing.JButton btnbuscar_cliente;
     private javax.swing.JButton btnconfirmar_venta_combinar;
     private javax.swing.JButton btnconfirmar_venta_efectivo;
@@ -3289,18 +3323,18 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnlimpiar_cliente;
     private javax.swing.JButton btnnuevoCliente;
     private javax.swing.JButton btnnuevo_cliente;
-    private javax.swing.JButton btnpasar_venta_efectivo;
-    private javax.swing.JButton btnpasar_venta_tarjeta;
     private javax.swing.JButton btnseleccionarCerrar;
     private javax.swing.JComboBox<String> cmbentregador;
     private javax.swing.ButtonGroup gru_campo;
     private javax.swing.ButtonGroup gru_condi;
     private javax.swing.ButtonGroup gru_tipocli;
     private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBox jCestado_alquilado;
     private javax.swing.JCheckBox jCestado_anulado;
+    private javax.swing.JCheckBox jCestado_devolucion;
     private javax.swing.JCheckBox jCestado_emitido;
-    private javax.swing.JCheckBox jCestado_terminado;
-    private javax.swing.JCheckBox jCfecha_todos;
+    private javax.swing.JCheckBox jCestado_finalizado;
+    private javax.swing.JCheckBox jCestado_usoreserva;
     private javax.swing.JCheckBox jCfuncionario;
     private javax.swing.JCheckBox jCimprimir_ticket;
     private javax.swing.JCheckBox jCvuelto;
@@ -3362,6 +3396,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblcantidad_filtro;
     private javax.swing.JLabel lblidcliente;
     private javax.swing.JPanel panel_base_1;
+    private javax.swing.JPanel panel_estado;
     private javax.swing.JPanel panel_insertar_pri_item;
     private javax.swing.JPanel panel_insertar_pri_producto;
     private javax.swing.JPanel panel_referencia_categoria;

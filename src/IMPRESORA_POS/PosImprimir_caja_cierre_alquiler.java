@@ -10,6 +10,7 @@ import Config_JSON.json_config;
 import Config_JSON.json_imprimir_pos;
 import Evento.Mensaje.EvenMensajeJoptionpane;
 import FORMULARIO.ENTIDAD.caja_detalle_alquilado;
+import FORMULARIO.ENTIDAD.claNombreEstatico;
 import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
 import java.io.FileInputStream;
@@ -83,7 +84,7 @@ public class PosImprimir_caja_cierre_alquiler {
     private static String[] compra_proveedor = new String[200];
     private static String[] compra_nota = new String[200];
     private static String tk_eg_comp_credito = "0";
-    
+    claNombreEstatico nom_sta=new claNombreEstatico();
 
     private void cargar_datos_caja_cierre(Connection conn, int idcaja_cierre_alquilado) {
         String titulo = "cargar_datos_caja_cierre";
@@ -198,8 +199,8 @@ public class PosImprimir_caja_cierre_alquiler {
                 + " and icc.fk_idcaja_detalle_alquilado=cd.idcaja_detalle_alquilado\n"
                 + "and co.fk_idproveedor=pv.idproveedor\n"
                 + "and cd.fk_idcompra=co.idcompra\n"
-                + "and (cd.tabla_origen='" + caja.getTabla_origen_compra_contado() + "' "
-                + "or cd.tabla_origen='" + caja.getTabla_origen_compra_credito() + "') \n"
+                + "and (cd.tabla_origen='" + nom_sta.getTabla_origen_compra_contado() + "' "
+                + "or cd.tabla_origen='" + nom_sta.getTabla_origen_compra_credito() + "') \n"
                 + "and co.estado!='ANULADO' \n"
                 + "order by co.monto_compra desc;";
         try {

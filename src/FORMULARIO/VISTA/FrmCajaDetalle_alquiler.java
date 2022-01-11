@@ -19,6 +19,7 @@ import Evento.Mensaje.EvenMensajeJoptionpane;
 import FORMULARIO.DAO.DAO_caja_detalle;
 import FORMULARIO.DAO.DAO_caja_detalle_alquilado;
 import FORMULARIO.ENTIDAD.caja_detalle_alquilado;
+import FORMULARIO.ENTIDAD.claNombreEstatico;
 import IMPRESORA_POS.PosImprimir_Compra;
 import IMPRESORA_POS.PosImprimir_Gasto;
 import IMPRESORA_POS.PosImprimir_Vale;
@@ -68,6 +69,7 @@ public class FrmCajaDetalle_alquiler extends javax.swing.JInternalFrame {
 //    PosImprimir_Gasto posgas = new PosImprimir_Gasto();
 //    PosImprimir_Vale posval = new PosImprimir_Vale();
 //    PosImprimir_Compra poscomp = new PosImprimir_Compra();
+    claNombreEstatico nom_sta=new claNombreEstatico();
     ConnPostgres cpt = new ConnPostgres();
     cla_color_pelete clacolor = new cla_color_pelete();
     public static caja_detalle_alquilado caja = new caja_detalle_alquilado();
@@ -94,11 +96,11 @@ public class FrmCajaDetalle_alquiler extends javax.swing.JInternalFrame {
             actualizar_caja_detalle_venta(fecha_emision, tabla_origen_ALQUILER,"c.fk_idventa_alquiler",tblcaja_venta, txtcantidad_venta_efectivo, jFtotal_venta_contado);
 //            actualizar_caja_detalle_otros(fecha_emision, "VENTA_EFECTIVO", "c.monto_alquilado_efectivo", tblcaja_venta_efectivo,txtcantidad_venta_efectivo,jFtotal_venta_efectivo);
 //            actualizar_caja_detalle_otros(fecha_emision, "VENTA_TARJETA", "c.monto_alquilado_tarjeta", tblcaja_venta_tarjeta,txtcantidad_venta_tarjeta,jFtotal_venta_tarjeta);
-            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_vale(),"c.fk_idvale" ,"c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
-            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_gasto(),"c.fk_idgasto", "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
-            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_compra_contado(),"c.fk_idcompra", "c.monto_compra_contado", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
-            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_compra_credito(),"c.fk_idcompra", "c.monto_compra_credito", tblcaja_compra_credito, txtcantidad_compra_credito, jFtotal_compra_credito);
-            actualizar_caja_detalle_otros(fecha_emision, caja.getTabla_origen_recibo(),"c.fk_idrecibo_pago_cliente", "c.monto_recibo_pago", tblcaja_recibo, txtcantidad_recibo_comp, jFtotal_recibo_comp);
+            actualizar_caja_detalle_otros(fecha_emision, nom_sta.getTabla_origen_vale(),"c.fk_idvale" ,"c.monto_vale", tblcaja_vale, txtcantidad_vale, jFtotal_vale);
+            actualizar_caja_detalle_otros(fecha_emision, nom_sta.getTabla_origen_gasto(),"c.fk_idgasto", "c.monto_gasto", tblcaja_gasto, txtcantidad_gasto, jFtotal_gasto);
+            actualizar_caja_detalle_otros(fecha_emision, nom_sta.getTabla_origen_compra_contado(),"c.fk_idcompra", "c.monto_compra_contado", tblcaja_compra, txtcantidad_compra, jFtotal_compra);
+            actualizar_caja_detalle_otros(fecha_emision, nom_sta.getTabla_origen_compra_credito(),"c.fk_idcompra", "c.monto_compra_credito", tblcaja_compra_credito, txtcantidad_compra_credito, jFtotal_compra_credito);
+            actualizar_caja_detalle_otros(fecha_emision, nom_sta.getTabla_origen_recibo(),"c.fk_idrecibo_pago_cliente", "c.monto_recibo_pago", tblcaja_recibo, txtcantidad_recibo_comp, jFtotal_recibo_comp);
             caja_detalle_saldo(fecha_emision);
         }        
     }

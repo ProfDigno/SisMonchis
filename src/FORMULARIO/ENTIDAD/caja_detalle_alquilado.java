@@ -264,60 +264,6 @@ public class caja_detalle_alquilado {
     public String toString() {
         return "caja_detalle_alquilado(" + ",idcaja_detalle_alquilado=" + C1idcaja_detalle_alquilado + " ,fecha_emision=" + C2fecha_emision + " ,descripcion=" + C3descripcion + " ,tabla_origen=" + C4tabla_origen + " ,estado=" + C5estado + " ,cierre=" + C6cierre + " ,monto_alquilado_efectivo=" + C7monto_alquilado_efectivo + " ,monto_alquilado_tarjeta=" + C8monto_alquilado_tarjeta + " ,monto_alquilado_transferencia=" + C9monto_alquilado_transferencia + " ,monto_recibo_pago=" + C10monto_recibo_pago + " ,monto_delivery=" + C11monto_delivery + " ,monto_gasto=" + C12monto_gasto + " ,monto_vale=" + C13monto_vale + " ,monto_compra_contado=" + C14monto_compra_contado + " ,monto_compra_credito=" + C15monto_compra_credito + " ,monto_apertura_caja=" + C16monto_apertura_caja + " ,monto_cierre_caja=" + C17monto_cierre_caja + " ,fk_idgasto=" + C18fk_idgasto + " ,fk_idcompra=" + C19fk_idcompra + " ,fk_idventa_alquiler=" + C20fk_idventa_alquiler + " ,fk_idvale=" + C21fk_idvale + " ,fk_idrecibo_pago_cliente=" + C22fk_idrecibo_pago_cliente + " ,fk_idusuario=" + C23fk_idusuario + " )";
     }
-    private static String tabla_origen_venta_efectivo = "VENTA_EFECTIVO";
-    private static String tabla_origen_venta_tarjeta = "VENTA_TARJETA";
-    private static String tabla_origen_venta_combinado = "VENTA_COMBI";
-    private static String tabla_origen_compra_contado = "COMPRA_CONTADO";
-    private static String tabla_origen_compra_credito = "COMPRA_CREDITO";
-    private static String tabla_origen_vale = "VALE";
-    private static String tabla_origen_gasto = "GASTO";
-    private static String tabla_origen_recibo = "RECIBO";
-    private static String tabla_origen_caja_abrir = "CAJA_ABRIR";
-    private static String tabla_origen_caja_cerrar = "CAJA_CERRAR";
-    private static String tabla_origen_venta_alquiler = "ALQUILER";
 
-    public static String getTabla_origen_venta_alquiler() {
-        return tabla_origen_venta_alquiler;
-    }
-    
-    public static String getTabla_origen_venta_efectivo() {
-        return tabla_origen_venta_efectivo;
-    }
-
-    public static String getTabla_origen_venta_tarjeta() {
-        return tabla_origen_venta_tarjeta;
-    }
-
-    public static String getTabla_origen_venta_combinado() {
-        return tabla_origen_venta_combinado;
-    }
-
-    public static String getTabla_origen_compra_contado() {
-        return tabla_origen_compra_contado;
-    }
-
-    public static String getTabla_origen_compra_credito() {
-        return tabla_origen_compra_credito;
-    }
-
-    public static String getTabla_origen_vale() {
-        return tabla_origen_vale;
-    }
-
-    public static String getTabla_origen_gasto() {
-        return tabla_origen_gasto;
-    }
-
-    public static String getTabla_origen_recibo() {
-        return tabla_origen_recibo;
-    }
-
-    public static String getTabla_origen_caja_abrir() {
-        return tabla_origen_caja_abrir;
-    }
-
-    public static String getTabla_origen_caja_cerrar() {
-        return tabla_origen_caja_cerrar;
-    }
     
 }
