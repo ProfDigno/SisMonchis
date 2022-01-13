@@ -29,7 +29,7 @@ public class BO_venta_alquiler {
     private DAO_producto pro_dao = new DAO_producto();
     EvenMensajeJoptionpane evmen = new EvenMensajeJoptionpane();
 
-    public boolean getBoolean_insertar_venta_alquiler(venta_alquiler vealq, caja_detalle_alquilado cdalq, credito_cliente ccli, cliente clie, boolean escredito, JTable tbltabla) {
+    public boolean getBoolean_insertar_venta_alquiler(venta_alquiler vealq, caja_detalle_alquilado cdalq, credito_cliente ccli, cliente clie, boolean escredito,boolean espagoparcial, JTable tbltabla) {
         boolean insertado = false;
         String titulo = "getBoolean_insertar_venta_alquiler";
         Connection conn = ConnPostgres.getConnPosgres();
@@ -40,7 +40,7 @@ public class BO_venta_alquiler {
             vealq_dao.insertar_venta_alquiler(conn, vealq);
             ivealq_dao.insertar_item_venta_alquiler_de_tabla(conn, tbltabla, vealq);
             cdalq_dao.insertar_caja_detalle_alquilado(conn, cdalq);
-            if (escredito) {
+            if (escredito || espagoparcial) {
                 ccli_dao.insertar_credito_cliente(conn, ccli);
                 cli_dao.update_cliente_saldo_credito(conn, clie);
             }

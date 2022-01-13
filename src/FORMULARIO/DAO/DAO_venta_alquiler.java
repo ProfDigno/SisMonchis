@@ -21,7 +21,11 @@ public class DAO_venta_alquiler {
     EvenFecha evefec = new EvenFecha();
     private String mensaje_insert = "VENTA_ALQUILER GUARDADO CORRECTAMENTE";
     private String mensaje_update = "VENTA_ALQUILER MODIFICADO CORECTAMENTE";
-    private String sql_insert = "INSERT INTO venta_alquiler(idventa_alquiler,fecha_creado,fecha_retirado_previsto,fecha_retirado_real,fecha_devolusion_previsto,fecha_devolusion_real,monto_total,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_delivery,forma_pago,condicion,alquiler_retirado,alquiler_devolusion,direccion_alquiler,observacion,estado,fk_idcliente,fk_identregador,monto_alquilado_credito) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+    private String sql_insert = "INSERT INTO venta_alquiler(idventa_alquiler,fecha_creado,"
+            + "fecha_retirado_previsto,fecha_retirado_real,fecha_devolusion_previsto,fecha_devolusion_real,"
+            + "monto_total,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_delivery,"
+            + "forma_pago,condicion,alquiler_retirado,alquiler_devolusion,direccion_alquiler,observacion,estado,"
+            + "fk_idcliente,fk_identregador,monto_alquilado_credito,monto_alquilado_reservado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     private String sql_update = "UPDATE venta_alquiler SET fecha_creado=?,fecha_retirado_previsto=?,fecha_retirado_real=?,fecha_devolusion_previsto=?,fecha_devolusion_real=?,monto_total=?,monto_alquilado_efectivo=?,monto_alquilado_tarjeta=?,monto_alquilado_transferencia=?,monto_delivery=?,forma_pago=?,condicion=?,alquiler_retirado=?,alquiler_devolusion=?,direccion_alquiler=?,observacion=?,estado=?,fk_idcliente=?,fk_identregador=? WHERE idventa_alquiler=?;";
     private String sql_cargar = "SELECT idventa_alquiler,fecha_creado,fecha_retirado_previsto,fecha_retirado_real,fecha_devolusion_previsto,fecha_devolusion_real,"
             + "monto_total,monto_alquilado_efectivo,monto_alquilado_tarjeta,monto_alquilado_transferencia,monto_delivery,"
@@ -66,12 +70,7 @@ public class DAO_venta_alquiler {
             pst.setInt(19, vealq.getC19fk_idcliente());
             pst.setInt(20, vealq.getC20fk_identregador());
             pst.setDouble(21, vealq.getC21monto_alquilado_credito());
-//            pst.setString(22, vealq.getC22fecha_retirado());
-//            pst.setString(23, vealq.getC23hora_retirado());
-//            pst.setString(24, vealq.getC24min_retirado());
-//            pst.setString(25, vealq.getC25fecha_devolusion());
-//            pst.setString(26, vealq.getC26hora_devolusion());
-//            pst.setString(27, vealq.getC27min_devolusion());
+            pst.setDouble(22, vealq.getC28monto_alquilado_reservado());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + vealq.toString(), titulo);
@@ -222,23 +221,25 @@ public class DAO_venta_alquiler {
         }
     }
 
-    public void actualizar_tabla_venta_alquiler(Connection conn, JTable tbltabla,String filtro) {
+    public void actualizar_tabla_venta_alquiler(Connection conn, JTable tbltabla, String filtro) {
         String sql_select = "select v.idventa_alquiler as idva,"
-            + "TRIM(to_char(v.fecha_retirado_real,'yyyy-MM-dd HH24:MI')) as retirado,"
-            + "TRIM(to_char(v.fecha_devolusion_real,'yyyy-MM-dd HH24:MI')) as devolusion,\n"
-            + "cl.idcliente as idc,cl.nombre,v.direccion_alquiler as direccion, \n"
-            + "TRIM(to_char((v.monto_alquilado_efectivo+v.monto_alquilado_tarjeta+v.monto_alquilado_transferencia+v.monto_alquilado_credito),'999G999G999')) as monto_total,\n"
-            + "TRIM(to_char((v.monto_total-(v.monto_alquilado_efectivo+v.monto_alquilado_tarjeta+v.monto_alquilado_transferencia+v.monto_alquilado_credito)),'999G999G999')) as reservado,\n"
-            + "v.forma_pago,v.condicion,v.estado\n"
-            + "from venta_alquiler v,cliente cl\n"
-            + "where v.fk_idcliente=cl.idcliente\n"+filtro
-            + " order by 1 desc";
+                + "TRIM(to_char(v.fecha_retirado_real,'yyyy-MM-dd HH24:MI')) as retirado,"
+                + "TRIM(to_char(v.fecha_devolusion_real,'yyyy-MM-dd HH24:MI')) as devolusion,\n"
+                + "cl.idcliente as idc,cl.nombre,v.direccion_alquiler as direccion, \n"
+                + "TRIM(to_char((v.monto_total),'999G999G999')) as mon_total,\n"
+                + "TRIM(to_char((v.monto_alquilado_reservado),'999G999G999')) as reservado,\n"
+                + "v.forma_pago,v.condicion,v.estado,\n"
+                + "TRIM(to_char((v.monto_alquilado_efectivo+v.monto_alquilado_tarjeta+v.monto_alquilado_transferencia),'999G999G999')) as mon_pago,\n"
+                + "TRIM(to_char((v.monto_alquilado_credito),'999G999G999')) as mon_credi\n"
+                + "from venta_alquiler v,cliente cl\n"
+                + "where v.fk_idcliente=cl.idcliente\n" + filtro
+                + " order by 1 desc";
         eveconn.Select_cargar_jtable(conn, sql_select, tbltabla);
         ancho_tabla_venta_alquiler(tbltabla);
     }
 
     public void ancho_tabla_venta_alquiler(JTable tbltabla) {
-        int Ancho[] = {6, 10, 10, 2, 17, 17, 7, 7, 9, 7, 9};
+        int Ancho[] = {4, 10, 10, 2, 13, 13, 6, 6, 8, 8, 9, 6, 6};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 

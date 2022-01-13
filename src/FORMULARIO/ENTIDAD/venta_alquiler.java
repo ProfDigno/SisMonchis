@@ -2,6 +2,20 @@
 public class venta_alquiler {
 
     /**
+     * @return the C28monto_alquilado_reservado
+     */
+    public double getC28monto_alquilado_reservado() {
+        return C28monto_alquilado_reservado;
+    }
+
+    /**
+     * @param C28monto_alquilado_reservado the C28monto_alquilado_reservado to set
+     */
+    public void setC28monto_alquilado_reservado(double C28monto_alquilado_reservado) {
+        this.C28monto_alquilado_reservado = C28monto_alquilado_reservado;
+    }
+
+    /**
      * @return the C22fecha_retirado
      */
     public String getC22fecha_retirado() {
@@ -170,6 +184,7 @@ private String C24min_retirado;
 private String C25fecha_devolusion;
 private String C26hora_devolusion;
 private String C27min_devolusion;
+private double C28monto_alquilado_reservado;
 private static String nom_tabla;
 private static String nom_idtabla;
 private static String compotexte;

@@ -30,7 +30,7 @@ public class DAO_credito_cliente {
             + "TRIM(to_char(cc.monto_credito,'999G999G999')) as credito,\n"
             + "TRIM(to_char(cc.monto_contado,'999G999G999')) as contado\n"
             + " from credito_cliente cc\n"
-            + " where  cc.fk_idgrupo_credito_cliente=";
+            + " where  cc.estado!='ANULADO' and cc.fk_idgrupo_credito_cliente=";
         private String sql_anular = "UPDATE credito_cliente SET estado=? WHERE fk_idventa_alquiler=?;";
  
     public void insertar_credito_cliente(Connection conn, credito_cliente crcl) {
