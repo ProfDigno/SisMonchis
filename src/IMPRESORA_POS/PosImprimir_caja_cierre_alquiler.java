@@ -108,6 +108,7 @@ public class PosImprimir_caja_cierre_alquiler {
                 + "from caja_cierre_alquilado cc,item_caja_cierre_alquilado icc,caja_detalle_alquilado cd\n"
                 + "where cc.idcaja_cierre_alquilado=icc.fk_idcaja_cierre_alquilado\n"
                 + "and cd.idcaja_detalle_alquilado=icc.fk_idcaja_detalle_alquilado\n"
+                + "and cd.estado!='ANULADO' \n"
                 + "and cc.idcaja_cierre_alquilado=" + idcaja_cierre_alquilado
                 + "group by 1,2,3\n";
         try {
@@ -312,7 +313,7 @@ private static String getString_completar_caracter(String campo) {
                 jsprint.getLinea_ven_top_1() + jsprint.getCant_top_venta() + jsprint.getLinea_ven_top_2());
         for (int i = 0; i < tk_iv_fila_top; i++) {
             printer.printTextWrap(25 + tempfila, 25, jsprint.getSep_inicio(), totalColumna, iv1_cantidad_top[i] + " X");
-            printer.printTextWrap(25 + tempfila, 25, jsprint.getSep_item_precio(), jsprint.getTt_text_descrip(), getString_completar_caracter(iv2_nombre_top[i]));
+            printer.printTextWrap(25 + tempfila, 25, jsprint.getSep_item_precio(), jsprint.getTt_text_descrip(), iv2_nombre_top[i]);
             tempfila = tempfila + 1;
         }
         printer.printTextWrap(26 + tempfila, 26, jsprint.getSep_inicio(), totalColumna, "-----COMPRA-PROVEEDOR----");

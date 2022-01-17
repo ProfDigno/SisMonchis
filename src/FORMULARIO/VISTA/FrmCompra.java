@@ -84,6 +84,8 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private credito_finanza cfina = new credito_finanza();
     private grupo_credito_finanza gcc = new grupo_credito_finanza();
     private financista fina = new financista();
+    private DAO_caja_detalle_alquilado cdalq_dao = new DAO_caja_detalle_alquilado();
+    private caja_detalle_alquilado cdalq = new caja_detalle_alquilado();
     Connection conn = ConnPostgres.getConnPosgres();
     private DefaultTableModel model_itemf = new DefaultTableModel();
     private cla_color_pelete clacolor = new cla_color_pelete();
@@ -93,7 +95,10 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private double monto_compra;
     private String prod_tabla = "producto p,producto_unidad u,producto_marca pm ";
     private String prod_mostrar = "(pm.nombre||'-'||u.nombre||'-'||p.nombre) as producto";
-    private String prod_buscar = "p.fk_idproducto_marca=pm.idproducto_marca \n"
+    private String prod_buscar_todos = " p.fk_idproducto_marca=pm.idproducto_marca \n"
+            + "and p.fk_idproducto_unidad=u.idproducto_unidad \n"
+            + "and concat(pm.nombre||'-'||u.nombre||'-'||p.nombre)";
+    private String prod_buscar_alquiler = " p.alquilado=true and p.fk_idproducto_marca=pm.idproducto_marca \n"
             + "and p.fk_idproducto_unidad=u.idproducto_unidad \n"
             + "and concat(pm.nombre||'-'||u.nombre||'-'||p.nombre)";
     private int idproducto = -1;
@@ -117,6 +122,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     private double monto_compra_credito;
     private String condicion;
     private int fk_idfinancista;
+    private String forma_pago = "SIN FORMA";
 
     private void abrir_formulario() {
         String servidor = "";
@@ -198,7 +204,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
     }
 
     private void seleccionar_buscar_producto() {
-        idproducto = eveconn.getInt_Solo_seleccionar_JLista(conn, jList_producto, prod_tabla, prod_buscar, "idproducto");
+        idproducto = eveconn.getInt_Solo_seleccionar_JLista(conn, jList_producto, prod_tabla, prod_buscar_todos, "idproducto");
         ipdao.cargar_producto_por_idproducto(conn, prod, idproducto);
         txtprod_codbarra.setText(prod.getC2cod_barra());
         txtprod_buscar_nombre.setText(prod.getC20_marca() + "-" + prod.getC18_unidad() + "-" + prod.getC3nombre());
@@ -356,9 +362,11 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         String condicion = "";
         if (jRcond_contado.isSelected()) {
             condicion = condicion_CONTADO;
+            forma_pago = condicion_CONTADO;
         }
         if (jRcond_credito.isSelected()) {
             condicion = condicion_CREDITO;
+            forma_pago = condicion_CREDITO;
         }
         fk_idfinancista = cmb.getInt_seleccionar_COMBOBOX(conn, jCfinancista, "idfinancista", "nombre", "financista");
         compi.setC10condicion(condicion);
@@ -383,6 +391,17 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         caja.setC16fk_idusuario(usu.getGlobal_idusuario());
         caja.setC17monto_recibo_pago(0);
         caja.setC18monto_compra_credito(monto_compra_credito);
+    }
+
+    void cargar_dato_caja_alquilado() {
+        cdalq_dao.limpiar_caja_detalle_alquilado(cdalq);
+        cdalq.setC3descripcion("(COMPRA-ALQUILER) id:" + idcompra_ultimo + " Pro:" + txtprovee_nombre.getText());
+        cdalq.setC4tabla_origen(tabla_origen);
+        cdalq.setC5estado(est_EMITIDO);
+        cdalq.setC19fk_idcompra(idcompra_ultimo);
+        cdalq.setC14monto_compra_contado(monto_compra_contado);
+        cdalq.setC15monto_compra_credito(monto_compra_credito);
+        cdalq.setC25forma_pago(forma_pago);
     }
 
     private String getDescripcion_item_venta() {
@@ -417,8 +436,12 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                 tabla_origen = caja.getTabla_origen_compra_contado();
                 sumar_item_compra();
                 cargar_datos_compra();
-                cargar_datos_caja();
-                if (ciBO.getBoolean_compra1(tblitem_producto, compi, caja)) {
+                if (jCalquiler.isSelected()) {
+                    cargar_dato_caja_alquilado();
+                } else {
+                    cargar_datos_caja();
+                }
+                if (ciBO.getBoolean_compra1(tblitem_producto, compi, caja,cdalq,jCalquiler.isSelected())) {
                     poscomp.boton_imprimir_pos_compra(conn, idcompra_ultimo);
                     reestableser_compra();
                 }
@@ -430,9 +453,13 @@ public class FrmCompra extends javax.swing.JInternalFrame {
                 tabla_origen = caja.getTabla_origen_compra_credito();
                 cargar_datos_compra();
                 cargar_credito_finanza();
-                cargar_datos_caja();
+                if (jCalquiler.isSelected()) {
+                    cargar_dato_caja_alquilado();
+                } else {
+                    cargar_datos_caja();
+                }
                 fina.setC1idfinancista(fk_idfinancista);
-                if (ciBO.getBoolean_insertar_compra_credito(conn, tblitem_producto, item, compi, cfina, fina, caja)) {
+                if (ciBO.getBoolean_insertar_compra_credito(conn, tblitem_producto, item, compi, cfina, fina, caja,cdalq,jCalquiler.isSelected())) {
                     poscomp.boton_imprimir_pos_compra(conn, idcompra_ultimo);
                     reestableser_compra();
                 }
@@ -477,7 +504,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         }
     }
 
-    private void anular_compra(int idcompra_insumo, int idfinancista) {
+    private void anular_compra(int idcompra_insumo, int idfinancista,boolean esalquiler) {
         compi.setC1idcompra(idcompra_insumo);
         compi.setC3estado(est_ANULADO);
         caja.setC15estado(est_ANULADO);
@@ -488,7 +515,9 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         cfina.setC6monto_credito(0);
         cfina.setC11fk_idcompra(idcompra_insumo);
         fina.setC1idfinancista(idfinancista);
-        ciBO.update_anular_compra(conn, compi, caja, cfina, fina);
+        cdalq.setC5estado(est_ANULADO);
+        cdalq.setC19fk_idcompra(idcompra_insumo);
+        ciBO.update_anular_compra(conn, compi, caja, cfina, fina,cdalq,esalquiler);
         cidao.actualizar_tabla_compra(conn, tblcompra);
     }
 
@@ -498,7 +527,15 @@ public class FrmCompra extends javax.swing.JInternalFrame {
             if (evemen.MensajeGeneral_warning("ESTAS SEGURO DE ANULAR ESTA COMPRA", "ANULAR", "ACEPTAR", "CANCELAR")) {
                 int idcompra = evejt.getInt_select_id(tblcompra);
                 int idfinancista = evejt.getInt_select(tblcompra, 7);
-                anular_compra(idcompra, idfinancista);
+                String alquiler = evejt.getString_select(tblcompra, 10);
+                boolean esalquiler=false;
+                if(alquiler.equals("SI")){
+                    esalquiler=true;
+                }
+                if(alquiler.equals("NO")){
+                    esalquiler=false;
+                }
+                anular_compra(idcompra, idfinancista,esalquiler);
             }
         }
     }
@@ -613,7 +650,7 @@ public class FrmCompra extends javax.swing.JInternalFrame {
         if (jCalquiler.isSelected()) {
             jCalquiler.setForeground(Color.RED);
             color_formulario(clacolor.getColor_shopp());
-            
+
         } else {
             jCalquiler.setForeground(Color.BLACK);
             color_formulario(clacolor.getColor_insertar_primario());
@@ -1469,9 +1506,15 @@ public class FrmCompra extends javax.swing.JInternalFrame {
 
     private void txtprod_buscar_nombreKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtprod_buscar_nombreKeyReleased
         // TODO add your handling code here:
+        String pro_buscar = "";
+        if (jCalquiler.isSelected()) {
+            pro_buscar = prod_buscar_alquiler;
+        } else {
+            pro_buscar = prod_buscar_todos;
+        }
         eveconn.buscar_cargar_Jlista(conn, txtprod_buscar_nombre, jList_producto,
                 prod_tabla,
-                prod_buscar,
+                pro_buscar,
                 prod_mostrar, 10);
     }//GEN-LAST:event_txtprod_buscar_nombreKeyReleased
 

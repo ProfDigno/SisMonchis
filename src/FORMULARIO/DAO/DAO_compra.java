@@ -27,7 +27,7 @@ public class DAO_compra {
     private String sql_select = "select c.idcompra as idc,to_char(c.fecha_emision,'dd-MM-yyyy HH24:MI') as fecha, \n"
             + "p.nombre as provee,p.ruc,c.estado,c.condicion,\n"
             + "TRIM(to_char(c.monto_compra,'999G999G999')) as monto,f.idfinancista as idf,f.nombre as financista,\n"
-            + "gcf.estado as est_credito\n"
+            + "gcf.estado as est_credito,case when c.alquilado=true then 'SI' when c.alquilado=false then 'NO' else 'error' end as alquiler \n"
             + "from compra c\n"
             + "inner join proveedor p on c.fk_idproveedor=p.idproveedor \n"
             + "inner join financista f on c.fk_idfinancista=f.idfinancista\n"
@@ -123,7 +123,7 @@ public class DAO_compra {
     }
 
     public void ancho_tabla_compra(JTable tbltabla) {
-        int Ancho[] = {5,8, 20, 9, 6, 6, 7, 2, 12,8};
+        int Ancho[] = {5,8,17,8, 6, 6, 7, 2, 10,8,6};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 

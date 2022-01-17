@@ -1,33 +1,32 @@
                                    
  ======MONCHI'S SHOP BEER======    
-          CODIGO:116               
- INICIO:       2021-08-11 01:38    
- FIN:          2021-08-11 01:51    
+          CODIGO:246               
+ INICIO:       2022-01-17 02:38    
+ FIN:          2022-01-17 03:34    
  #=============================#   
- CAJA ABRIR:             10,000    
- VENTA EFECTIVO:         66,680    
- VENTA TARJETA:          35,000    
+ CAJA ABRIR:             50,000    
+ VENTA EFECTIVO:         166,700   
+ VENTA TARJETA:          0         
  ------Detalle Venta-----------    
                                    
  DELIVERY:               0         
  #=============================#   
  TOTAL GASTO:            0         
  TOTAL VALE:             0         
- TOTAL COMPRA:           0         
- TOTAL RECIBO:           33,942    
+ TOTAL COMPRA:           51,260    
+ TOTAL RECIBO:           0         
  #=============================#   
- SISTEMA:                77,738    
- CIERRE:                 78,000    
- DIFERENCIA:             (262)     
+ SISTEMA:                165,440   
+ CIERRE:                 170,000   
+ DIFERENCIA:             (4,560)   
  #=============================#   
- TOTAL COMP-CREDITO:     33,942    
+ TOTAL COMP-CREDITO:     0         
  ------TOP 20 Mas Vendido-----     
- 20 X   HEINEKEN-Bote 1Lts-alcohol 
- 7 X    Skol-Bote 275ml-Abre facil 
+ 50 X   HEINEKEN-Bote 1Lts-alcohol 
                                    
  -----COMPRA-PROVEEDOR----         
- (CREDITO)Distribuidora del Paraguay S.A
- Nota:(362)              33,942    
+ (CONTADO)Comercial Arnaldo        
+ Nota:(2342)             51,260    
                                    
                                    
                                    

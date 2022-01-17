@@ -28,7 +28,7 @@ public class BO_venta_alquiler {
     private DAO_cliente cli_dao = new DAO_cliente();
     private DAO_producto pro_dao = new DAO_producto();
     EvenMensajeJoptionpane evmen = new EvenMensajeJoptionpane();
-
+ private String campoid="fk_idventa_alquiler"; 
     public boolean getBoolean_insertar_venta_alquiler1(venta_alquiler vealq, caja_detalle_alquilado cdalq, credito_cliente ccli, cliente clie, boolean escredito,boolean espagoparcial, JTable tbltabla) {
         boolean insertado = false;
         String titulo = "getBoolean_insertar_venta_alquiler";
@@ -91,7 +91,8 @@ public class BO_venta_alquiler {
                 vealq_dao.update_venta_alquiler_anular(conn, vealq);
                 ccli_dao.update_credito_cliente_anular(conn, ccli);
                 cli_dao.update_cliente_saldo_credito(conn, clie);
-                cdalq_dao.update_caja_detalle_alquilado_estado_venta_alquiler(conn, cdalq);
+                int datocampoid=cdalq.getC20fk_idventa_alquiler();
+                cdalq_dao.update_caja_detalle_alquilado_estado_todos(conn, cdalq,datocampoid,campoid);
                 conn.commit();
                 anulado = true;
             } catch (SQLException e) {
@@ -117,7 +118,8 @@ public class BO_venta_alquiler {
                 }
                 vealq_dao.update_venta_alquiler_alquilado(conn, vealq);
                 pro_dao.update_producto_stock_Alquilado(conn, vealq);
-                cdalq_dao.update_caja_detalle_alquilado_estado_venta_alquiler(conn, cdalq);
+                int datocampoid=cdalq.getC20fk_idventa_alquiler();
+                cdalq_dao.update_caja_detalle_alquilado_estado_todos(conn, cdalq,datocampoid,campoid);
                 conn.commit();
                 retirar = true;
             } catch (SQLException e) {
@@ -143,7 +145,8 @@ public class BO_venta_alquiler {
                 }
                 vealq_dao.update_venta_alquiler_Devolucion(conn, vealq);
                 pro_dao.update_producto_stock_Devolucion(conn, vealq);
-                cdalq_dao.update_caja_detalle_alquilado_estado_venta_alquiler(conn, cdalq);
+                int datocampoid=cdalq.getC20fk_idventa_alquiler();
+                cdalq_dao.update_caja_detalle_alquilado_estado_todos(conn, cdalq,datocampoid,campoid);
                 conn.commit();
                 devolusion = true;
             } catch (SQLException e) {
@@ -168,7 +171,8 @@ public class BO_venta_alquiler {
                     conn.setAutoCommit(false);
                 }
                 vealq_dao.update_venta_alquiler_Finalizar(conn, vealq);
-                cdalq_dao.update_caja_detalle_alquilado_estado_venta_alquiler(conn, cdalq);
+                int datocampoid=cdalq.getC20fk_idventa_alquiler();
+                cdalq_dao.update_caja_detalle_alquilado_estado_todos(conn, cdalq,datocampoid,campoid);
                 conn.commit();
                 finalizar = true;
             } catch (SQLException e) {

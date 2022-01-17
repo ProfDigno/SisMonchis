@@ -200,19 +200,20 @@ public class DAO_caja_detalle_alquilado {
         int Ancho[] = {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
-    public void update_caja_detalle_alquilado_estado_venta_alquiler(Connection conn, caja_detalle_alquilado cdalq) {
-        String titulo = "update_caja_detalle_alquilado_estado_venta_alquiler";
+    public void update_caja_detalle_alquilado_estado_todos(Connection conn, caja_detalle_alquilado cdalq,int datocampoid,String campoid) {
+        String sql_estado = "UPDATE caja_detalle_alquilado SET estado=? WHERE "+campoid+"=?;";
+        String titulo = "update_caja_detalle_alquilado_estado_todos";
         PreparedStatement pst = null;
         try {
-            pst = conn.prepareStatement(sql_estado_venta_alquiler);
+            pst = conn.prepareStatement(sql_estado);
             pst.setString(1, cdalq.getC5estado());
-            pst.setInt(2, cdalq.getC20fk_idventa_alquiler());
+            pst.setInt(2, datocampoid);
             pst.execute();
             pst.close();
-            evemen.Imprimir_serial_sql(sql_estado_venta_alquiler + "\n" + cdalq.toString(), titulo);
+            evemen.Imprimir_serial_sql(sql_estado + "\n" + cdalq.toString(), titulo);
             evemen.modificado_correcto(mensaje_update, false);
         } catch (Exception e) {
-            evemen.mensaje_error(e, sql_estado_venta_alquiler + "\n" + cdalq.toString(), titulo);
+            evemen.mensaje_error(e, sql_estado + "\n" + cdalq.toString(), titulo);
         }
     }
     public void update_caja_detalle_CERRARTODO(Connection conn){

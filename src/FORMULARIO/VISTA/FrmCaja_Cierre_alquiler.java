@@ -243,7 +243,7 @@ public class FrmCaja_Cierre_alquiler extends javax.swing.JInternalFrame {
             }
             cjcie.setC1idcaja_cierre_alquilado(idcaja_cierre);
             cjcie.setC4estado(estado_CERRADO);
-            cjcie_dao.update_caja_cierre_alquilado(connLocal, cjcie);
+            cjcie_dao.update_caja_cierre_alquilado_CERRAR(connLocal, cjcie);
             cdao.update_caja_detalle_CERRARTODO(connLocal);
             connLocal.commit();
         } catch (SQLException e) {

@@ -27,6 +27,7 @@ import IMPRESORA_POS.PosImprimir_Gasto;
 import IMPRESORA_POS.PosImprimir_Vale;
 import IMPRESORA_POS.PosImprimir_Venta;
 import IMPRESORA_POS.PosImprimir_caja_cierre;
+import IMPRESORA_POS.PosImprimir_caja_cierre_alquiler;
 import IMPRESORA_POS.PosImprimir_caja_cierre_vgrupo;
 import IMPRESORA_POS.PosImprimir_venta_alquiler;
 import br.com.adilson.util.Extenso;
@@ -71,6 +72,7 @@ public class FrmCaja_abrir_cerrar_alquiler extends javax.swing.JInternalFrame {
     DAO_caja_detalle_alquilado cdao = new DAO_caja_detalle_alquilado();
     DAO_caja_cierre_alquilado ccdao = new DAO_caja_cierre_alquilado();
     PosImprimir_venta_alquiler posven = new PosImprimir_venta_alquiler();
+    PosImprimir_caja_cierre_alquiler poscc = new PosImprimir_caja_cierre_alquiler();
 //    PosImprimir_Compra poscomp = new PosImprimir_Compra();
 //    PosImprimir_Gasto posgas = new PosImprimir_Gasto();
 //    PosImprimir_Vale posval = new PosImprimir_Vale();
@@ -1041,7 +1043,7 @@ public class FrmCaja_abrir_cerrar_alquiler extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         if (!evejt.getBoolean_validar_select(tblcaja_resumen)) {
             int idcaja_cierre = evejt.getInt_select_id(tblcaja_resumen);
-//            poscc.boton_imprimir_pos_caja_cierre(conn, idcaja_cierre);
+             poscc.boton_imprimir_pos_caja_cierre(conn, idcaja_cierre);
         }
     }//GEN-LAST:event_btnimprimir_ccierreActionPerformed
 

@@ -1,19 +1,17 @@
                                    
  ======COMPRA======                
- IDCOM:197     FEC:2021-08-08 16:33
+ IDCOM:417     FEC:2022-01-17 01:59
  USU: DIGNO                        
- PROV: VINOTECA DON JORGE          
+ PROV: CERVEPAR                    
                                    
  #=============================#   
- 19-HEINEKEN-Bote 650ml-Holandesa Premium
-    3.00 X               23,100    
- 18-HEINEKEN-Bote 250ml-Pony       
-    3.00 X               11,550    
+ 580-PILSEN-30lts-BARRIL           
+    3.00 X            600,000      
                                    
  #=============================#   
                                    
  OBSERVACION: Ninguna              
- TOTAL :                 34,650    
+ TOTAL :                 600,000   
                                    
                                    
                                    
