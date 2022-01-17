@@ -139,7 +139,13 @@ public class EvenFecha {
         Sfecha = String.valueOf(sdf.format(date));
         return Sfecha;
     }
-
+    public String getString_formato_fecha_hora_zona() {
+        String Sfecha;
+        java.util.Date date = new java.util.Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(formato_fechaHoraZona);
+        Sfecha = String.valueOf(sdf.format(date));
+        return Sfecha;
+    }
     public java.util.Date getDate_sistema() {
         java.util.Date fechaDate;
         try {

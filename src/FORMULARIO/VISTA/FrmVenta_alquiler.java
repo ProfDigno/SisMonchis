@@ -857,6 +857,8 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             btnconfirmar_venta_transferencia.setVisible(false);
             btnconfirmar_venta_combinar.setVisible(false);
             ocultar_pago_parcial(false);
+            lblvence_credito.setVisible(true);
+            txtfec_vence_credito.setVisible(true);
         }
         if (jRcond_pagoparcial.isSelected()) {
             btnconfirmar_venta_efectivo.setText(forma_pago_EFECTIVO);
@@ -935,6 +937,8 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             cclie.setC9fk_idsaldo_credito_cliente(0);
             cclie.setC10fk_idrecibo_pago_cliente(0);
             cclie.setC11fk_idventa_alquiler(idventa_alquiler_ultimo);
+            cclie.setC12vence(true);
+            cclie.setC13fecha_vence(txtfec_vence_credito.getText()+" 12:00:00.00");
             clie.setC1idcliente(fk_idcliente_local);
         }
     }
@@ -1094,7 +1098,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                 JDpago_combinado combi = new JDpago_combinado(null, true);
                 combi.setVisible(true);
             }
-            if (vBO.getBoolean_insertar_venta_alquiler(ven_alq, cdalq, cclie, clie, escredito,espagoparcial, tblitem_producto)) {
+            if (vBO.getBoolean_insertar_venta_alquiler1(ven_alq, cdalq, cclie, clie, escredito,espagoparcial, tblitem_producto)) {
                 if (hab_venta_combinado) {
                     if (jCimprimir_ticket.isSelected()) {
                         posv.boton_imprimir_pos_VENTA(connLocal, idventa_alquiler_ultimo);
@@ -2065,12 +2069,13 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panel_insertar_pri_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtmonto_pago_parcial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblpago_parcial)
+                .addGroup(panel_insertar_pri_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_insertar_pri_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblvence_credito)
-                        .addComponent(txtfec_vence_credito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtfec_vence_credito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panel_insertar_pri_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtmonto_pago_parcial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblpago_parcial)))
                 .addGap(5, 5, 5)
                 .addGroup(panel_insertar_pri_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(cmbentregador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)

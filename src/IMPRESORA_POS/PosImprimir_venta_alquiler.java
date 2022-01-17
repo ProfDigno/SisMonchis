@@ -40,6 +40,7 @@ public class PosImprimir_venta_alquiler {
     private static String v4_telefono = "0";
     private static String v5_direccion = "0";
     private static String v6_monto_pago = "0";
+    private static String v6_monto_credi ="0";
      private static String v6_monto_rese = "0";
     private static String v6_delivery = "0";
     private static String v7_observacion = "0";
@@ -63,6 +64,7 @@ public class PosImprimir_venta_alquiler {
     private static String v2_forma_pago;
     private static String v2_condicion;
     
+    
    
     
 
@@ -75,9 +77,9 @@ public class PosImprimir_venta_alquiler {
                 + "(c.idcliente||'-'||c.nombre) as cliente,\n"
                 + "c.telefono,v.direccion_alquiler as direccion,\n"
                 + "TRIM(to_char((v.monto_alquilado_efectivo+v.monto_alquilado_tarjeta+\n"
-                + "v.monto_alquilado_transferencia+v.monto_alquilado_credito),'999G999G999')) as monto_pago,\n"
-                + "TRIM(to_char((v.monto_total-(v.monto_alquilado_efectivo+v.monto_alquilado_tarjeta+\n"
-                + "v.monto_alquilado_transferencia+v.monto_alquilado_credito)),'999G999G999')) as monto_rese,\n"
+                + "v.monto_alquilado_transferencia),'999G999G999')) as monto_pago,\n"
+                + "TRIM(to_char((v.monto_alquilado_credito),'999G999G999')) as monto_credi,\n"
+                + "TRIM(to_char(((v.monto_alquilado_reservado)),'999G999G999')) as monto_rese,\n"
                 + "TRIM(to_char(v.monto_delivery,'999G999G999')) as delivery,\n"
                 + "v.observacion,iv.cantidad_pagado as cant_pago,iv.descripcion,\n"
                 + "TRIM(to_char(iv.precio_venta,'999G999G999')) as precio,"
@@ -105,6 +107,7 @@ public class PosImprimir_venta_alquiler {
                 v4_telefono = rs.getString("telefono");
                 v5_direccion = rs.getString("direccion");
                 v6_monto_pago = rs.getString("monto_pago");
+                v6_monto_credi = rs.getString("monto_credi");
                 v6_monto_rese = rs.getString("monto_rese");
                 v6_delivery = rs.getString("delivery");
                 v7_observacion = rs.getString("observacion");
@@ -162,6 +165,7 @@ public class PosImprimir_venta_alquiler {
         mensaje_impresora = mensaje_impresora + "FORMA PAGO: " + v2_forma_pago + saltolinea;
         mensaje_impresora = mensaje_impresora + "OBSERVACION: " + v7_observacion + saltolinea;
         mensaje_impresora = mensaje_impresora + "MONTO PAGO :" + tabular + tabular + v6_monto_pago + saltolinea;
+        mensaje_impresora = mensaje_impresora + "MONTO CRED :" + tabular + tabular + v6_monto_credi + saltolinea;
         mensaje_impresora = mensaje_impresora + "DELIVERY :" + tabular + tabular + v6_delivery + saltolinea;
         return mensaje_impresora;
     }
@@ -236,8 +240,10 @@ public class PosImprimir_venta_alquiler {
         printer.printTextWrap(21 + tempfila, 21, jsprint.getSep_inicio(), totalColumna, "OBSERVACION: " + v7_observacion);
         printer.printTextWrap(22 + tempfila, 22, jsprint.getSep_inicio(), totalColumna, "TOTAL PAGO:");
         printer.printTextWrap(22 + tempfila, 22, jsprint.getSep_total_gral(), totalColumna, getString_completar_caracter(v6_monto_pago));
-        printer.printTextWrap(23 + tempfila, 23, jsprint.getSep_inicio(), totalColumna, "DELIVERY :");
-        printer.printTextWrap(23 + tempfila, 23, jsprint.getSep_total_gral(), totalColumna, getString_completar_caracter(v6_delivery));
+        printer.printTextWrap(23 + tempfila, 23, jsprint.getSep_inicio(), totalColumna, "TOTAL CREDI:");
+        printer.printTextWrap(23 + tempfila, 23, jsprint.getSep_total_gral(), totalColumna, getString_completar_caracter(v6_monto_credi));
+        printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_inicio(), totalColumna, "DELIVERY :");
+        printer.printTextWrap(24 + tempfila, 24, jsprint.getSep_total_gral(), totalColumna, getString_completar_caracter(v6_delivery));
         printer.toFile(tk_ruta_archivo);
         try {
             inputStream = new FileInputStream(tk_ruta_archivo);

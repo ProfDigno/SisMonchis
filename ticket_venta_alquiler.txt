@@ -3,33 +3,30 @@
  0974505297/0972511654             
  Avd Capitan del Puerto, Esq. Picui
  #=============================#   
- ALQ:29        CONDI:CREDITO       
- ALQUILADO: 2022-01-06 12:00       
- DEVOLUCION:2022-01-07 12:00       
- CLI: 2-DIGNO ALFREDO TALAVERA     
- TEL: 0986799285                   
- DIR: Calle boqueron M43 L18 - Area
+ ALQ:36        CONDI:PAGO-PARCIAL  
+ ALQUILADO: 2022-01-13 10:38       
+ DEVOLUCION:2022-01-14 12:00       
+ CLI: 4-Edulfo Torres              
+ TEL: 0994283506                   
+ DIR: Area 3                       
  #=============================#   
  #####--ITEM-PAGADO--#####         
- PILSEN-30LTS-barril               
-    1 X 250,000 =        250,000   
- MONCHIS-UNIDAD-MAQUINA 1          
+ PILSEN-30lts-BARRIL               
     1 X 250,000 =        250,000   
                                    
  #=============================#   
  #####--ITEM-RESERVA--#####        
+ PILSEN-30lts-BARRIL               
+    1 X 250,000 =        250,000   
                                    
- MONTO RESERVA:                0   
+ MONTO RESERVA:          250,000   
  #=============================#   
- ESTADO ALQ: EMITIDO               
- FORMA PAGO: CREDITO               
+ ESTADO ALQ: ALQUILADO             
+ FORMA PAGO: EFECTIVO              
  OBSERVACION: NINGUNA              
- TOTAL PAGO:                500,000
+ TOTAL PAGO:                150,000
+ TOTAL CREDI:            error     
  DELIVERY :                  10,000
-                                   
-                                   
-                                   
-                                   
                                    
                                    
                                    

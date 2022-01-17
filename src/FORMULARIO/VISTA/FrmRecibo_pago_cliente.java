@@ -34,20 +34,23 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
     private BO_recibo_pago_cliente rpcli_bo = new BO_recibo_pago_cliente();
     private DAO_recibo_pago_cliente rpcli_dao = new DAO_recibo_pago_cliente();
     private BO_cliente clBO = new BO_cliente();
+    private grupo_credito_cliente gcfina = new grupo_credito_cliente();
+    private DAO_grupo_credito_cliente gcfina_dao = new DAO_grupo_credito_cliente();
+    private DAO_credito_cliente cfina_dao = new DAO_credito_cliente();
     EvenJTextField evejtf = new EvenJTextField();
     Connection conn = ConnPostgres.getConnPosgres();
     EvenConexion eveconn = new EvenConexion();
     cla_color_pelete clacolor = new cla_color_pelete();
     EvenFecha evefec = new EvenFecha();
-    EvenMensajeJoptionpane evemen=new EvenMensajeJoptionpane();
+    EvenMensajeJoptionpane evemen = new EvenMensajeJoptionpane();
     private DAO_cliente cdao = new DAO_cliente();
     private cliente clie = new cliente();
     private credito_cliente ccli = new credito_cliente();
     private credito_cliente ccli2 = new credito_cliente();
     private DAO_grupo_credito_cliente gccDAO = new DAO_grupo_credito_cliente();
     private grupo_credito_cliente gcc = new grupo_credito_cliente();
-     private saldo_credito_cliente sccli = new saldo_credito_cliente();
-    private  caja_detalle caja = new caja_detalle();
+    private saldo_credito_cliente sccli = new saldo_credito_cliente();
+    private caja_detalle caja = new caja_detalle();
     caja_detalle_alquilado cdalq = new caja_detalle_alquilado();
     private DAO_caja_detalle_alquilado cdalq_dao = new DAO_caja_detalle_alquilado();
     private usuario usu = new usuario();
@@ -56,7 +59,7 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
     private int fk_idcliente;
     private String estado_EMITIDO = "EMITIDO";
     private String estado_ABIERTO = "ABIERTO";
-    private String forma_pago_EFECTIVO="EFECTIVO";
+    private String forma_pago_EFECTIVO = "EFECTIVO";
     private double monto_recibo_pago;
     private double monto_saldo_credito;
     private String monto_letra;
@@ -68,12 +71,12 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
     private void abrir_formulario() {
         this.setTitle("RECIBO PAGO CLIENTE");
         evetbl.centrar_formulario_internalframa(this);
-        fk_idusuario=usu.getGlobal_idusuario();
+        fk_idusuario = usu.getGlobal_idusuario();
         cargar_cliente();
         reestableser();
         rpcli_dao.actualizar_tabla_recibo_pago_cliente(conn, tblpro_categoria);
         color_formulario();
-        
+
     }
 
     private void color_formulario() {
@@ -88,10 +91,10 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
         if (evejtf.getBoo_JTextField_vacio(txtrec_monto_recibo_pago, "DEBE CARGAR UN MONTO")) {
             return false;
         }
-        if(monto_recibo_pago > (Math.abs(clie.getC13saldo_credito()))){
-            JOptionPane.showMessageDialog(null, "EL MONTO EXEDE EL MONTO MAXIMO DE PAGO","ERROR",JOptionPane.ERROR_MESSAGE);
+        if (monto_recibo_pago > (Math.abs(clie.getC13saldo_credito()))) {
+            JOptionPane.showMessageDialog(null, "EL MONTO EXEDE EL MONTO MAXIMO DE PAGO", "ERROR", JOptionPane.ERROR_MESSAGE);
             monto_recibo_pago = Math.abs(clie.getC13saldo_credito());
-            txtrec_monto_recibo_pago.setText(String.valueOf((int)monto_recibo_pago));
+            txtrec_monto_recibo_pago.setText(String.valueOf((int) monto_recibo_pago));
             cargar_monto();
             return false;
         }
@@ -104,12 +107,12 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
             monto_recibo_pago = Double.parseDouble(monto_recibo);
             monto_letra = nroletra.Convertir(monto_recibo, true);
             txtrec_monto_letra.setText(monto_letra);
-            Lmonto_saldo_credito = clie.getC13saldo_credito() + monto_recibo_pago ;
+            Lmonto_saldo_credito = clie.getC13saldo_credito() + monto_recibo_pago;
             jFnuevo_saldo.setValue(Lmonto_saldo_credito);
             monto_saldo_credito = Math.abs(Lmonto_saldo_credito);
-            if(Lmonto_saldo_credito >= 0){
+            if (Lmonto_saldo_credito >= 0) {
                 jFnuevo_saldo.setBackground(Color.yellow);
-            }else{
+            } else {
                 jFnuevo_saldo.setBackground(Color.white);
             }
         }
@@ -136,7 +139,10 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
         ccli.setC11fk_idventa_alquiler(0);
         ccli.setC10fk_idrecibo_pago_cliente(idrecibo_pago_cliente);
         ccli.setC9fk_idsaldo_credito_cliente(0);
+        ccli.setC12vence(false);
+        ccli.setC13fecha_vence(evefec.getString_formato_fecha_hora_zona());
     }
+
     private void cargar_credito_cliente_saldo() {
         ccli2.setC3descripcion("SALDO DEL CIERRE ANTERIOR");
         ccli2.setC4estado(estado_EMITIDO);
@@ -145,11 +151,14 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
         ccli2.setC7tabla_origen(tabla_origen);
         ccli2.setC11fk_idventa_alquiler(0);
         ccli2.setC10fk_idrecibo_pago_cliente(0);
+        ccli2.setC12vence(false);
+        ccli2.setC13fecha_vence(evefec.getString_formato_fecha_hora_zona());
     }
+
     private void cargar_saldo_credito_cliente() {
         sccli.setC3descripcion("SALDO DEL CIERRE ANTERIOR");
         sccli.setC4monto_saldo_credito(monto_saldo_credito);
-        String Smonto_saldo_credito=String.valueOf(monto_saldo_credito);
+        String Smonto_saldo_credito = String.valueOf(monto_saldo_credito);
         sccli.setC5monto_letra(nroletra.Convertir(Smonto_saldo_credito, true));
         sccli.setC6estado(estado_EMITIDO);
         sccli.setC7fk_idcliente(fk_idcliente);
@@ -158,13 +167,14 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
 
     void cargar_dato_caja_alquilado() {
         cdalq_dao.limpiar_caja_detalle_alquilado(cdalq);
-        cdalq.setC3descripcion("(RECIBO CLIENTE) ID:" +idrecibo_pago_cliente + " DESCRIP:"+ txtrec_descripcion.getText());
+        cdalq.setC3descripcion("(RECIBO CLIENTE) ID:" + idrecibo_pago_cliente + " DESCRIP:" + txtrec_descripcion.getText());
         cdalq.setC4tabla_origen(tabla_origen);
         cdalq.setC5estado(estado_EMITIDO);
         cdalq.setC10monto_recibo_pago(monto_recibo_pago);
         cdalq.setC22fk_idrecibo_pago_cliente(idrecibo_pago_cliente);
         cdalq.setC25forma_pago(forma_pago_EFECTIVO);
     }
+
     private void boton_guardar() {
         if (hab_guardar) {
             if (validar_guardar()) {
@@ -174,11 +184,14 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
                 cargar_credito_cliente_saldo();
                 cargar_dato_caja_alquilado();
                 clie.setC1idcliente(fk_idcliente);
-                if (clBO.getBoolean_insertar_cliente_con_recibo_pago(clie, ccli,ccli2, gcc, rpcli,sccli,cdalq)) {
+                if (clBO.getBoolean_insertar_cliente_con_recibo_pago1(clie, ccli, ccli2, gcc, rpcli, sccli, cdalq)) {
                     reestableser();
                     rpcli_dao.actualizar_tabla_recibo_pago_cliente(conn, tblpro_categoria);
                     cdao.actualizar_tabla_cliente2(conn, FrmCliente.tblcliente_credito_resumen);
-                    if(evemen.MensajeGeneral_question("DESEA CERRAR EL RECIBO","RECIBO","CERRAR","CANCELAR")){
+                    gcfina_dao.actualizar_tabla_grupo_credito_cliente_idc(conn, FrmCliente.tblgrupo_credito_cliente, fk_idcliente);
+                    gcfina_dao.cargar_grupo_credito_cliente_id(conn, gcfina, fk_idcliente);
+                    cfina_dao.actualizar_tabla_credito_cliente_por_grupo(conn, FrmCliente.tblcredito_cliente, gcfina.getC1idgrupo_credito_cliente());
+                    if (evemen.MensajeGeneral_question("DESEA CERRAR EL RECIBO", "RECIBO", "CERRAR", "CANCELAR")) {
                         this.dispose();
                     }
                 }
@@ -207,7 +220,7 @@ public class FrmRecibo_pago_cliente extends javax.swing.JInternalFrame {
     private void reestableser() {
         txtid.setText(null);
         txtrec_fecha_emision.setText(evefec.getString_formato_fecha_hora());
-        txtrec_descripcion.setText("RECIBO DE PAGO PARA: "+clie.getC3nombre());
+        txtrec_descripcion.setText("RECIBO DE PAGO PARA: " + clie.getC3nombre());
         txtrec_monto_recibo_pago.setText(null);
         txtrec_monto_letra.setText(null);
         btnguardar.setEnabled(true);

@@ -25,8 +25,8 @@ public class DAO_grupo_credito_cliente {
     private String sql_select = "SELECT idgrupo_credito_cliente,fecha_inicio,fecha_fin,estado,fk_idcliente FROM grupo_credito_cliente order by 1 desc;";
     private String sql_cargar = "SELECT idgrupo_credito_cliente,fecha_inicio,fecha_fin,estado,fk_idcliente FROM grupo_credito_cliente WHERE idgrupo_credito_cliente=";
     private String sql_select_idc = "select gcc.idgrupo_credito_cliente as idgcc,\n"
-            + "to_char(gcc.fecha_inicio,'yyyy-MM-dd') as inicio,\n"
-            + "to_char(gcc.fecha_fin,'yyyy-MM-dd') as fin,\n"
+            + "to_char(gcc.fecha_inicio,'yyyy-MM-dd HH24:MI') as inicio,\n"
+            + "to_char(gcc.fecha_fin,'yyyy-MM-dd HH24:MI') as fin,\n"
             + "gcc.estado,cl.nombre,\n"
             + "(select TRIM(to_char(coalesce(sum(cc.monto_contado),0),'999G999G999')) \n"
             + "from credito_cliente cc \n"

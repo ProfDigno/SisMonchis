@@ -20,12 +20,15 @@ public class DAO_credito_cliente {
     EvenFecha evefec = new EvenFecha();
     private String mensaje_insert = "CREDITO_CLIENTE GUARDADO CORRECTAMENTE";
     private String mensaje_update = "CREDITO_CLIENTE MODIFICADO CORECTAMENTE";
-    private String sql_insert = "INSERT INTO credito_cliente(idcredito_cliente,fecha_emision,descripcion,estado,monto_contado,monto_credito,tabla_origen,fk_idgrupo_credito_cliente,fk_idsaldo_credito_cliente,fk_idrecibo_pago_cliente,fk_idventa_alquiler) VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+    private String sql_insert = "INSERT INTO credito_cliente(idcredito_cliente,fecha_emision,descripcion,estado,"
+            + "monto_contado,monto_credito,tabla_origen,fk_idgrupo_credito_cliente,"
+            + "fk_idsaldo_credito_cliente,fk_idrecibo_pago_cliente,fk_idventa_alquiler,vence,fecha_vence) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);";
     private String sql_update = "UPDATE credito_cliente SET fecha_emision=?,descripcion=?,estado=?,monto_contado=?,monto_credito=?,tabla_origen=?,fk_idgrupo_credito_cliente=?,fk_idsaldo_credito_cliente=?,fk_idrecibo_pago_cliente=?,fk_idventa_alquiler=? WHERE idcredito_cliente=?;";
     private String sql_select = "SELECT idcredito_cliente,fecha_emision,descripcion,estado,monto_contado,monto_credito,tabla_origen,fk_idgrupo_credito_cliente,fk_idsaldo_credito_cliente,fk_idrecibo_pago_cliente,fk_idventa_alquiler FROM credito_cliente order by 1 desc;";
     private String sql_cargar = "SELECT idcredito_cliente,fecha_emision,descripcion,estado,monto_contado,monto_credito,tabla_origen,fk_idgrupo_credito_cliente,fk_idsaldo_credito_cliente,fk_idrecibo_pago_cliente,fk_idventa_alquiler FROM credito_cliente WHERE idcredito_cliente=";
     private String sql_select_gcc = "select cc.idcredito_cliente as idc,\n"
-            + "to_char(cc.fecha_emision,'yyyy-MM-dd') as fecha,\n"
+            + "to_char(cc.fecha_emision,'yyyy-MM-dd HH24:MI') as fecha,\n"
+            + "case when vence=true then to_char(cc.fecha_vence,'yyyy-MM-dd') else 'NO VENCE' end as vence,"
             + "cc.descripcion,cc.estado,cc.tabla_origen,\n"
             + "TRIM(to_char(cc.monto_credito,'999G999G999')) as credito,\n"
             + "TRIM(to_char(cc.monto_contado,'999G999G999')) as contado\n"
@@ -33,7 +36,7 @@ public class DAO_credito_cliente {
             + " where  cc.estado!='ANULADO' and cc.fk_idgrupo_credito_cliente=";
         private String sql_anular = "UPDATE credito_cliente SET estado=? WHERE fk_idventa_alquiler=?;";
  
-    public void insertar_credito_cliente(Connection conn, credito_cliente crcl) {
+    public void insertar_credito_cliente1(Connection conn, credito_cliente crcl) {
         crcl.setC1idcredito_cliente(eveconn.getInt_ultimoID_mas_uno(conn, crcl.getTb_credito_cliente(), crcl.getId_idcredito_cliente()));
         String titulo = "insertar_credito_cliente";
         PreparedStatement pst = null;
@@ -50,6 +53,8 @@ public class DAO_credito_cliente {
             pst.setInt(9, crcl.getC9fk_idsaldo_credito_cliente());
             pst.setInt(10, crcl.getC10fk_idrecibo_pago_cliente());
             pst.setInt(11, crcl.getC11fk_idventa_alquiler());
+            pst.setBoolean(12, crcl.getC12vence());
+            pst.setTimestamp(13, evefec.getTimestamp_fecha_cargado(crcl.getC13fecha_vence()));
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + crcl.toString(), titulo);
@@ -123,7 +128,7 @@ public class DAO_credito_cliente {
     }
 
     public void ancho_tabla_credito_cliente_por_grupo(JTable tbltabla) {
-        int Ancho[] = {5, 10, 40, 10, 15, 10, 10};
+        int Ancho[] = {5, 12,10,27, 10, 15, 10, 10};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
     public void update_credito_cliente_anular(Connection conn, credito_cliente crcl) {

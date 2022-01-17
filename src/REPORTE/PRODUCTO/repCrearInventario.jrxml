@@ -333,7 +333,4 @@ and i.idinventario=13 order by 1 desc;]]>
 			</frame>
 		</band>
 	</pageFooter>
-	<summary>
-		<band splitType="Stretch"/>
-	</summary>
 </jasperReport>

@@ -160,6 +160,8 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         cfina.setC11fk_idventa_alquiler(0);
         cfina.setC10fk_idrecibo_pago_cliente(0);
         cfina.setC9fk_idsaldo_credito_cliente(idsaldo_credito_cliente);
+        cfina.setC12vence(false);
+        cfina.setC13fecha_vence(evefec.getString_formato_fecha_hora_zona());
     }
 
     private void boton_guardar_cliente() {
@@ -171,7 +173,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
             cargar_saldo_credito_cliente(idcliente);
             cargar_grupo_credito_cliente(idcliente);
             cargar_credito_cliente(idsaldo_credito_cliente, idgrupo_credito_cliente);
-            if (cBO.getBoolean_insertar_cliente_con_credito_inicio(clie, scfina, cfina, gcfina)) {
+            if (cBO.getBoolean_insertar_cliente_con_credito_inicio1(clie, scfina, cfina, gcfina)) {
                 reestableser_cliente();
                 gcfina_dao.actualizar_tabla_grupo_credito_cliente_idc(conn, tblgrupo_credito_cliente, idcliente);
                 cfina_dao.actualizar_tabla_credito_cliente_por_grupo(conn, tblcredito_cliente, idgrupo_credito_cliente);
@@ -187,7 +189,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
             cargar_saldo_credito_cliente(idcliente);
             cargar_grupo_credito_cliente(idcliente);
             cargar_credito_cliente(idsaldo_credito_cliente, idgrupo_credito_cliente);
-            if (cBO.getBoolean_insertar_credito_inicio(scfina, cfina, gcfina)) {
+            if (cBO.getBoolean_insertar_credito_inicio1(scfina, cfina, gcfina)) {
                 gcfina_dao.actualizar_tabla_grupo_credito_cliente_idc(conn, tblgrupo_credito_cliente, idcliente);
                 cfina_dao.actualizar_tabla_credito_cliente_por_grupo(conn, tblcredito_cliente, idgrupo_credito_cliente);
             }

@@ -36,6 +36,9 @@
 	<variable name="total_compra_1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
 		<variableExpression><![CDATA[$F{total_compra}]]></variableExpression>
 	</variable>
+	<variable name="total_compra_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_compra}]]></variableExpression>
+	</variable>
 	<group name="categoria">
 		<groupExpression><![CDATA[$F{categoria}]]></groupExpression>
 		<groupHeader>
@@ -289,6 +292,24 @@
 		</band>
 	</pageFooter>
 	<summary>
-		<band splitType="Stretch"/>
+		<band height="29" splitType="Stretch">
+			<line>
+				<reportElement x="1" y="4" width="554" height="1"/>
+			</line>
+			<textField pattern="#,##0">
+				<reportElement x="432" y="5" width="123" height="20"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_compra_2}]]></textFieldExpression>
+			</textField>
+		</band>
 	</summary>
 </jasperReport>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="9"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
@@ -37,6 +37,9 @@ order by iv.iditem_venta asc;]]>
 	<field name="monto" class="java.math.BigDecimal"/>
 	<field name="usuario" class="java.lang.String"/>
 	<variable name="monto_1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{monto}]]></variableExpression>
+	</variable>
+	<variable name="monto_2" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{monto}]]></variableExpression>
 	</variable>
 	<background>
@@ -308,6 +311,31 @@ order by iv.iditem_venta asc;]]>
 		</band>
 	</pageFooter>
 	<summary>
-		<band splitType="Stretch"/>
+		<band height="31" splitType="Stretch">
+			<line>
+				<reportElement x="1" y="3" width="554" height="1"/>
+			</line>
+			<textField pattern="#,##0">
+				<reportElement x="433" y="4" width="122" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{monto_2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="332" y="4" width="100" height="23"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL GRAL:]]></text>
+			</staticText>
+		</band>
 	</summary>
 </jasperReport>

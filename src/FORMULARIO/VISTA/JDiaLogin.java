@@ -118,7 +118,7 @@ public class JDiaLogin extends javax.swing.JDialog {
             this.dispose();
             if (bdao.getBoolean_backup_creado_hoy(conn)) {
                 
-//                evetbl.abrir_TablaJinternal(new FrmCrearBackup());
+                evetbl.abrir_TablaJinternal(new FrmCrearBackup());
             }
 //            primer_finanza();
             int idcaja_cierre = (eveconn.getInt_ultimoID_max(conn, cjcie.getTb_caja_cierre(), cjcie.getId_idcaja_cierre()));

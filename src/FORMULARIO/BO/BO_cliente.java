@@ -74,7 +74,7 @@ public class BO_cliente {
             }
         }
     }
-    public boolean getBoolean_insertar_cliente_con_credito_inicio(cliente cli,saldo_credito_cliente sccli,credito_cliente ccli,grupo_credito_cliente gcc) {
+    public boolean getBoolean_insertar_cliente_con_credito_inicio1(cliente cli,saldo_credito_cliente sccli,credito_cliente ccli,grupo_credito_cliente gcc) {
         String titulo = "insertar_cliente_con_credito_inicio";
         Connection conn = ConnPostgres.getConnPosgres();
         boolean insert=false;
@@ -85,7 +85,7 @@ public class BO_cliente {
             pidao.insertar_cliente(conn, cli);    
             sccli_dao.insertar_saldo_credito_cliente(conn, sccli);
             gcc_dao.insertar_grupo_credito_cliente(conn, gcc);
-            ccli_dao.insertar_credito_cliente(conn, ccli);
+            ccli_dao.insertar_credito_cliente1(conn, ccli);
             
             conn.commit();
             insert=true;
@@ -99,7 +99,7 @@ public class BO_cliente {
         }
         return insert;
     }
-    public boolean getBoolean_insertar_credito_inicio(saldo_credito_cliente sccli,credito_cliente ccli,grupo_credito_cliente gcc) {
+    public boolean getBoolean_insertar_credito_inicio1(saldo_credito_cliente sccli,credito_cliente ccli,grupo_credito_cliente gcc) {
         String titulo = "getBoolean_insertar_credito_inicio";
         Connection conn = ConnPostgres.getConnPosgres();
         boolean insert=false;
@@ -109,7 +109,7 @@ public class BO_cliente {
             }   
             sccli_dao.insertar_saldo_credito_cliente(conn, sccli);
             gcc_dao.insertar_grupo_credito_cliente(conn, gcc);
-            ccli_dao.insertar_credito_cliente(conn, ccli);
+            ccli_dao.insertar_credito_cliente1(conn, ccli);
             
             conn.commit();
             insert=true;
@@ -123,7 +123,7 @@ public class BO_cliente {
         }
         return insert;
     }
-     public boolean getBoolean_insertar_cliente_con_recibo_pago(cliente cli, credito_cliente ccli, credito_cliente ccli2,
+     public boolean getBoolean_insertar_cliente_con_recibo_pago1(cliente cli, credito_cliente ccli, credito_cliente ccli2,
             grupo_credito_cliente gcc, recibo_pago_cliente rpcli, saldo_credito_cliente sccli, caja_detalle_alquilado caja) {
         String titulo = "getBoolean_insertar_cliente_con_recibo_pago";
         Connection conn = ConnPostgres.getConnPosgres();
@@ -133,7 +133,7 @@ public class BO_cliente {
                 conn.setAutoCommit(false);
             }
             rpcli_dao.insertar_recibo_pago_cliente(conn, rpcli);
-            ccli_dao.insertar_credito_cliente(conn, ccli);
+            ccli_dao.insertar_credito_cliente1(conn, ccli);
             gcc_dao.cargar_grupo_credito_cliente_id(conn, gcc2, cli.getC1idcliente());
             gcc2.setC4estado(estado_CERRADO);
             gcc_dao.cerrar_grupo_credito_cliente(conn, gcc2);
@@ -145,7 +145,7 @@ public class BO_cliente {
             int idsaldo_credito_cliente = (eveconn.getInt_ultimoID_max(conn, sccli.getTb_saldo_credito_cliente(), sccli.getId_idsaldo_credito_cliente()));
             ccli2.setC8fk_idgrupo_credito_cliente(gcc3.getC1idgrupo_credito_cliente());
             ccli2.setC9fk_idsaldo_credito_cliente(idsaldo_credito_cliente);
-            ccli_dao.insertar_credito_cliente(conn, ccli2);
+            ccli_dao.insertar_credito_cliente1(conn, ccli2);
             pidao.update_cliente_saldo_credito(conn, cli);
             cdalq_dao.insertar_caja_detalle_alquilado(conn, caja);
 //            cdao.insertar_caja_detalle1(conn, caja);

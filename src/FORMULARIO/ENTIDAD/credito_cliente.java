@@ -1,6 +1,34 @@
 	package FORMULARIO.ENTIDAD;
 public class credito_cliente {
 
+    /**
+     * @return the C12vence
+     */
+    public boolean getC12vence() {
+        return C12vence;
+    }
+
+    /**
+     * @param C12vence the C12vence to set
+     */
+    public void setC12vence(boolean C12vence) {
+        this.C12vence = C12vence;
+    }
+
+    /**
+     * @return the C13fecha_vence
+     */
+    public String getC13fecha_vence() {
+        return C13fecha_vence;
+    }
+
+    /**
+     * @param C13fecha_vence the C13fecha_vence to set
+     */
+    public void setC13fecha_vence(String C13fecha_vence) {
+        this.C13fecha_vence = C13fecha_vence;
+    }
+
 //---------------DECLARAR VARIABLES---------------
 private int C1idcredito_cliente;
 private String C2fecha_emision;
@@ -13,6 +41,8 @@ private int C8fk_idgrupo_credito_cliente;
 private int C9fk_idsaldo_credito_cliente;
 private int C10fk_idrecibo_pago_cliente;
 private int C11fk_idventa_alquiler;
+private boolean C12vence;
+private String C13fecha_vence;
 private static String nom_tabla;
 private static String nom_idtabla;
 //---------------TABLA-ID---------------
