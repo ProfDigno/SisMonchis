@@ -849,7 +849,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
                 jLzona1KeyReleased(evt);
             }
         });
-        jLayeredPane2.add(jLzona1, new org.netbeans.lib.awtextra.AbsoluteConstraints(91, 40, 220, 100));
+        jLayeredPane2.add(jLzona1, new org.netbeans.lib.awtextra.AbsoluteConstraints(91, 40, 220, 70));
 
         jLabel28.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel28.setText("ZONA:");

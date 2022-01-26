@@ -140,7 +140,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         reestableser_venta();
         cargar_boton_categoria();
         crear_item_producto();
-        
+
     }
 
     void color_formulario() {
@@ -281,7 +281,12 @@ public class FrmVenta extends javax.swing.JInternalFrame {
             pdao.cargar_producto_por_idproducto(connLocal, prod, Iidproducto);
             String idproducto = String.valueOf(prod.getC1idproducto());
             String descripcion = prod.getC20_marca() + "-" + prod.getC18_unidad() + "-" + prod.getC3nombre();
-            int Iprecio_mino = (int) prod.getC4precio_venta_minorista();
+            int Iprecio_mostrar = 0;
+            if (jCver_promocion.isSelected()) {
+                Iprecio_mostrar = (int) prod.getC22precio_venta_promocion();
+            } else {
+                Iprecio_mostrar = (int) prod.getC4precio_venta_minorista();
+            }
             int Iprecio_mayo = (int) prod.getC5precio_venta_mayorista();
             int Icant_mayo = (int) prod.getC6cantidad_mayorista();
             String cantidad = txtcantidad_producto.getText();
@@ -294,11 +299,17 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                 Isubtotal = Icantidad * Iprecio_venta;
             } else {
                 if (Icantidad < Icant_mayo) {
-                    Isubtotal = Icantidad * Iprecio_mino;
-                    Sprecio_venta = String.valueOf(Iprecio_mino);
+                    Isubtotal = Icantidad * Iprecio_mostrar;
+                    Sprecio_venta = String.valueOf(Iprecio_mostrar);
                 } else {
-                    Isubtotal = Icantidad * Iprecio_mayo;
-                    Sprecio_venta = String.valueOf(Iprecio_mayo);
+                    
+                    if (jCver_promocion.isSelected()) {
+                        Sprecio_venta = String.valueOf(Iprecio_mostrar);
+                        Isubtotal = Icantidad * Iprecio_mostrar;
+                    } else {
+                        Sprecio_venta = String.valueOf(Iprecio_mayo);
+                        Isubtotal = Icantidad * Iprecio_mayo;
+                    }
                 }
             }
             String Ssubtotal = String.valueOf(Isubtotal);
@@ -317,14 +328,19 @@ public class FrmVenta extends javax.swing.JInternalFrame {
             int Icantidad = evejtf.getInt_sumar_restar_cantidad(evt, txtcantidad_producto, false, 0);
             if (Icantidad > 0) {
                 pdao.cargar_producto_por_idproducto(connLocal, prod, Iidproducto);
-                int Iprecio_mino = (int) prod.getC4precio_venta_minorista();
+                int Iprecio_mostrar = 0;
+                if (jCver_promocion.isSelected()) {
+                    Iprecio_mostrar = (int) prod.getC22precio_venta_promocion();
+                } else {
+                    Iprecio_mostrar = (int) prod.getC4precio_venta_minorista();
+                }
                 int Iprecio_mayo = (int) prod.getC5precio_venta_mayorista();
                 int Icant_mayo = (int) prod.getC6cantidad_mayorista();
                 int Isubtotal = 0;
                 String Sprecio_venta = "0";
                 if (Icantidad < Icant_mayo) {
-                    Isubtotal = Icantidad * Iprecio_mino;
-                    Sprecio_venta = String.valueOf(Iprecio_mino);
+                    Isubtotal = Icantidad * Iprecio_mostrar;
+                    Sprecio_venta = String.valueOf(Iprecio_mostrar);
                     color_campo_item_venta(Color.white);
                 } else {
                     Isubtotal = Icantidad * Iprecio_mayo;
@@ -533,10 +549,15 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                 filtro_producto = " and p.cod_barra='" + temp + "' ";
             }
         }
+        String precio_mostrar = "error";
+        if (jCver_promocion.isSelected()) {
+            precio_mostrar = "TRIM(to_char(p.precio_venta_promocion,'999G999G999')) as pv_promo";
+        } else {
+            precio_mostrar = "TRIM(to_char(p.precio_venta_minorista,'999G999G999')) as pv_mino";
+        }
         String sql = "select p.idproducto as idp,\n"
                 + "(pm.nombre||'-'||u.nombre||'-'||p.nombre) as marca_unid_nom,\n"
-                + "p.stock,"
-                + "TRIM(to_char(p.precio_venta_minorista,'999G999G999')) as pv_mino, \n"
+                + "p.stock," + precio_mostrar + ", \n"
                 + "p.cantidad_mayorista as mayor,"
                 + "TRIM(to_char(p.precio_venta_mayorista,'999G999G999')) as pv_mayo \n"
                 + "from producto p,producto_categoria c,producto_unidad u,producto_marca pm \n"
@@ -552,9 +573,14 @@ public class FrmVenta extends javax.swing.JInternalFrame {
 
     void pre_cargar_item_venta() {
         String Sprecio_venta = "0";
-        int Iprecio_mino = (int) prod.getC4precio_venta_minorista();
+        int Iprecio_mostrar = 0;
+        if (jCver_promocion.isSelected()) {
+            Iprecio_mostrar = (int) prod.getC22precio_venta_promocion();
+        } else {
+            Iprecio_mostrar = (int) prod.getC4precio_venta_minorista();
+        }
         int Istock = (int) prod.getC8stock();
-        Sprecio_venta = String.valueOf(Iprecio_mino);
+        Sprecio_venta = String.valueOf(Iprecio_mostrar);
         String Sstock = String.valueOf(Istock);
         txtbuscar_producto.setText(prod.getC20_marca() + "-" + prod.getC18_unidad() + "-" + prod.getC3nombre());
         txtcod_barra.setText(prod.getC2cod_barra());
@@ -774,9 +800,9 @@ public class FrmVenta extends javax.swing.JInternalFrame {
             cargar_datos_venta();
             cargar_datos_caja();
             if (hab_venta_combinado) {
-                    JDpago_combinado combi = new JDpago_combinado(null, true);
-                    combi.setVisible(true);
-                }
+                JDpago_combinado combi = new JDpago_combinado(null, true);
+                combi.setVisible(true);
+            }
             if (vBO.getBoolean_insertar_venta(connLocal, tblitem_producto, item, ven, caja)) {
                 if (hab_venta_combinado) {
                     if (jCimprimir_ticket.isSelected()) {
@@ -1188,6 +1214,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         txtstock = new javax.swing.JTextField();
         jLabel34 = new javax.swing.JLabel();
         lblmensaje = new javax.swing.JLabel();
+        txtidventa = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtobservacion = new javax.swing.JTextField();
         panel_insertar_pri_item = new javax.swing.JPanel();
@@ -1222,14 +1249,13 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         jLabel33 = new javax.swing.JLabel();
         btnconfirmar_venta_tarjeta = new javax.swing.JButton();
         txtredondeo = new javax.swing.JTextField();
-        jCimprimir_ticket = new javax.swing.JCheckBox();
         btnconfirmar_venta_combinar = new javax.swing.JButton();
         jCvuelto = new javax.swing.JCheckBox();
         panel_referencia_marca = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        txtidventa = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         panel_referencia_categoria = new javax.swing.JPanel();
+        jCimprimir_ticket = new javax.swing.JCheckBox();
+        jCver_promocion = new javax.swing.JCheckBox();
         panel_referencia_venta = new javax.swing.JPanel();
         panel_tabla_venta = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -1440,6 +1466,11 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         lblmensaje.setForeground(new java.awt.Color(255, 255, 0));
         lblmensaje.setText("jLabel35");
 
+        txtidventa.setBackground(new java.awt.Color(0, 0, 255));
+        txtidventa.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtidventa.setForeground(new java.awt.Color(255, 255, 0));
+        txtidventa.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
         javax.swing.GroupLayout panel_insertar_pri_productoLayout = new javax.swing.GroupLayout(panel_insertar_pri_producto);
         panel_insertar_pri_producto.setLayout(panel_insertar_pri_productoLayout);
         panel_insertar_pri_productoLayout.setHorizontalGroup(
@@ -1475,7 +1506,10 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                         .addGroup(panel_insertar_pri_productoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel34, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblmensaje, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panel_insertar_pri_productoLayout.createSequentialGroup()
+                                .addComponent(txtidventa, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblmensaje, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panel_insertar_pri_productoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtcantidad_producto, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1507,10 +1541,11 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                         .addComponent(txtcantidad_producto, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(232, 232, 232)
                         .addComponent(btnagregar_cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_insertar_pri_productoLayout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblmensaje)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_insertar_pri_productoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblmensaje)
+                    .addComponent(txtidventa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(28, 28, 28))
         );
 
@@ -1723,8 +1758,6 @@ public class FrmVenta extends javax.swing.JInternalFrame {
             }
         });
 
-        jCimprimir_ticket.setText("IMPRIMIR TICKET");
-
         btnconfirmar_venta_combinar.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnconfirmar_venta_combinar.setText("COMBINAR");
         btnconfirmar_venta_combinar.addActionListener(new java.awt.event.ActionListener() {
@@ -1799,16 +1832,13 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                             .addComponent(jLabel9)
                             .addComponent(jFtotal_dolar, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(panel_insertar_pri_itemLayout.createSequentialGroup()
-                        .addGroup(panel_insertar_pri_itemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCimprimir_ticket)
-                            .addGroup(panel_insertar_pri_itemLayout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnconfirmar_venta_efectivo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnconfirmar_venta_tarjeta)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnconfirmar_venta_combinar)))
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnconfirmar_venta_efectivo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnconfirmar_venta_tarjeta)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnconfirmar_venta_combinar)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -1861,9 +1891,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                     .addComponent(btnconfirmar_venta_efectivo, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnconfirmar_venta_combinar, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jCimprimir_ticket)
-                .addContainerGap())
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         jCvuelto.setText("VUELTO");
@@ -1872,18 +1900,19 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         panel_referencia_marca.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         panel_referencia_marca.setLayout(new java.awt.GridLayout(1, 0));
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel12.setText("IDVENTA:");
-
-        txtidventa.setBackground(new java.awt.Color(0, 0, 255));
-        txtidventa.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        txtidventa.setForeground(new java.awt.Color(255, 255, 0));
-        txtidventa.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-
         panel_referencia_categoria.setBackground(new java.awt.Color(102, 153, 255));
         panel_referencia_categoria.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         panel_referencia_categoria.setLayout(new java.awt.GridLayout(0, 1));
         jScrollPane3.setViewportView(panel_referencia_categoria);
+
+        jCimprimir_ticket.setText("IMPRIMIR TICKET");
+
+        jCver_promocion.setText("VER PRECIO PROMOCION");
+        jCver_promocion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCver_promocionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panel_base_1Layout = new javax.swing.GroupLayout(panel_base_1);
         panel_base_1.setLayout(panel_base_1Layout);
@@ -1894,17 +1923,17 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_base_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_base_1Layout.createSequentialGroup()
-                        .addGroup(panel_base_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panel_base_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(panel_base_1Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtobservacion, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtobservacion)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCver_promocion)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCimprimir_ticket)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jCvuelto)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel12)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtidventa, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jCvuelto))
                             .addComponent(jTab_producto_ingrediente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(panel_insertar_pri_item, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1930,11 +1959,11 @@ public class FrmVenta extends javax.swing.JInternalFrame {
                                     .addComponent(txtobservacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel2)
                                     .addComponent(jCvuelto)
-                                    .addComponent(jLabel12)
-                                    .addComponent(txtidventa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jCimprimir_ticket)
+                                    .addComponent(jCver_promocion)))
                             .addComponent(panel_insertar_pri_item, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(11, 15, Short.MAX_VALUE))
         );
 
         jTabbedPane_VENTA.addTab("CREAR VENTA", panel_base_1);
@@ -2783,7 +2812,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane_VENTA, javax.swing.GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
+            .addComponent(jTabbedPane_VENTA)
         );
 
         pack();
@@ -3272,6 +3301,11 @@ public class FrmVenta extends javax.swing.JInternalFrame {
         boton_venta_combinado();
     }//GEN-LAST:event_btnconfirmar_venta_combinarActionPerformed
 
+    private void jCver_promocionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCver_promocionActionPerformed
+        // TODO add your handling code here:
+        actualizar_tabla_producto(1);
+    }//GEN-LAST:event_jCver_promocionActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnagregar_cantidad;
@@ -3306,6 +3340,7 @@ public class FrmVenta extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox jCfecha_todos;
     private javax.swing.JCheckBox jCfuncionario;
     private javax.swing.JCheckBox jCimprimir_ticket;
+    private javax.swing.JCheckBox jCver_promocion;
     private javax.swing.JCheckBox jCvuelto;
     private javax.swing.JFormattedTextField jFtotal_dolar;
     private javax.swing.JFormattedTextField jFtotal_guarani;
@@ -3313,7 +3348,6 @@ public class FrmVenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;

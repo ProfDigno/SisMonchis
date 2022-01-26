@@ -129,7 +129,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private double monto_alquilado_tarjeta = 0;
     private double monto_alquilado_transferencia = 0;
     private double monto_alquilado_credito = 0;
-    private double monto_alquilado_reservado =0;
+    private double monto_alquilado_reservado = 0;
     private String forma_pago = "SIN FORMA";
     private String tabla_origen = "ALQUILER";
     private double valor_redondeo = 500;
@@ -151,7 +151,6 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private String hora_estandar = "12";
     private String estado_venta_alquiler;
     private String observacion_inicio = "NINGUNA";
-    
 
     private void abrir_formulario() {
         String servidor = "";
@@ -264,7 +263,12 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             pdao.cargar_producto_por_idproducto(connLocal, prod, Iidproducto);
             String idproducto = String.valueOf(prod.getC1idproducto());
             String descripcion = prod.getC20_marca() + "-" + prod.getC18_unidad() + "-" + prod.getC3nombre();
-            int Iprecio_mino = (int) prod.getC4precio_venta_minorista();
+            int Iprecio_mostrar = 0;
+            if (jCver_promocion.isSelected()) {
+                Iprecio_mostrar = (int) prod.getC22precio_venta_promocion();
+            } else {
+                Iprecio_mostrar = (int) prod.getC4precio_venta_minorista();
+            }
             int Iprecio_mayo = (int) prod.getC5precio_venta_mayorista();
             int Icant_mayo = (int) prod.getC6cantidad_mayorista();
             String cant_cobrado = txtcantidad_cobrado.getText();
@@ -281,13 +285,19 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                 Isubtotal_reserva = Icant_reserva * Iprecio_venta;
             } else {
                 if (Icant_cobrado < Icant_mayo) {
-                    Isubtotal_cobrado = Icant_cobrado * Iprecio_mino;
-                    Isubtotal_reserva = Icant_reserva * Iprecio_mino;
-                    Sprecio_venta = String.valueOf(Iprecio_mino);
+                    Isubtotal_cobrado = Icant_cobrado * Iprecio_mostrar;
+                    Isubtotal_reserva = Icant_reserva * Iprecio_mostrar;
+                    Sprecio_venta = String.valueOf(Iprecio_mostrar);
                 } else {
-                    Isubtotal_cobrado = Icant_cobrado * Iprecio_mayo;
-                    Isubtotal_reserva = Icant_reserva * Iprecio_mayo;
-                    Sprecio_venta = String.valueOf(Iprecio_mayo);
+                    if (jCver_promocion.isSelected()) {
+                        Isubtotal_cobrado = Icant_cobrado * Iprecio_mostrar;
+                        Isubtotal_reserva = Icant_reserva * Iprecio_mostrar;
+                        Sprecio_venta = String.valueOf(Iprecio_mostrar);
+                    } else {
+                        Isubtotal_cobrado = Icant_cobrado * Iprecio_mayo;
+                        Isubtotal_reserva = Icant_reserva * Iprecio_mayo;
+                        Sprecio_venta = String.valueOf(Iprecio_mayo);
+                    }
                 }
             }
             String Ssubtotal_cobrado = String.valueOf(Isubtotal_cobrado);
@@ -317,7 +327,12 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             }
             if (Icant_cobrado > 0) {
                 pdao.cargar_producto_por_idproducto(connLocal, prod, Iidproducto);
-                int Iprecio_mino = (int) prod.getC4precio_venta_minorista();
+                int Iprecio_mostrar = 0;
+                if (jCver_promocion.isSelected()) {
+                    Iprecio_mostrar = (int) prod.getC22precio_venta_promocion();
+                } else {
+                    Iprecio_mostrar = (int) prod.getC4precio_venta_minorista();
+                }
                 int Iprecio_mayo = (int) prod.getC5precio_venta_mayorista();
                 int Icant_mayo = (int) prod.getC6cantidad_mayorista();
                 int Isubtotal = 0;
@@ -330,8 +345,8 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                 }
                 String Sprecio_venta = "0";
                 if (Icant_cobrado < Icant_mayo) {
-                    Isubtotal = Icant_cobrado * Iprecio_mino;
-                    Sprecio_venta = String.valueOf(Iprecio_mino);
+                    Isubtotal = Icant_cobrado * Iprecio_mostrar;
+                    Sprecio_venta = String.valueOf(Iprecio_mostrar);
                     color_campo_item_venta(Color.white);
                 } else {
                     Isubtotal = Icant_cobrado * Iprecio_mayo;
@@ -550,10 +565,15 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                 filtro_producto = " and p.cod_barra='" + temp + "' ";
             }
         }
+        String precio_mostrar = "error";
+        if (jCver_promocion.isSelected()) {
+            precio_mostrar = "TRIM(to_char(p.precio_venta_promocion,'999G999G999')) as pv_promo";
+        } else {
+            precio_mostrar = "TRIM(to_char(p.precio_venta_minorista,'999G999G999')) as pv_mino";
+        }
         String sql = "select p.idproducto as idp,\n"
                 + "(pm.nombre||'-'||u.nombre||'-'||p.nombre) as marca_unid_nom,\n"
-                + "p.stock,"
-                + "TRIM(to_char(p.precio_venta_minorista,'999G999G999')) as pv_mino, \n"
+                + "p.stock," + precio_mostrar + ", \n"
                 + "p.cantidad_mayorista as mayor,"
                 + "TRIM(to_char(p.precio_venta_mayorista,'999G999G999')) as pv_mayo \n"
                 + "from producto p,producto_categoria c,producto_unidad u,producto_marca pm \n"
@@ -570,7 +590,12 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
 
     void pre_cargar_item_venta() {
         String Sprecio_venta = "0";
-        int Iprecio_mino = (int) prod.getC4precio_venta_minorista();
+        int Iprecio_mino = 0;
+        if (jCver_promocion.isSelected()) {
+            Iprecio_mino = (int) prod.getC22precio_venta_promocion();
+        } else {
+            Iprecio_mino = (int) prod.getC4precio_venta_minorista();
+        }
         int Istock = (int) prod.getC8stock();
         Sprecio_venta = String.valueOf(Iprecio_mino);
         String Sstock = String.valueOf(Istock);
@@ -919,12 +944,12 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         return suma_descripcion;
     }
 
-    private void cargar_credito_cliente(boolean escredito,boolean espagoparcial) {
+    private void cargar_credito_cliente(boolean escredito, boolean espagoparcial) {
         if (escredito || espagoparcial) {
             double monto_credito = 0;
-            if(espagoparcial){
-                monto_credito =  monto_alquilado_credito;
-            }else{
+            if (espagoparcial) {
+                monto_credito = monto_alquilado_credito;
+            } else {
                 monto_credito = monto_alquilado_efectivo + monto_alquilado_tarjeta + monto_alquilado_transferencia + monto_alquilado_credito;
             }
             gccDAO.cargar_grupo_credito_cliente_id(connLocal, gcc, fk_idcliente_local);
@@ -938,7 +963,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             cclie.setC10fk_idrecibo_pago_cliente(0);
             cclie.setC11fk_idventa_alquiler(idventa_alquiler_ultimo);
             cclie.setC12vence(true);
-            cclie.setC13fecha_vence(txtfec_vence_credito.getText()+" 12:00:00.00");
+            cclie.setC13fecha_vence(txtfec_vence_credito.getText() + " 12:00:00.00");
             clie.setC1idcliente(fk_idcliente_local);
         }
     }
@@ -1093,12 +1118,12 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
             boolean espagoparcial = jRcond_pagoparcial.isSelected();
             cargar_dato_alquiler();
             cargar_dato_caja_alquilado();
-            cargar_credito_cliente(escredito,espagoparcial);
+            cargar_credito_cliente(escredito, espagoparcial);
             if (hab_venta_combinado) {
                 JDpago_combinado combi = new JDpago_combinado(null, true);
                 combi.setVisible(true);
             }
-            if (vBO.getBoolean_insertar_venta_alquiler1(ven_alq, cdalq, cclie, clie, escredito,espagoparcial, tblitem_producto)) {
+            if (vBO.getBoolean_insertar_venta_alquiler1(ven_alq, cdalq, cclie, clie, escredito, espagoparcial, tblitem_producto)) {
                 if (hab_venta_combinado) {
                     if (jCimprimir_ticket.isSelected()) {
                         posv.boton_imprimir_pos_VENTA(connLocal, idventa_alquiler_ultimo);
@@ -1397,6 +1422,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         jCvuelto = new javax.swing.JCheckBox();
         jLabel34 = new javax.swing.JLabel();
         jLabel35 = new javax.swing.JLabel();
+        jCver_promocion = new javax.swing.JCheckBox();
         panel_referencia_venta = new javax.swing.JPanel();
         panel_tabla_venta = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -2316,6 +2342,13 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         jLabel35.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel35.setText("MARCA:");
 
+        jCver_promocion.setText("VER PRECIO PROMOCION");
+        jCver_promocion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCver_promocionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panel_base_1Layout = new javax.swing.GroupLayout(panel_base_1);
         panel_base_1.setLayout(panel_base_1Layout);
         panel_base_1Layout.setHorizontalGroup(
@@ -2325,7 +2358,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_base_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_base_1Layout.createSequentialGroup()
-                        .addGroup(panel_base_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panel_base_1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jTab_producto_ingrediente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(panel_base_1Layout.createSequentialGroup()
                                 .addComponent(jPanel_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2339,8 +2372,10 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                             .addGroup(panel_base_1Layout.createSequentialGroup()
                                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtobservacion, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtobservacion)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCver_promocion)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jCimprimir_ticket)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jCvuelto)))
@@ -2388,9 +2423,10 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                                     .addComponent(txtobservacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel2)
                                     .addComponent(jCimprimir_ticket)
-                                    .addComponent(jCvuelto)))
+                                    .addComponent(jCvuelto)
+                                    .addComponent(jCver_promocion)))
                             .addComponent(panel_insertar_pri_item, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane_VENTA.addTab("CREAR VENTA", panel_base_1);
@@ -2709,7 +2745,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnalquiler_todos))))
                     .addComponent(btnestado_cobrar_reservado, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane_VENTA.addTab("FILTRO VENTA", panel_referencia_venta);
@@ -2883,7 +2919,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane_VENTA)
+            .addComponent(jTabbedPane_VENTA, javax.swing.GroupLayout.DEFAULT_SIZE, 651, Short.MAX_VALUE)
         );
 
         pack();
@@ -3407,6 +3443,11 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtfec_vence_creditoKeyPressed
 
+    private void jCver_promocionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCver_promocionActionPerformed
+        // TODO add your handling code here:
+        actualizar_tabla_producto(1);
+    }//GEN-LAST:event_jCver_promocionActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnagregar_cantidad;
@@ -3440,6 +3481,7 @@ public class FrmVenta_alquiler extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox jCestado_usoreserva;
     private javax.swing.JCheckBox jCfuncionario;
     private javax.swing.JCheckBox jCimprimir_ticket;
+    private javax.swing.JCheckBox jCver_promocion;
     private javax.swing.JCheckBox jCvuelto;
     private javax.swing.JFormattedTextField jFsaldo_credito;
     public static javax.swing.JFormattedTextField jFtotal_pagado;

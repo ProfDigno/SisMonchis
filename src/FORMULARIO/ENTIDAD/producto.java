@@ -66,6 +66,8 @@ private String C18_unidad;
 private String C19_categoria;
 private String C20_marca;
 private int C21_aux_cantidad;
+private double C22precio_venta_promocion;
+private double C23stock_fijo;
 private static String nom_tabla;
 private static String nom_idtabla;
 //---------------TABLA-ID---------------
@@ -188,6 +190,23 @@ private static String nom_idtabla;
 	public void setC17fk_idproducto_marca(int C17fk_idproducto_marca){
 		this.C17fk_idproducto_marca = C17fk_idproducto_marca;
 	}
+
+    public double getC22precio_venta_promocion() {
+        return C22precio_venta_promocion;
+    }
+
+    public void setC22precio_venta_promocion(double C22precio_venta_promocion) {
+        this.C22precio_venta_promocion = C22precio_venta_promocion;
+    }
+
+    public double getC23stock_fijo() {
+        return C23stock_fijo;
+    }
+
+    public void setC23stock_fijo(double C23stock_fijo) {
+        this.C23stock_fijo = C23stock_fijo;
+    }
+        
 	public String toString() {
 		return "producto(" + ",idproducto=" + C1idproducto + " ,cod_barra=" + C2cod_barra + " ,nombre=" + C3nombre + " ,precio_venta_minorista=" + C4precio_venta_minorista + " ,precio_venta_mayorista=" + C5precio_venta_mayorista + " ,cantidad_mayorista=" + C6cantidad_mayorista + " ,precio_compra=" + C7precio_compra + " ,stock=" + C8stock + " ,stock_min=" + C9stock_min + " ,activar=" + C10activar + " ,venta_mayorista=" + C11venta_mayorista + " ,promocion=" + C12promocion + " ,ult_venta=" + C13ult_venta + " ,ult_compra=" + C14ult_compra + " ,fk_idproducto_unidad=" + C15fk_idproducto_unidad + " ,fk_idproducto_categoria=" + C16fk_idproducto_categoria + " ,fk_idproducto_marca=" + C17fk_idproducto_marca + " )";
 	}

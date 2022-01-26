@@ -22,11 +22,15 @@ public class DAO_producto {
     EvenFecha evefec = new EvenFecha();
     private String mensaje_insert = "PRODUCTO GUARDADO CORRECTAMENTE";
     private String mensaje_update = "PRODUCTO MODIFICADO CORECTAMENTE";
-    private String sql_insert = "INSERT INTO producto(idproducto,cod_barra,nombre,precio_venta_minorista,precio_venta_mayorista,cantidad_mayorista,precio_compra,stock,stock_min,activar,venta_mayorista,promocion,ult_venta,ult_compra,fk_idproducto_unidad,fk_idproducto_categoria,fk_idproducto_marca,alquilado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+    private String sql_insert = "INSERT INTO producto(idproducto,cod_barra,nombre,precio_venta_minorista,precio_venta_mayorista,"
+            + "cantidad_mayorista,precio_compra,stock,stock_min,"
+            + "activar,venta_mayorista,promocion,ult_venta,ult_compra,"
+            + "fk_idproducto_unidad,fk_idproducto_categoria,fk_idproducto_marca,alquilado,precio_venta_promocion,stock_fijo) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     private String sql_update = "UPDATE producto SET cod_barra=?,nombre=?,precio_venta_minorista=?,precio_venta_mayorista=?,"
             + "cantidad_mayorista=?,precio_compra=?,stock=?,stock_min=?,"
             + "activar=?,venta_mayorista=?,promocion=?,ult_venta=?,ult_compra=?,"
-            + "fk_idproducto_unidad=?,fk_idproducto_categoria=?,fk_idproducto_marca=?,alquilado=? "
+            + "fk_idproducto_unidad=?,fk_idproducto_categoria=?,fk_idproducto_marca=?,alquilado=?,precio_venta_promocion=?,stock_fijo=? "
             + "WHERE idproducto=?;";
     private String sql_select = "SELECT p.idproducto as idp,p.cod_barra,pc.nombre as categoria,\n"
             + "(pm.nombre||'-'||pu.nombre||'-'||p.nombre) as marca_unid_nombre,\n"
@@ -40,7 +44,8 @@ public class DAO_producto {
     private String sql_cargar = "SELECT p.idproducto,p.cod_barra,p.nombre,p.precio_venta_minorista,p.precio_venta_mayorista,p.cantidad_mayorista,p.precio_compra,\n"
             + "p.stock,p.stock_min,p.activar,p.venta_mayorista,p.promocion,\n"
             + "p.ult_venta,p.ult_compra,p.fk_idproducto_unidad,p.fk_idproducto_categoria,p.fk_idproducto_marca,\n"
-            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca,p.alquilado \n"
+            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca,p.alquilado,\n"
+            + "p.precio_venta_promocion,p.stock_fijo \n"
             + "FROM producto p,producto_unidad pu,producto_categoria pc, producto_marca pm \n"
             + "where p.fk_idproducto_unidad=pu.idproducto_unidad\n"
             + "and p.fk_idproducto_categoria=pc.idproducto_categoria\n"
@@ -58,7 +63,8 @@ public class DAO_producto {
     private String sql_cargar_codbarra = "SELECT p.idproducto,p.cod_barra,p.nombre,p.precio_venta_minorista,p.precio_venta_mayorista,p.cantidad_mayorista,p.precio_compra,\n"
             + "p.stock,p.stock_min,p.activar,p.venta_mayorista,p.promocion,\n"
             + "p.ult_venta,p.ult_compra,p.fk_idproducto_unidad,p.fk_idproducto_categoria,p.fk_idproducto_marca,\n"
-            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca,p.alquilado \n"
+            + "pu.nombre as unidad,pc.nombre as categoria,pm.nombre as marca,p.alquilado,\n"
+            + "p.precio_venta_promocion,p.stock_fijo \n"
             + "FROM producto p,producto_unidad pu,producto_categoria pc, producto_marca pm \n"
             + "where p.fk_idproducto_unidad=pu.idproducto_unidad\n"
             + "and p.fk_idproducto_categoria=pc.idproducto_categoria\n"
@@ -90,6 +96,22 @@ public class DAO_producto {
             + "from item_venta_alquiler \n"
             + "where producto.idproducto=item_venta_alquiler.fk_idproducto\n"
             + "and item_venta_alquiler.fk_idventa_alquiler=";
+    private String sql_select_filtro = "SELECT p.idproducto as idp,p.cod_barra,pc.nombre as categoria,\n"
+            + "(pm.nombre||'-'||pu.nombre||'-'||p.nombre) as marca_unid_nombre,\n"
+            + "TRIM(to_char(p.precio_venta_minorista,'999G999G999')) as pventa,\n"
+            + "TRIM(to_char(p.precio_venta_promocion ,'999G999G999')) as ppromo,\n"
+            + "TRIM(to_char(p.precio_compra,'999G999G999')) as pcompra,\n"
+            + "p.stock_fijo, \n"
+            + "p.stock,\n"
+            + "case when p.promocion=true then 'SI' else 'NO' end as pro,\n"
+            + "case when p.alquilado=true then 'SI' else 'NO' end as alqui,\n"
+            + "case when p.activar=true then 'SI' else 'NO' end as activo\n"
+            + "FROM producto p,producto_unidad pu,producto_categoria pc, producto_marca pm \n"
+            + "where p.fk_idproducto_unidad=pu.idproducto_unidad\n"
+            + "and p.fk_idproducto_categoria=pc.idproducto_categoria\n"
+            + "and p.fk_idproducto_marca=pm.idproducto_marca\n"
+            + "order by 1 desc;";
+
     public void insertar_producto(Connection conn, producto pro) {
         pro.setC1idproducto(eveconn.getInt_ultimoID_mas_uno(conn, pro.getTb_producto(), pro.getId_idproducto()));
         String titulo = "insertar_producto";
@@ -114,6 +136,8 @@ public class DAO_producto {
             pst.setInt(16, pro.getC16fk_idproducto_categoria());
             pst.setInt(17, pro.getC17fk_idproducto_marca());
             pst.setBoolean(18, pro.getC18alquilado());
+            pst.setDouble(19, pro.getC22precio_venta_promocion());
+            pst.setDouble(20, pro.getC23stock_fijo());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_insert + "\n" + pro.toString(), titulo);
@@ -145,7 +169,9 @@ public class DAO_producto {
             pst.setInt(15, pro.getC16fk_idproducto_categoria());
             pst.setInt(16, pro.getC17fk_idproducto_marca());
             pst.setBoolean(17, pro.getC18alquilado());
-            pst.setInt(18, pro.getC1idproducto());
+            pst.setDouble(18, pro.getC22precio_venta_promocion());
+            pst.setDouble(19, pro.getC23stock_fijo());
+            pst.setInt(20, pro.getC1idproducto());
             pst.execute();
             pst.close();
             evemen.Imprimir_serial_sql(sql_update + "\n" + pro.toString(), titulo);
@@ -181,6 +207,8 @@ public class DAO_producto {
                 pro.setC19_categoria(rs.getString(19));
                 pro.setC20_marca(rs.getString(20));
                 pro.setC18alquilado(rs.getBoolean(21));
+                pro.setC22precio_venta_promocion(rs.getDouble(22));
+                pro.setC23stock_fijo(rs.getDouble(23));
                 evemen.Imprimir_serial_sql(sql_cargar + "\n" + pro.toString(), titulo);
             }
         } catch (Exception e) {
@@ -215,6 +243,8 @@ public class DAO_producto {
                 pro.setC19_categoria(rs.getString(19));
                 pro.setC20_marca(rs.getString(20));
                 pro.setC18alquilado(rs.getBoolean(21));
+                pro.setC22precio_venta_promocion(rs.getDouble(22));
+                pro.setC23stock_fijo(rs.getDouble(23));
                 encontado = true;
                 evemen.Imprimir_serial_sql(sql_cargar + "\n" + pro.toString(), titulo);
             }
@@ -231,6 +261,16 @@ public class DAO_producto {
 
     public void ancho_tabla_producto(JTable tbltabla) {
         int Ancho[] = {8, 18, 13, 35, 10, 7, 10};
+        evejt.setAnchoColumnaJtable(tbltabla, Ancho);
+    }
+
+    public void actualizar_tabla_producto_filtro(Connection conn, JTable tbltabla) {
+        eveconn.Select_cargar_jtable(conn, sql_select_filtro, tbltabla);
+        ancho_tabla_producto_filtro(tbltabla);
+    }
+
+    public void ancho_tabla_producto_filtro(JTable tbltabla) {
+        int Ancho[] = {5, 11, 10, 30, 8,8,8, 6, 6,4,4,4};
         evejt.setAnchoColumnaJtable(tbltabla, Ancho);
     }
 
@@ -253,7 +293,8 @@ public class DAO_producto {
         }
         String sql = "SELECT p.idproducto,p.cod_barra,pc.nombre as categoria,\n"
                 + "(pm.nombre||'-'||pu.nombre||'-'||p.nombre) as marca_unid_nombre,\n"
-                + "TRIM(to_char(p.precio_venta_minorista,'999G999G999')) as pventa,p.stock\n"
+                + "TRIM(to_char(p.precio_venta_minorista,'999G999G999')) as pventa,p.stock,\n"
+                 + "TRIM(to_char(p.precio_compra,'999G999G999')) as pcompra "
                 + "FROM producto p,producto_unidad pu,producto_categoria pc, producto_marca pm \n"
                 + "where p.fk_idproducto_unidad=pu.idproducto_unidad\n"
                 + "and p.fk_idproducto_categoria=pc.idproducto_categoria\n"
@@ -429,32 +470,35 @@ public class DAO_producto {
         }
         return total;
     }
-    public void update_producto_stock_Alquilado(Connection conn,venta_alquiler vealq) {
+
+    public void update_producto_stock_Alquilado(Connection conn, venta_alquiler vealq) {
         String titulo = "update_producto_stock_Alquilado";
         PreparedStatement pst = null;
-        String sql=sql_stock_alquilado+vealq.getC1idventa_alquiler();
+        String sql = sql_stock_alquilado + vealq.getC1idventa_alquiler();
         try {
             pst = conn.prepareStatement(sql);
             pst.executeUpdate();
-            pst.close();
-            evemen.Imprimir_serial_sql(sql , titulo);
+//            pst.close();
+            evemen.Imprimir_serial_sql(sql, titulo);
         } catch (Exception e) {
-            evemen.mensaje_error(e, sql , titulo);
+            evemen.mensaje_error(e, sql, titulo);
         }
     }
-    public void update_producto_stock_Devolucion(Connection conn,venta_alquiler vealq) {
+
+    public void update_producto_stock_Devolucion(Connection conn, venta_alquiler vealq) {
         String titulo = "update_producto_stock_Devolucion";
         PreparedStatement pst = null;
-        String sql=sql_stock_devolucion+vealq.getC1idventa_alquiler();
+        String sql = sql_stock_devolucion + vealq.getC1idventa_alquiler();
         try {
             pst = conn.prepareStatement(sql);
             pst.executeUpdate();
-            pst.close();
-            evemen.Imprimir_serial_sql(sql , titulo);
+//            pst.close();
+            evemen.Imprimir_serial_sql(sql, titulo);
         } catch (Exception e) {
-            evemen.mensaje_error(e, sql , titulo);
+            evemen.mensaje_error(e, sql, titulo);
         }
     }
+
     public void actualizar_tabla_producto_stock_minimo(Connection conn, JTable tbltabla) {
         eveconn.Select_cargar_jtable(conn, sql_stock_minimo, tbltabla);
         ancho_tabla_producto_stock_minimo(tbltabla);

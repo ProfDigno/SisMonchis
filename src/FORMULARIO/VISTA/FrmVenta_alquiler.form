@@ -41,7 +41,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jTabbedPane_VENTA" alignment="0" max="32767" attributes="0"/>
+          <Component id="jTabbedPane_VENTA" alignment="0" pref="651" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -67,7 +67,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="jTab_producto_ingrediente" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="jPanel_fecha" min="-2" max="-2" attributes="0"/>
@@ -84,8 +84,10 @@
                                   <Group type="102" attributes="0">
                                       <Component id="jLabel2" min="-2" pref="31" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtobservacion" min="-2" pref="370" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="txtobservacion" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="jCver_promocion" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jCimprimir_ticket" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jCvuelto" min="-2" max="-2" attributes="0"/>
@@ -148,13 +150,14 @@
                                           <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="jCimprimir_ticket" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="jCvuelto" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jCver_promocion" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <Component id="panel_insertar_pri_item" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace pref="27" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -203,7 +206,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
@@ -1536,6 +1539,14 @@
                 <Property name="text" type="java.lang.String" value="MARCA:"/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JCheckBox" name="jCver_promocion">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="VER PRECIO PROMOCION"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCver_promocionActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="panel_referencia_venta">
@@ -1636,7 +1647,7 @@
                           </Group>
                           <Component id="btnestado_cobrar_reservado" min="-2" pref="33" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="28" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
