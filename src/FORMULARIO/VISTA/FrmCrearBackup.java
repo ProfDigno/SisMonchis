@@ -35,6 +35,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
     private boolean estadoTiempo;
     private Timer tiempo;
     private int contartiempo;
+     private int max_contartiempo=20;
     EvenJFRAME evetbl = new EvenJFRAME();
     EvenFecha evefec = new EvenFecha();
     backup bac = new backup();
@@ -43,6 +44,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
     EvenJTextField evejtf = new EvenJTextField();
     Connection conn = ConnPostgres.getConnPosgres();
     private static String fecha;
+    private static String nombre_backup="bdmonchis_";
     boolean hab_realizar_backup = true;
     private static boolean sin_error_backup = true;
 
@@ -63,7 +65,8 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
         comandos.add(bac.getB4direc_backup() + fecha);   // eu utilizei meu C:\ e D:\ para os testes e gravei o backup com sucesso.  
         comandos.add(bac.getB5basedato());
         ProcessBuilder pb = new ProcessBuilder(comandos);
-        pb.environment().put("PGPASSWORD", bac.getB9senha());      //Somente coloque sua senha         
+        pb.environment().put("PGPASSWORD", bac.getB9senha());      //Somente coloque sua senha    
+        informebackup = informebackup + "ARCHIVO:"+fecha+"\n";
         try {
             final Process process = pb.start();
             final BufferedReader r = new BufferedReader(
@@ -80,6 +83,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
             process.destroy();
         } catch (IOException e) {
             e.printStackTrace();
+//            cargar_textArea(txtenviobackup, e);
             informebackup = informebackup + comandos + e + "\r\n";
             sin_error_backup = false;
         } catch (InterruptedException ie) {
@@ -100,12 +104,14 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
         this.setTitle("BACKUP");
         evetbl.centrar_formulario_internalframa(this);
         fecha = evefec.getString_formato_fecha();
-        fecha = fecha + ".backup";
+        nombre_backup = nombre_backup + fecha;
+        nombre_backup = nombre_backup + ".backup";
         iniciarTiempo();
     }
 
     void iniciarTiempo() {
         estadoTiempo = true;
+        progreso_tiempo.setMaximum(max_contartiempo);
         tiempo = new Timer();
         //le asignamos una tarea al timer
         tiempo.schedule(new FrmCrearBackup.clasetimer(), 0, 1000 * 1);
@@ -164,12 +170,13 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
 //                        bBO.update_backup_creado_hoy();
                     }
                 }
-                if (contartiempo == 20) {
+                if (contartiempo == max_contartiempo) {
                     cerrar_formulario();
                     pararTiempos();
                     bBO.update_backup_creado_hoy();
                 }
-                if (contartiempo == 25) {
+                if (contartiempo >= 25) {
+                    progreso_tiempo.setValue(contartiempo);
                     cerrar_formulario();
                     pararTiempos();
                 }
@@ -182,6 +189,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
                     pararTiempos();
                 }
             }
+            progreso_tiempo.setValue(contartiempo);
         }
     }
 
@@ -205,6 +213,7 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         txtenviobackup = new javax.swing.JTextArea();
+        progreso_tiempo = new javax.swing.JProgressBar();
 
         setClosable(true);
         setTitle("CREAR BACKUP");
@@ -219,7 +228,9 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
+                    .addComponent(progreso_tiempo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -227,13 +238,16 @@ public class FrmCrearBackup extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(progreso_tiempo, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JProgressBar progreso_tiempo;
     private javax.swing.JTextArea txtenviobackup;
     // End of variables declaration//GEN-END:variables
 }
